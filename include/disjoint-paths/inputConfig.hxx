@@ -294,7 +294,6 @@ inline ConfigDisjoint<T>::ConfigDisjoint(std::string fileName,char delim){
 			throw std::system_error(errno, std::system_category(), "failed to open "+fileName);
 		}
 
-		std::cout<<"call further"<<std::endl;
 
 	std::string line;
 	std::vector<std::string> strings;

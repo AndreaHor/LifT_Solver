@@ -39,27 +39,44 @@ namespace disjointPaths {
 
 template<class T=size_t>
 std::vector<std::vector<T>> readLines(std::string inputFileName, char delim) {
-	std::ifstream inputFile(inputFileName);
-
+	std::ifstream inputFile;
 	std::vector<std::vector<T>> outputs;
-	std::string line;
-	size_t lineCounter=0;
-	std::getline(inputFile, line);
-	std::vector<std::string> strings;
+	try{
 
-	while (std::getline(inputFile, line) && !line.empty()) {
-		strings=split(line,delim);
-		size_t length=strings.size();
-		std::vector<T> parsedLine(length);
-		for (int i = 0; i < length; ++i) {
-			parsedLine[i]=std::stoul(strings[i]);
+		inputFile.open(inputFileName);
+		if (!inputFile){
+			throw std::system_error(errno, std::system_category(), "failed to open "+inputFileName);
 		}
-		outputs.push_back(parsedLine);
+
+
+
+		std::string line;
+		size_t lineCounter=0;
+		std::getline(inputFile, line);
+		std::vector<std::string> strings;
+
+		while (std::getline(inputFile, line) && !line.empty()) {
+			strings=split(line,delim);
+			size_t length=strings.size();
+			std::vector<T> parsedLine(length);
+			for (int i = 0; i < length; ++i) {
+				parsedLine[i]=std::stoul(strings[i]);
+			}
+			outputs.push_back(parsedLine);
+
+		}
+
+		inputFile.close();
+
 
 	}
 
-	inputFile.close();
+	catch (std::system_error& er) {
+		std::clog << er.what() << " (" << er.code() << ")" << std::endl;
+
+	}
 	return outputs;
+
 
 }
 
@@ -3318,6 +3335,8 @@ inline void Data<T>::outputSolution(std::vector<std::vector<size_t>>& paths,bool
 	std::cout<<"file closed "<<std::endl;
 	parameters.infoFile()<<"file closed "<<std::endl;
 	parameters.infoFile().flush();
+
+
 
 
 }
