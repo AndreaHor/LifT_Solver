@@ -101,15 +101,22 @@ try
 
 	//disjointPaths::ConfigDisjoint<> config("/home/fuksova/codes/higher-order-disjoint-paths/matlab/Tracking/runtime_configuration/paramsBigger.ini");
 
+
 	auto parameters = parseCommandLine(argc, argv);
 	disjointPaths::ConfigDisjoint<size_t> configDisjoint(parameters.configFile);
-	if(configDisjoint.getSmallIntervals()==0&&configDisjoint.getMaxTimeLifted()>0){
-		disjointPaths::DisjointStructure<> disjointP(configDisjoint);
-		disjointPaths::solver_ilp<size_t>(disjointP);
+	if(configDisjoint.isParametersSet()){
+		if(configDisjoint.getSmallIntervals()==0&&configDisjoint.getMaxTimeLifted()>0){
+			disjointPaths::DisjointStructure<> disjointP(configDisjoint);
+			disjointPaths::solver_ilp<size_t>(disjointP);
+		}
+		else{
+			disjointPaths::solver_ilp<size_t>(configDisjoint);
+		}
 	}
 	else{
-		disjointPaths::solver_ilp<size_t>(configDisjoint);
+		std::cout<<"Problem with parameter settings. No computation done."<<std::endl;
 	}
+
 
 //	auto parameters = parseCommandLine(argc, argv);
 //	if(parameters.timeFileName.empty()){

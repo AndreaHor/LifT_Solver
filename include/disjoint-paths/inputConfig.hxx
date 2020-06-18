@@ -47,8 +47,10 @@ public:
 	~ConfigDisjoint(){
 		std::cout<<"config disjoint destructor"<<std::endl;
 		infoFile()<<"config disjoint destructor"<<std::endl;
-		(*pInfoFile).close();
-		delete pInfoFile;
+		if(pInfoFile!=0){
+			(*pInfoFile).close();
+			delete pInfoFile;
+		}
 	}
 
 
@@ -215,6 +217,10 @@ public:
 		return taskType;
 	}
 
+	bool isParametersSet() const {
+		return parametersSet;
+	}
+
 	//ConfigDisjoint<>& operator=(const ConfigDisjoint<>&);
 
 
@@ -270,6 +276,7 @@ private:
 	char taskType;
 	std::string intervalFile;
 
+	bool parametersSet;
 
 
 	bool repulsive;
@@ -278,8 +285,17 @@ private:
 
 template<class T>
 inline ConfigDisjoint<T>::ConfigDisjoint(std::string fileName,char delim){
+	parametersSet=false;
+	std::ifstream data;
+	//data.exceptions( std::ifstream::failbit | std::ifstream::badbit );
+	try{
+		data.open(fileName);
+		if (!data){
+			throw std::system_error(errno, std::system_category(), "failed to open "+fileName);
+		}
 
- 	std::ifstream data(fileName);
+		std::cout<<"call further"<<std::endl;
+
 	std::string line;
 	std::vector<std::string> strings;
 	std::map<std::string,std::string> parameters;
@@ -722,6 +738,14 @@ inline ConfigDisjoint<T>::ConfigDisjoint(std::string fileName,char delim){
 
 
 	paramsFile.close();
+	parametersSet=true;
+		//}
+
+	}
+
+	catch (std::system_error& er) {
+		std::clog << er.what() << " (" << er.code() << ")" << std::endl;
+	}
 
 
 
