@@ -1,0 +1,3 @@
+[submodule "external/andres-graph"]
+	path = external/andres-graph
+	url = https://github.com/bjoern-andres/graph.git
