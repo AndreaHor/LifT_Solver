@@ -1,3 +1,6 @@
 [submodule "external/andres-graph"]
 	path = external/andres-graph
 	url = https://github.com/bjoern-andres/graph.git
+[submodule "external/TCLAP"]
+	path = external/TCLAP
+	url = https://github.com/mirror/tclap.git
