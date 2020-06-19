@@ -123,7 +123,7 @@ public:
 		try{
 			timeData.open(parameters.getTimeFileName());
 			if(!timeData){
-				throw std::system_error(errno, std::system_category(), "failed to open "+timeData);
+				throw std::system_error(errno, std::system_category(), "failed to open "+parameters.getTimeFileName());
 			}
 
 			size_t lineCounter=0;
@@ -534,7 +534,7 @@ public:
 		try{
 			data.open(configParameters.getGraphFileName());
 			if(!data){
-				throw std::system_error(errno, std::system_category(), "failed to open "+data);
+				throw std::system_error(errno, std::system_category(), "failed to open "+configParameters.getGraphFileName());
 			}
 
 			std::getline(data, line);
@@ -767,7 +767,7 @@ parameters(configParameters)
 		try{
 			graphFile.open(parameters.getGraphFileName());
 			if(!graphFile){
-				throw std::system_error(errno, std::system_category(), "failed to open "+graphFile);
+				throw std::system_error(errno, std::system_category(), "failed to open "+parameters.getGraphFileName());
 			}
 			readGraph(graphFile,maxVertex,delim);
 			if(!parameters.isAutomaticLifted()){
@@ -2112,7 +2112,7 @@ inline void Data<T>::readCompleteGraph(){
 			data.open(parameters.getGraphFileName());
 			if(!data){
 
-				throw std::system_error(errno, std::system_category(), "failed to open "+data);
+				throw std::system_error(errno, std::system_category(), "failed to open "+parameters.getGraphFileName());
 
 			}
 			char delim=',';
