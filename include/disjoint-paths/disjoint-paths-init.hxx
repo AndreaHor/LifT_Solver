@@ -48,8 +48,6 @@ std::vector<std::vector<T>> readLines(std::string inputFileName, char delim) {
 			throw std::system_error(errno, std::system_category(), "failed to open "+inputFileName);
 		}
 
-
-
 		std::string line;
 		size_t lineCounter=0;
 		std::getline(inputFile, line);
@@ -121,84 +119,94 @@ public:
 
 		std::string line;
 		std::vector<std::string> strings;
-		std::ifstream timeData(parameters.getTimeFileName());
-
-		size_t lineCounter=0;
-		std::vector<size_t> currentGroup;
-
-		unsigned int previousTime=0;
-		unsigned int time=0;
-
-		while (std::getline(timeData, line) && !line.empty()) {
-
-			//std::cout<<"time file line "<<lineCounter<<" delim "<<delim<<std::endl;
-			lineCounter++;
-
-			strings = split(line,delim);
-			//std::cout<<"split "<<std::endl;
-			if (strings.size() < 2) {
-				throw std::runtime_error(
-						std::string("Vertex and time frame expected"));
+		std::ifstream timeData;
+		try{
+			timeData.open(parameters.getTimeFileName());
+			if(!timeData){
+				throw std::system_error(errno, std::system_category(), "failed to open "+timeData);
 			}
 
-			unsigned int v = std::stoul(strings[0]);
-			time = std::stoul(strings[1]);
-			if(time>parameters.getMaxTimeFrame()){
-				//groups[previousTime]=currentGroup;
-				break;
-			}
-			if(vToGroup.size()!=v){
-				throw std::runtime_error(
-						std::string("Wrong vertex numbering in time file"));
-			}
-			else{
+			size_t lineCounter=0;
+			std::vector<size_t> currentGroup;
 
-				vToGroup.push_back(time);
-				//if(time==groups.size()+1){  //Change groups to map?
-				if(time==previousTime||previousTime==0){
-					currentGroup.push_back(v);
+			unsigned int previousTime=0;
+			unsigned int time=0;
+
+			while (std::getline(timeData, line) && !line.empty()) {
+
+				//std::cout<<"time file line "<<lineCounter<<" delim "<<delim<<std::endl;
+				lineCounter++;
+
+				strings = split(line,delim);
+				//std::cout<<"split "<<std::endl;
+				if (strings.size() < 2) {
+					throw std::runtime_error(
+							std::string("Vertex and time frame expected"));
 				}
-				//else if(time==groups.size()+2){
+
+				unsigned int v = std::stoul(strings[0]);
+				time = std::stoul(strings[1]);
+				if(time>parameters.getMaxTimeFrame()){
+					//groups[previousTime]=currentGroup;
+					break;
+				}
+				if(vToGroup.size()!=v){
+					throw std::runtime_error(
+							std::string("Wrong vertex numbering in time file"));
+				}
 				else{
-					//groups.push_back(currentGroup);
-					groups[previousTime]=currentGroup;
-					currentGroup=std::vector<size_t>();
-					currentGroup.push_back(v);
+
+					vToGroup.push_back(time);
+					//if(time==groups.size()+1){  //Change groups to map?
+					if(time==previousTime||previousTime==0){
+						currentGroup.push_back(v);
+					}
+					//else if(time==groups.size()+2){
+					else{
+						//groups.push_back(currentGroup);
+						groups[previousTime]=currentGroup;
+						currentGroup=std::vector<size_t>();
+						currentGroup.push_back(v);
+					}
+					previousTime=time;
+					//				else{
+					//					throw std::runtime_error("Wrong time frame numbering.");
+					//				}
+
 				}
-				previousTime=time;
-				//				else{
-				//					throw std::runtime_error("Wrong time frame numbering.");
-				//				}
-
 			}
+			groups[previousTime]=currentGroup;
+
+
+			maxTime=*(vToGroup.rbegin());
+
+			//time frame of s is zero
+			vToGroup.push_back(0);
+			currentGroup=std::vector<size_t>();
+			currentGroup.push_back(vToGroup.size()-1);
+			groups[0]=currentGroup;
+
+			//time frame of t is maxTime
+			vToGroup.push_back(maxTime+1);
+			currentGroup=std::vector<size_t>();
+			currentGroup.push_back(vToGroup.size()-1);
+			groups[maxTime+1]=currentGroup;
+
+			maxVertex=vToGroup.size()-3;
+
+			//		for (int i = 0; i < maxTime+2; ++i) {
+			//			std::cout<<"group "<<i<<": ";
+			//			for (int j = 0; j < groups[i].size(); ++j) {
+			//				std::cout<<groups[i][j]<<",";
+			//			}
+			//			std::cout<<std::endl;
+			//
+			//		}
 		}
-		groups[previousTime]=currentGroup;
+		catch (std::system_error& er) {
+			std::clog << er.what() << " (" << er.code() << ")" << std::endl;
 
-
-		maxTime=*(vToGroup.rbegin());
-
-		//time frame of s is zero
-		vToGroup.push_back(0);
-		currentGroup=std::vector<size_t>();
-		currentGroup.push_back(vToGroup.size()-1);
-		groups[0]=currentGroup;
-
-		//time frame of t is maxTime
-		vToGroup.push_back(maxTime+1);
-		currentGroup=std::vector<size_t>();
-		currentGroup.push_back(vToGroup.size()-1);
-		groups[maxTime+1]=currentGroup;
-
-		maxVertex=vToGroup.size()-3;
-
-//		for (int i = 0; i < maxTime+2; ++i) {
-//			std::cout<<"group "<<i<<": ";
-//			for (int j = 0; j < groups[i].size(); ++j) {
-//				std::cout<<groups[i][j]<<",";
-//			}
-//			std::cout<<std::endl;
-//
-//		}
+		}
 
 	}
 
@@ -522,59 +530,67 @@ public:
 		std::cout<<"cg vertices "<<completeGraph.numberOfVertices()<<std::endl;
 		configParameters.infoFile()<<"cg vertices "<<completeGraph.numberOfVertices()<<std::endl;
 		std::string line;
-		std::ifstream data(configParameters.getGraphFileName());
-
-		std::getline(data, line);
-		double objValue=0;
-
-		std::cout << "Read big graph" << std::endl;
-        configParameters.infoFile()<<"Read big graph" << std::endl;
-		std::vector<std::string> strings;
-
-
-		std::cout<<"Reading vertices from file. "<<std::endl;
-		configParameters.infoFile()<<"Reading vertices from file. "<<std::endl;
-		configParameters.infoFile().flush();
-		//Vertices that are not found have score=0. Appearance and disappearance cost are read here.
-		while (std::getline(data, line) && !line.empty()) {
-
-		}
-
-		std::cout<<"Reading base edges from file. "<<std::endl;
-		configParameters.infoFile()<<"Reading base edges from file. "<<std::endl;
-		configParameters.infoFile().flush();
-		size_t maxLabel=0;
-		while (std::getline(data, line) && !line.empty()) {
-
-			strings = split(line, delim);
-
-			unsigned int v = std::stoul(strings[0]);
-			unsigned int w = std::stoul(strings[1]);
-			size_t l0=vg.getGroupIndex(v);
-			size_t l1=vg.getGroupIndex(w);
-			if(v>vg.getMaxVertex()||w>vg.getMaxVertex()) continue;
-			//std::cout<<"edge "<<v<<" "<<w<<std::endl;
-
-			if(l1-l0<=configParameters.getMaxTimeGapComplete()){
-				double score = std::stod(strings[2]);
-				completeGraph.insertEdge(v,w);
-				completeScore.push_back(score);
+		std::ifstream data;
+		try{
+			data.open(configParameters.getGraphFileName());
+			if(!data){
+				throw std::system_error(errno, std::system_category(), "failed to open "+data);
 			}
 
+			std::getline(data, line);
+			double objValue=0;
+
+			std::cout << "Read big graph" << std::endl;
+			configParameters.infoFile()<<"Read big graph" << std::endl;
+			std::vector<std::string> strings;
+
+
+			std::cout<<"Reading vertices from file. "<<std::endl;
+			configParameters.infoFile()<<"Reading vertices from file. "<<std::endl;
+			configParameters.infoFile().flush();
+			//Vertices that are not found have score=0. Appearance and disappearance cost are read here.
+			while (std::getline(data, line) && !line.empty()) {
+
+			}
+
+			std::cout<<"Reading base edges from file. "<<std::endl;
+			configParameters.infoFile()<<"Reading base edges from file. "<<std::endl;
+			configParameters.infoFile().flush();
+			size_t maxLabel=0;
+			while (std::getline(data, line) && !line.empty()) {
+
+				strings = split(line, delim);
+
+				unsigned int v = std::stoul(strings[0]);
+				unsigned int w = std::stoul(strings[1]);
+				size_t l0=vg.getGroupIndex(v);
+				size_t l1=vg.getGroupIndex(w);
+				if(v>vg.getMaxVertex()||w>vg.getMaxVertex()) continue;
+				//std::cout<<"edge "<<v<<" "<<w<<std::endl;
+
+				if(l1-l0<=configParameters.getMaxTimeGapComplete()){
+					double score = std::stod(strings[2]);
+					completeGraph.insertEdge(v,w);
+					completeScore.push_back(score);
+				}
+
+			}
+
+
+			//objValue+=maxLabel*parameters.getInputCost()+maxLabel*parameters.getOutputCost();
+
+			data.close();
 		}
+		catch (std::system_error& er) {
+			std::clog << er.what() << " (" << er.code() << ")" << std::endl;
 
-
-		//objValue+=maxLabel*parameters.getInputCost()+maxLabel*parameters.getOutputCost();
-
-		data.close();
+		}
 	}
 
 	andres::graph::Digraph<> completeGraph;
 	std::vector<double> completeScore;
 	VertexGroups<> vg;
 	size_t maxTime;
-
-
 
 };
 
@@ -747,40 +763,50 @@ parameters(configParameters)
 		else{
 			maxVertex=std::numeric_limits<size_t>::max();
 		}
-		std::ifstream graphFile(parameters.getGraphFileName());
-	    readGraph(graphFile,maxVertex,delim);
-	    if(!parameters.isAutomaticLifted()){
-	    	//std::vector<std::vector<bool>> secOrderDesc=automaticLifted(graph_);
-	    	std::cout<<"Reading lifted edges from file."<<std::endl;
-	    	std::string line;
-	    	std::vector<std::string> strings;
-	    	while (std::getline(graphFile, line) && !line.empty()) {
-	    		strings = split(line, delim);
-	    		if (strings.size() < 3) {
-	    			throw std::runtime_error(
-	    					std::string("Edge vertices and score expected on every edge line "));
-	    		}
+		std::ifstream graphFile;
+		try{
+			graphFile.open(parameters.getGraphFileName());
+			if(!graphFile){
+				throw std::system_error(errno, std::system_category(), "failed to open "+graphFile);
+			}
+			readGraph(graphFile,maxVertex,delim);
+			if(!parameters.isAutomaticLifted()){
+				//std::vector<std::vector<bool>> secOrderDesc=automaticLifted(graph_);
+				std::cout<<"Reading lifted edges from file."<<std::endl;
+				std::string line;
+				std::vector<std::string> strings;
+				while (std::getline(graphFile, line) && !line.empty()) {
+					strings = split(line, delim);
+					if (strings.size() < 3) {
+						throw std::runtime_error(
+								std::string("Edge vertices and score expected on every edge line "));
+					}
 
-	    		unsigned int v = std::stoul(strings[0]);
-	    		unsigned int w = std::stoul(strings[1]);
-	    		if(v>=graph_.numberOfVertices()-2||w>=graph_.numberOfVertices()-2) continue;
-	    		//if(isReachable(v,w)&&v!=s_&&w!=t_&&v!=t_&&w!=s_){
-	    		if(isReachableNew(v,w)&&v!=s_&&w!=t_&&v!=t_&&w!=s_){
-	    			double score = std::stod(strings[2]);
-	    			//if(secOrderDesc[v][w]){
-	    			auto edgeTest=graphLifted_.findEdge(v,w);
-	    			if(!edgeTest.first){
-	    				graphLifted_.insertEdge(v, w);
-	    				liftedEdgeScore.push_back(score);
-	    			}
-	    			else{
-	    				liftedEdgeScore[edgeTest.second]=score;
-	    			}
-	    		}
-	    	}
+					unsigned int v = std::stoul(strings[0]);
+					unsigned int w = std::stoul(strings[1]);
+					if(v>=graph_.numberOfVertices()-2||w>=graph_.numberOfVertices()-2) continue;
+					//if(isReachable(v,w)&&v!=s_&&w!=t_&&v!=t_&&w!=s_){
+					if(isReachableNew(v,w)&&v!=s_&&w!=t_&&v!=t_&&w!=s_){
+						double score = std::stod(strings[2]);
+						//if(secOrderDesc[v][w]){
+						auto edgeTest=graphLifted_.findEdge(v,w);
+						if(!edgeTest.first){
+							graphLifted_.insertEdge(v, w);
+							liftedEdgeScore.push_back(score);
+						}
+						else{
+							liftedEdgeScore[edgeTest.second]=score;
+						}
+					}
+				}
 
-	    }
-	    graphFile.close();
+			}
+			graphFile.close();
+		}
+		catch (std::system_error& er) {
+			std::clog << er.what() << " (" << er.code() << ")" << std::endl;
+
+		}
 	}
 	else{
 		readGraphWithTime(minTime,maxTime,cs);
@@ -2081,51 +2107,63 @@ inline void Data<T>::readCompleteGraph(){
 	if(pGraphComplete==0){
 
 		std::string line;
-		std::ifstream data(parameters.getGraphFileName());
-		char delim=',';
-		std::getline(data, line);
+		std::ifstream data;
+		try{
+			data.open(parameters.getGraphFileName());
+			if(!data){
 
-		//size_t origVertexNumber=std::stoul(line);
-		size_t origVertexNumber=pVertexGroups->getMaxVertex()+1;
-		pGraphComplete=new andres::graph::Digraph<>(origVertexNumber);
-		pCompleteScore=new std::vector<double>();
-		double objValue=0;
+				throw std::system_error(errno, std::system_category(), "failed to open "+data);
 
-		std::cout << "Read complete graph" << std::endl;
-		parameters.infoFile()<< "Read complete graph" << std::endl;
-		std::vector<std::string> strings;
+			}
+			char delim=',';
+			std::getline(data, line);
+
+			//size_t origVertexNumber=std::stoul(line);
+			size_t origVertexNumber=pVertexGroups->getMaxVertex()+1;
+			pGraphComplete=new andres::graph::Digraph<>(origVertexNumber);
+			pCompleteScore=new std::vector<double>();
+			double objValue=0;
+
+			std::cout << "Read complete graph" << std::endl;
+			parameters.infoFile()<< "Read complete graph" << std::endl;
+			std::vector<std::string> strings;
 
 
-		std::cout<<"Skipping vertices in file. "<<std::endl;
-		parameters.infoFile()<<"Skipping vertices in file. "<<std::endl;
-		parameters.infoFile().flush();
-		//Vertices that are not found have score=0. Appearance and disappearance cost are read here.
-		while (std::getline(data, line) && !line.empty()) {
+			std::cout<<"Skipping vertices in file. "<<std::endl;
+			parameters.infoFile()<<"Skipping vertices in file. "<<std::endl;
+			parameters.infoFile().flush();
+			//Vertices that are not found have score=0. Appearance and disappearance cost are read here.
+			while (std::getline(data, line) && !line.empty()) {
 
-		}
-
-		std::cout<<"Reading base edges from file. "<<std::endl;
-		parameters.infoFile()<<"Reading base edges from file. "<<std::endl;
-		parameters.infoFile().flush();
-		size_t maxLabel=0;
-		while (std::getline(data, line) && !line.empty()) {
-
-			strings = split(line, delim);
-
-			unsigned int v = std::stoul(strings[0]);
-			unsigned int w = std::stoul(strings[1]);
-			size_t l0=pVertexGroups->getGroupIndex(v);
-			size_t l1=pVertexGroups->getGroupIndex(w);
-			if(v>=origVertexNumber||w>=origVertexNumber) continue;
-			if(l1-l0<=parameters.getMaxTimeGapComplete()){
-				double score = std::stod(strings[2]);
-				pGraphComplete->insertEdge(v,w);
-				pCompleteScore->push_back(score);
 			}
 
-		}
+			std::cout<<"Reading base edges from file. "<<std::endl;
+			parameters.infoFile()<<"Reading base edges from file. "<<std::endl;
+			parameters.infoFile().flush();
+			size_t maxLabel=0;
+			while (std::getline(data, line) && !line.empty()) {
 
-		data.close();
+				strings = split(line, delim);
+
+				unsigned int v = std::stoul(strings[0]);
+				unsigned int w = std::stoul(strings[1]);
+				size_t l0=pVertexGroups->getGroupIndex(v);
+				size_t l1=pVertexGroups->getGroupIndex(w);
+				if(v>=origVertexNumber||w>=origVertexNumber) continue;
+				if(l1-l0<=parameters.getMaxTimeGapComplete()){
+					double score = std::stod(strings[2]);
+					pGraphComplete->insertEdge(v,w);
+					pCompleteScore->push_back(score);
+				}
+
+			}
+
+			data.close();
+		}
+		catch (std::system_error& er) {
+			std::clog << er.what() << " (" << er.code() << ")" << std::endl;
+
+		}
 	}
 
 }
