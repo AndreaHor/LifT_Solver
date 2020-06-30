@@ -756,13 +756,13 @@ parameters(configParameters)
 	useTimeFrames=parameters.isRestrictFrames()||parameters.isSparsify();
 	size_t maxVertex;
 	if(cs==0){
-		if(useTimeFrames){
+	//	if(useTimeFrames){
 			vertexGroups=VertexGroups<size_t>(configParameters,delim);
 			maxVertex=vertexGroups.getMaxVertex();
-		}
-		else{
-			maxVertex=std::numeric_limits<size_t>::max();
-		}
+//		}
+//		else{
+//			maxVertex=std::numeric_limits<size_t>::max();
+//		}
 		std::ifstream graphFile;
 		try{
 			graphFile.open(parameters.getGraphFileName());
@@ -903,58 +903,58 @@ inline void DisjointStructure<T>::readGraphWithTime(size_t minTime,size_t maxTim
 			mt--;
 		}
 		size_t maxVertexTime=mt;
-//		if(maxVertexTime==minVertexTime){
-//			//TODO graphs with one layer and no edges, do something meaningful
-//		}
-//		else{
+		//		if(maxVertexTime==minVertexTime){
+		//			//TODO graphs with one layer and no edges, do something meaningful
+		//		}
+		//		else{
 
-			size_t maxVertex=*(vg.getGroupVertices(maxVertexTime).rbegin());
+		size_t maxVertex=*(vg.getGroupVertices(maxVertexTime).rbegin());
 
-			size_t numberOfVertices=maxVertex-minVertex+3;
-			s_ = numberOfVertices - 2;
-			t_ = numberOfVertices - 1;
+		size_t numberOfVertices=maxVertex-minVertex+3;
+		s_ = numberOfVertices - 2;
+		t_ = numberOfVertices - 1;
 
-			std::vector<size_t> vToGroup(numberOfVertices);
-			vToGroup[s_]=0;
-			vToGroup[t_]=maxTime-minTime+1;
+		std::vector<size_t> vToGroup(numberOfVertices);
+		vToGroup[s_]=0;
+		vToGroup[t_]=maxTime-minTime+1;
 
-			for (int gi = minTime; gi < maxTime; ++gi) {
-				//groups[gi-minTime+1]=std::vector<size_t>();
-				for(size_t v:vg.getGroupVertices(gi)){
-					size_t vertex=v-minVertex;
-					groups[gi-minTime+1].push_back(vertex);
-					vToGroup[vertex]=gi-minTime+1;
-				}
+		for (int gi = minTime; gi < maxTime; ++gi) {
+			//groups[gi-minTime+1]=std::vector<size_t>();
+			for(size_t v:vg.getGroupVertices(gi)){
+				size_t vertex=v-minVertex;
+				groups[gi-minTime+1].push_back(vertex);
+				vToGroup[vertex]=gi-minTime+1;
 			}
+		}
 
-			vertexGroups=VertexGroups<>(groups,vToGroup);
-			vertexScore = std::vector<double>(numberOfVertices, 0);
-			graphLifted_ = andres::graph::Digraph<>(numberOfVertices);
-			graph_ = andres::graph::Digraph<>(numberOfVertices);
+		vertexGroups=VertexGroups<>(groups,vToGroup);
+		vertexScore = std::vector<double>(numberOfVertices, 0);
+		graphLifted_ = andres::graph::Digraph<>(numberOfVertices);
+		graph_ = andres::graph::Digraph<>(numberOfVertices);
 
-			bool useZeroInOut=false;
-			for (int v = 0; v < numberOfVertices-2; ++v) {
-				graph_.insertEdge(s_,v);
-				if(useZeroInOut) edgeScore.push_back(0);
-				else edgeScore.push_back(parameters.getInputCost());
-				graph_.insertEdge(v,t_);
-				if(useZeroInOut) edgeScore.push_back(0);
-				else edgeScore.push_back(parameters.getOutputCost());
+		bool useZeroInOut=false;
+		for (int v = 0; v < numberOfVertices-2; ++v) {
+			graph_.insertEdge(s_,v);
+			if(useZeroInOut) edgeScore.push_back(0);
+			else edgeScore.push_back(parameters.getInputCost());
+			graph_.insertEdge(v,t_);
+			if(useZeroInOut) edgeScore.push_back(0);
+			else edgeScore.push_back(parameters.getOutputCost());
+		}
+
+
+		for (int v = minVertex; v < maxVertex; ++v) {
+			for (int i = 0; i < completeGraph.numberOfEdgesFromVertex(v); ++i) {
+				size_t w=completeGraph.vertexFromVertex(v,i);
+				if(w>maxVertex) continue;
+				size_t e=completeGraph.edgeFromVertex(v,i);
+				graph_.insertEdge(v-minVertex, w-minVertex);
+				edgeScore.push_back(completeScore[e]);
 			}
-
-
-			for (int v = minVertex; v < maxVertex; ++v) {
-				for (int i = 0; i < completeGraph.numberOfEdgesFromVertex(v); ++i) {
-					size_t w=completeGraph.vertexFromVertex(v,i);
-					if(w>maxVertex) continue;
-					size_t e=completeGraph.edgeFromVertex(v,i);
-					graph_.insertEdge(v-minVertex, w-minVertex);
-					edgeScore.push_back(completeScore[e]);
-				}
-			}
-			minV=minVertex;
-			maxV=maxVertex;
-			std::cout<<"DS constructor max Vertex "<<maxV<<std::endl;
+		}
+		minV=minVertex;
+		maxV=maxVertex;
+		std::cout<<"DS constructor max Vertex "<<maxV<<std::endl;
 		//}
 	}
 
@@ -1633,14 +1633,14 @@ public:
 		pReachable=problemGraph.getPReachableNew();
 
 
-		if(parameters.isRestrictFrames()||parameters.isSparsify()){
+		//if(parameters.isRestrictFrames()||parameters.isSparsify()){
 			useTimeFrames=true;
 			pVertexGroups=problemGraph.getPVertexGroups();
-	    }
-		else{
-			pVertexGroups=0;
-			useTimeFrames=false;
-		}
+//	    }
+//		else{
+//			pVertexGroups=0;
+//			useTimeFrames=false;
+//		}
 
 		pGraphComplete=0;
 		pCompleteScore=0;
