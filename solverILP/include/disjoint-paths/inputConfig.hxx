@@ -355,13 +355,15 @@ inline ConfigDisjoint<T>::ConfigDisjoint(std::string fileName,char delim){
 	}
 	std::cout<<"input graph "<<graphFileName<<std::endl;
 
+	std::string pathToInputFile=graphFileName.substr(0,graphFileName.find_last_of('/')+1);
+
 	if(parameters.count("OUTPUT_PATH")==0){
-		parameters["OUTPUT_PATH"]=graphFileName.substr(0,graphFileName.find_last_of('/'));
+		parameters["OUTPUT_PATH"]=pathToInputFile;
 	}
 
 	//TODO fix output prefix, it is surrounded by spaces!
 	if(parameters.count("OUTPUT_PREFIX")==0){
-		parameters["OUTPUT_PREFIX"]=parameters["OUTPUT_PATH"]+"_output";
+		parameters["OUTPUT_PREFIX"]="output";
 	}
 
 
@@ -385,7 +387,7 @@ inline ConfigDisjoint<T>::ConfigDisjoint(std::string fileName,char delim){
 		timeFileName=parameters["INPUT_FRAMES"];
 	}
 	else{
-		timeFileName="problemDesc_frames";
+		timeFileName=graphFileName+"_frames";
 	}
 	std::cout<<"input frames "<<timeFileName<<std::endl;
 	paramsFile<<"input frames "<<timeFileName<<std::endl;
@@ -425,6 +427,7 @@ inline ConfigDisjoint<T>::ConfigDisjoint(std::string fileName,char delim){
 
 	if(parameters.count("MAX_TIMEGAP")>0){
 		maxTimeFrame=std::stoul(parameters["MAX_TIMEGAP"]);
+		if(maxTimeFrame==0){maxTimeFrame=std::numeric_limits<size_t>::max();}
 	}
 	else{
 		maxTimeFrame=std::numeric_limits<size_t>::max();
@@ -436,7 +439,7 @@ inline ConfigDisjoint<T>::ConfigDisjoint(std::string fileName,char delim){
 		inputCost=std::stod(parameters["INPUT_COST"]);
 	}
 	else{
-		inputCost=2;
+		inputCost=0;
 	}
 	std::cout<<"input cost "<<inputCost<<std::endl;
 	paramsFile<<"input cost "<<inputCost<<std::endl;
@@ -445,7 +448,7 @@ inline ConfigDisjoint<T>::ConfigDisjoint(std::string fileName,char delim){
 		outputCost=std::stod(parameters["OUTPUT_COST"]);
 	}
 	else{
-		outputCost=2;
+		outputCost=0;
 	}
 	std::cout<<"output cost "<<outputCost<<std::endl;
 	paramsFile<<"output cost "<<outputCost<<std::endl;
@@ -486,21 +489,21 @@ inline ConfigDisjoint<T>::ConfigDisjoint(std::string fileName,char delim){
 	std::cout<<"base upper threshold "<<baseUpperThreshold<<std::endl;
 	paramsFile<<"base upper threshold "<<baseUpperThreshold<<std::endl;
 
-	if(parameters.count("REQUIRE_IMPROVING")>0){
-		requireImproving=std::stoi(parameters["REQUIRE_IMPROVING"]);
-	}
-	else{
+//	if(parameters.count("REQUIRE_IMPROVING")>0){
+//		requireImproving=std::stoi(parameters["REQUIRE_IMPROVING"]);
+//	}
+//	else{
 		requireImproving=0;
-	}
+	//}
 	std::cout<<"require improving "<<requireImproving<<std::endl;
 	paramsFile<<"require improving "<<requireImproving<<std::endl;
 
-	if(parameters.count("AUTOMATIC_LIFTED")>0){
-		automaticLifted=std::stoi(parameters["AUTOMATIC_LIFTED"]);
-	}
-	else{
+//	if(parameters.count("AUTOMATIC_LIFTED")>0){
+//		automaticLifted=std::stoi(parameters["AUTOMATIC_LIFTED"]);
+//	}
+//	else{
 		automaticLifted=true;
-	}
+	//}
 	std::cout<<"automatic lifted "<<automaticLifted<<std::endl;
 	paramsFile<<"automatic lifted "<<automaticLifted<<std::endl;
 
@@ -576,7 +579,7 @@ inline ConfigDisjoint<T>::ConfigDisjoint(std::string fileName,char delim){
 		smallIntervals=std::stoul(parameters["SMALL_INTERVALS"]);
 	}
 	else{
-		smallIntervals=50;
+		smallIntervals=40;
 	}
 	std::cout<<"small intervals "<<smallIntervals<<std::endl;
 	paramsFile<<"small intervals "<<smallIntervals<<std::endl;

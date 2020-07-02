@@ -935,11 +935,9 @@ inline void DisjointStructure<T>::readGraphWithTime(size_t minTime,size_t maxTim
 		bool useZeroInOut=false;
 		for (int v = 0; v < numberOfVertices-2; ++v) {
 			graph_.insertEdge(s_,v);
-			if(useZeroInOut) edgeScore.push_back(0);
-			else edgeScore.push_back(parameters.getInputCost());
+			edgeScore.push_back(parameters.getInputCost());
 			graph_.insertEdge(v,t_);
-			if(useZeroInOut) edgeScore.push_back(0);
-			else edgeScore.push_back(parameters.getOutputCost());
+			edgeScore.push_back(parameters.getOutputCost());
 		}
 
 
@@ -1011,23 +1009,26 @@ inline void DisjointStructure<T>::readGraph(std::ifstream& data,size_t maxVertex
 	parameters.infoFile()<<"Reading vertices from file. "<<std::endl;
 	parameters.infoFile().flush();
 	//Vertices that are not found have score=0. Appearance and disappearance cost are read here.
+	bool vertexAndInOutScore=false;
 	while (std::getline(data, line) && !line.empty()) {
-		lineCounter++;
-		strings = split(line, delim);
-		if (strings.size() < 2) {
-			throw std::runtime_error(
-					std::string("Vertex and its score expected"));
-		}
+		if(vertexAndInOutScore){ //By default disabled in the final version
+			lineCounter++;
+			strings = split(line, delim);
+			if (strings.size() < 2) {
+				throw std::runtime_error(
+						std::string("Vertex and its score expected"));
+			}
 
 
-		unsigned int v = std::stoul(strings[0]);
-		if(v>graph_.numberOfVertices()-3) continue;
-		double score = std::stod(strings[1]);
-		vertexScore[v] = score;
+			unsigned int v = std::stoul(strings[0]);
+			if(v>graph_.numberOfVertices()-3) continue;
+			double score = std::stod(strings[1]);
+			vertexScore[v] = score;
 
-		if(strings.size()==4){
-			inputCosts[v]=std::stod(strings[2]);
-			outputCosts[v]=std::stod(strings[3]);
+			if(strings.size()==4){
+				inputCosts[v]=std::stod(strings[2]);
+				outputCosts[v]=std::stod(strings[3]);
+			}
 		}
 
 	}
