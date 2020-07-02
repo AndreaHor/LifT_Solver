@@ -553,24 +553,24 @@ inline ConfigDisjoint<T>::ConfigDisjoint(std::string fileName,char delim){
 	paramsFile<<"longer interval lifted "<<longerIntervalLifted<<std::endl;
 
 
-	if(parameters.count("REPULSIVE_TIMEGAP")>0){
-		repulsiveTimeGap=std::stoul(parameters["REPULSIVE_TIMEGAP"]);
-	}
-	else{
+//	if(parameters.count("REPULSIVE_TIMEGAP")>0){
+//		repulsiveTimeGap=std::stoul(parameters["REPULSIVE_TIMEGAP"]);
+//	}
+//	else{
 		repulsiveTimeGap=maxTimeLifted;
-	}
-	std::cout<<"repulsive time gap "<<repulsiveTimeGap<<std::endl;
-	paramsFile<<"repulsive time gap "<<repulsiveTimeGap<<std::endl;
+	//}
+	//std::cout<<"repulsive time gap "<<repulsiveTimeGap<<std::endl;
+	//paramsFile<<"repulsive time gap "<<repulsiveTimeGap<<std::endl;
 
 
-	if(parameters.count("NEW_LIFTED")>0){
-		newLifted=std::stoi(parameters["NEW_LIFTED"]);
-	}
-	else{
+//	if(parameters.count("NEW_LIFTED")>0){
+//		newLifted=std::stoi(parameters["NEW_LIFTED"]);
+//	}
+//	else{
 		newLifted=false;
-	}
-	std::cout<<"new lifted sparse. strategy "<<newLifted<<std::endl;
-	paramsFile<<"new lifted sparse. strategy "<<newLifted<<std::endl;
+//	}
+//	std::cout<<"new lifted sparse. strategy "<<newLifted<<std::endl;
+//	paramsFile<<"new lifted sparse. strategy "<<newLifted<<std::endl;
 
 
 
@@ -654,23 +654,23 @@ inline ConfigDisjoint<T>::ConfigDisjoint(std::string fileName,char delim){
 
 
 
-	if(parameters.count("OVERLAP_INTERVALS")>0){
-		overlappingIntervals=std::stoi(parameters["OVERLAP_INTERVALS"]);
-		if(smallIntervals==0) overlappingIntervals=0;
-	}
-	else{
+//	if(parameters.count("OVERLAP_INTERVALS")>0){
+//		overlappingIntervals=std::stoi(parameters["OVERLAP_INTERVALS"]);
+//		if(smallIntervals==0) overlappingIntervals=0;
+//	}
+//	else{
 		overlappingIntervals=0;
-	}
-	std::cout<<"overlapping intervals "<<overlappingIntervals<<std::endl;
-	paramsFile<<"overlapping intervals "<<overlappingIntervals<<std::endl;
+	//}
+	//std::cout<<"overlapping intervals "<<overlappingIntervals<<std::endl;
+	//paramsFile<<"overlapping intervals "<<overlappingIntervals<<std::endl;
 
-
-	if(parameters.count("REPULSIVE")>0){
-		repulsive=std::stoi(parameters["REPULSIVE"]);
-	}
-	else{
+//
+//	if(parameters.count("REPULSIVE")>0){
+//		repulsive=std::stoi(parameters["REPULSIVE"]);
+//	}
+//	else{
 		repulsive=0;
-	}
+//	}
 	std::cout<<"use repulsive "<<repulsive<<std::endl;
 	paramsFile<<"use repulsive "<<repulsive<<std::endl;
 
