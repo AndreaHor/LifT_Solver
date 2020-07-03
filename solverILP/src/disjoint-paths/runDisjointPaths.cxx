@@ -14,7 +14,7 @@
 #include <tclap/CmdLine.h>
 
 #include "andres/graph/graph.hxx"
-#include "disjoint-paths/disjoint-paths-init.hxx"
+#include "disjoint-paths/disjointPathsData.hxx"
 //#include "disjoint-paths/ilp/gurobi-callback-disjoint.hxx"
 #include "disjoint-paths/ilp/solver-disjoint-ilp.hxx"
 //#include "disjoint-paths/ilp/MyCallback.hxx"

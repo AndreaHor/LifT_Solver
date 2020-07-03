@@ -17,7 +17,7 @@
 #include <iostream>
 #include <map>
 #include <list>
-#include "disjoint-paths/disjoint-paths-init.hxx"
+#include "disjoint-paths/disjointPathsData.hxx"
 #include "disjoint-paths/disjointStructure.hxx"
 #include "disjoint-paths/ilp/gurobi-callback-disjoint.hxx"
 

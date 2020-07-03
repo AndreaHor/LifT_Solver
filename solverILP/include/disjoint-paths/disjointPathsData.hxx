@@ -5,8 +5,8 @@
  *      Author: fuksova
  */
 
-#ifndef INCLUDE_DISJOINT_PATHS_DISJOINT_PATHS_INIT_HXX_
-#define INCLUDE_DISJOINT_PATHS_DISJOINT_PATHS_INIT_HXX_
+#ifndef INCLUDE_DISJOINT_PATHS_DISJOINT_PATHS_DATA_HXX_
+#define INCLUDE_DISJOINT_PATHS_DISJOINT_PATHS_DATA_HXX_
 
 #include <stdexcept>
 #include <array>
@@ -1817,4 +1817,4 @@ inline void Data<T>::outputSolution(std::vector<std::vector<size_t>>& paths,bool
 
 }
 
-#endif /* INCLUDE_DISJOINT_PATHS_DISJOINT_PATHS_INIT_HXX_ */
+#endif /* INCLUDE_DISJOINT_PATHS_DISJOINT_PATHS_DATA_HXX_ */
