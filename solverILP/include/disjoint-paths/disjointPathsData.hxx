@@ -1273,8 +1273,8 @@ inline void Data<T>::graphFromIntervalsDense(){
 		std::cout<<"cost size "<<costs.size()<<" sum "<<numberOfEdges+numberOfLiftedEdges+numberOfVertices<<std::endl;
 
 
-		std::cout<<"paths for init "<<std::endl;
-		if(task=='T'&&!pathsForInit.empty()){ //Do not do this in the first iteration where paths are obtained from intervals
+		std::cout<<"paths for init size "<<pathsForInit.size()<<std::endl;
+		if((task=='T'&&!pathsForInit.empty())||parameters.getSmallIntervals()==0){ //Do not do this in the first iteration where paths are obtained from intervals
 			initSolution=std::vector<double>(costs.size(),0);
 			for (int i = 0; i < pathsForInit.size(); ++i) {
 				bool terminatedEarlier=false;
