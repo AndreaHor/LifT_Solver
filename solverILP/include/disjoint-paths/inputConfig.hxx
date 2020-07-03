@@ -457,7 +457,7 @@ inline ConfigDisjoint<T>::ConfigDisjoint(std::string fileName,char delim){
 		maxTimeBase=std::stoul(parameters["MAX_TIMEGAP_BASE"]);
 	}
 	else{
-		maxTimeBase=4;
+		maxTimeBase=24;
 	}
 	std::cout<<"max time gap base "<<maxTimeBase<<std::endl;
 	paramsFile<<"max time gap base "<<maxTimeBase<<std::endl;
