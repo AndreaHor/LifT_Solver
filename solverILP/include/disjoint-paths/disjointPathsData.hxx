@@ -42,33 +42,33 @@ template<class T = size_t>
 struct Data {
 
 public:
-	Data(DisjointStructure<> & problemGraph) :
-		parameters(problemGraph.parameters) {
+	Data(DisjointStructure<> & disjointStructure) :
+		parameters(disjointStructure.parameters) {
 
 		//std::cout<<"data new constructor"<<std::endl;
 
-		pGraph=problemGraph.getPGraph();
-		pGraphLifted=problemGraph.getPGraphLifted();
+		pGraph=disjointStructure.getPGraph();
+		pGraphLifted=disjointStructure.getPGraphLifted();
 
-		numberOfEdges = problemGraph.getGraph().numberOfEdges();
-		numberOfVertices = problemGraph.getGraph().numberOfVertices();
-		numberOfLiftedEdges = problemGraph.getGraphLifted().numberOfEdges();
-		s=problemGraph.getSourceNode();
-		t=problemGraph.getTerminalNode();
+		numberOfEdges = disjointStructure.getGraph().numberOfEdges();
+		numberOfVertices = disjointStructure.getGraph().numberOfVertices();
+		numberOfLiftedEdges = disjointStructure.getGraphLifted().numberOfEdges();
+		s=disjointStructure.getSourceNode();
+		t=disjointStructure.getTerminalNode();
 
 		costs=std::vector<double>();
-		costs.insert(costs.begin(),problemGraph.getVerticesScore().begin(),problemGraph.getVerticesScore().end());
-		costs.insert(costs.end(),problemGraph.getEdgesScore().begin(),problemGraph.getEdgesScore().end());
-		costs.insert(costs.end(),problemGraph.getLiftedEdgesScore().begin(),problemGraph.getLiftedEdgesScore().end());
+		costs.insert(costs.begin(),disjointStructure.getVerticesScore().begin(),disjointStructure.getVerticesScore().end());
+		costs.insert(costs.end(),disjointStructure.getEdgesScore().begin(),disjointStructure.getEdgesScore().end());
+		costs.insert(costs.end(),disjointStructure.getLiftedEdgesScore().begin(),disjointStructure.getLiftedEdgesScore().end());
 
 
 		//pReachable=problemGraph.getPReachable();
-		pReachable=problemGraph.getPReachableNew();
+		pReachable=disjointStructure.getPReachableNew();
 
 
 		//if(parameters.isRestrictFrames()||parameters.isSparsify()){
 			useTimeFrames=true;
-			pVertexGroups=problemGraph.getPVertexGroups();
+			pVertexGroups=disjointStructure.getPVertexGroups();
 //	    }
 //		else{
 //			pVertexGroups=0;

@@ -1001,7 +1001,7 @@ void solver_ilp(DisjointStructure<>& ds)
 
 	//If one more iteration would be done with cut into tracklets even if time breaks are empty, solution can be improved
 	if(data.parameters.isDenseTracklets()){
-		bool isNewGraph=data.prepareGraphFromIntervalsDense(paths,true);
+		bool isNewGraph=data.prepareGraphFromIntervalsDense(paths,false);
 		while(isNewGraph){
 			std::cout<<"final graph not optimal, recomputing..."<<std::endl;
 			ds.parameters.infoFile()<<"final graph not optimal, recomputing..."<<std::endl;
