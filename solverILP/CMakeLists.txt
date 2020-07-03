@@ -9,6 +9,7 @@ add_definitions(-march=native)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 include_directories(include)
+include_directories(include/disjoint-paths)
 #add_subdirectory(src)
 
 

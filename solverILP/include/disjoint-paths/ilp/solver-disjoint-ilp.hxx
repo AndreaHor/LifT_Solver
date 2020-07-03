@@ -20,6 +20,8 @@
 #include <list>
 #include "disjoint-paths/disjoint-paths-init.hxx"
 #include "disjoint-paths/ilp/MyCallback.hxx"
+#include "disjoint-paths/disjointStructure.hxx"
+#include "disjoint-paths/disjointPathsMethods.hxx"
 
 
 
