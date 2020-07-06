@@ -712,7 +712,7 @@ void solver_flow_only(ConfigDisjoint<>& parameters)
 
 
 template<class T=size_t>
-void solver_ilp(ConfigDisjoint<>& parameters)
+void solver_ilp(ConfigDisjoint<>& parameters,CompleteStructure<>& cs)
 {
 
 	char delim=',';
@@ -724,7 +724,7 @@ void solver_ilp(ConfigDisjoint<>& parameters)
 	}
 	else{
 
-		CompleteStructure<> cs=CompleteStructure<>(parameters,delim);
+		//CompleteStructure<> cs=CompleteStructure<>(parameters,delim);
 		std::cout<<"vg max time "<<cs.vg.getMaxTime()<<std::endl;
 		std::cout<<"vg max vertex "<<cs.vg.getMaxVertex()<<std::endl;
 		std::cout<<"vg last frame size "<<cs.vg.getGroupVertices(cs.vg.getMaxTime()).size()<<std::endl;

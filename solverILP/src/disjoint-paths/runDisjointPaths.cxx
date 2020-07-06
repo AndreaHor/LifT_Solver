@@ -19,6 +19,7 @@
 #include "disjoint-paths/ilp/solver-disjoint-ilp.hxx"
 //#include "disjoint-paths/ilp/MyCallback.hxx"
 #include "disjoint-paths/inputConfig.hxx"
+#include "disjoint-paths/disjointPathsMethods.hxx"
 
 
 struct Parameters {
@@ -105,12 +106,19 @@ try
 	auto parameters = parseCommandLine(argc, argv);
 	disjointPaths::ConfigDisjoint<size_t> configDisjoint(parameters.configFile);
 	if(configDisjoint.isParametersSet()){
-		if(configDisjoint.getSmallIntervals()==0&&configDisjoint.getMaxTimeLifted()>0){
-			disjointPaths::DisjointStructure<> disjointP(configDisjoint);
-			disjointPaths::solver_ilp<size_t>(disjointP);
+		if(configDisjoint.getMaxTimeLifted()==0){
+			disjointPaths::solver_flow_only(configDisjoint);
 		}
 		else{
-			disjointPaths::solver_ilp<size_t>(configDisjoint);
+
+			if(configDisjoint.getSmallIntervals()==0){
+				disjointPaths::DisjointStructure<> disjointP(configDisjoint);
+				disjointPaths::solver_ilp<size_t>(disjointP);
+			}
+			else{
+				disjointPaths::CompleteStructure<> cs(configDisjoint);
+				disjointPaths::solver_ilp<size_t>(configDisjoint,cs);
+			}
 		}
 	}
 	else{
