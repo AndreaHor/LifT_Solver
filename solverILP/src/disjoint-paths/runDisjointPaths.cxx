@@ -115,6 +115,7 @@ try
 			}
 			else{
 				disjointPaths::CompleteStructure<> cs(configDisjoint);
+				cs.addEdgesFromFile();
 				disjointPaths::solver_ilp<size_t>(configDisjoint,cs);
 			}
 		}

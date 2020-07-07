@@ -522,9 +522,9 @@ template<class T>
 template<class T = size_t>
 struct CompleteStructure {
 public:
-
-	CompleteStructure(DisjointParams<T> & configParameters,char delim=','){
-
+	CompleteStructure(DisjointParams<T> & configParameters,char delim=','):
+		params(configParameters)
+{
 		vg=VertexGroups<>(configParameters,delim);
 		maxTime=vg.getMaxTime();
 		std::cout<<"max time "<<maxTime<<std::endl;
@@ -532,71 +532,120 @@ public:
 		completeGraph=andres::graph::Digraph<>(vg.getMaxVertex()+1);
 		std::cout<<"cg vertices "<<completeGraph.numberOfVertices()<<std::endl;
 		configParameters.infoFile()<<"cg vertices "<<completeGraph.numberOfVertices()<<std::endl;
-		std::string line;
-		std::ifstream data;
-		try{
-			data.open(configParameters.getGraphFileName());
-			if(!data){
-				throw std::system_error(errno, std::system_category(), "failed to open "+configParameters.getGraphFileName());
-			}
 
-			std::getline(data, line);
-			double objValue=0;
+}
 
-			std::cout << "Read big graph" << std::endl;
-			configParameters.infoFile()<<"Read big graph" << std::endl;
-			std::vector<std::string> strings;
-
-
-			std::cout<<"Reading vertices from file. "<<std::endl;
-			configParameters.infoFile()<<"Reading vertices from file. "<<std::endl;
-			configParameters.infoFile().flush();
-			//Vertices that are not found have score=0. Appearance and disappearance cost are read here.
-			while (std::getline(data, line) && !line.empty()) {
-
-			}
-
-			std::cout<<"Reading base edges from file. "<<std::endl;
-			configParameters.infoFile()<<"Reading base edges from file. "<<std::endl;
-			configParameters.infoFile().flush();
-			size_t maxLabel=0;
-			while (std::getline(data, line) && !line.empty()) {
-
-				strings = split(line, delim);
-
-				unsigned int v = std::stoul(strings[0]);
-				unsigned int w = std::stoul(strings[1]);
-				size_t l0=vg.getGroupIndex(v);
-				size_t l1=vg.getGroupIndex(w);
-				if(v>vg.getMaxVertex()||w>vg.getMaxVertex()) continue;
-				//std::cout<<"edge "<<v<<" "<<w<<std::endl;
-
-				if(l1-l0<=configParameters.getMaxTimeGapComplete()){
-					double score = std::stod(strings[2]);
-					completeGraph.insertEdge(v,w);
-					completeScore.push_back(score);
-				}
-
-			}
-
-
-			//objValue+=maxLabel*parameters.getInputCost()+maxLabel*parameters.getOutputCost();
-
-			data.close();
-		}
-		catch (std::system_error& er) {
-			std::clog << er.what() << " (" << er.code() << ")" << std::endl;
-
-		}
-	}
+	void addEdgesFromFile();
+	void addEdges(size_t time1,size_t time2,std::stringstream& data);
 
 	andres::graph::Digraph<> completeGraph;
 	std::vector<double> completeScore;
 	VertexGroups<> vg;
 	size_t maxTime;
+	DisjointParams<T>& params;
 
 };
 
+
+template<class T>
+inline void CompleteStructure<T>::addEdges(size_t time1,size_t time2,std::stringstream& data){
+	std::string line;
+	std::vector<std::string> strings;
+	char delim=',';
+
+	size_t lineCounter=0;
+	size_t transformIndex1=vg.getGroupVertices(time1)[0];
+	size_t numberOfVertices1=vg.getGroupVertices(time1).size();
+	size_t transformIndex2=vg.getGroupVertices(time2)[0];
+	size_t numberOfVertices2=vg.getGroupVertices(time2).size();
+
+	while (std::getline(data, line) && !line.empty()) {
+		if(lineCounter>=numberOfVertices1){
+			throw std::invalid_argument("Attempt to add edges to non-existing vertices in time frame "+time1);
+		}
+		size_t vertex1=lineCounter+transformIndex1;
+		strings = split(line, delim);
+		if(strings.size()!=numberOfVertices2){
+			throw std::invalid_argument("Number of matrix columns does not match the number of vertices in time frame "+time2);
+		}
+
+		for (int i = 0; i < numberOfVertices2; ++i) {
+			double score=std::stoul(strings[i]);
+			if(score<std::numeric_limits<double>::infinity()){
+				size_t vertex2=i+transformIndex2;
+				completeGraph.insertEdge(vertex1,vertex2);
+				completeScore.push_back(score);
+			}
+		}
+    	lineCounter++;
+	}
+	if(lineCounter<numberOfVertices1){
+		throw std::invalid_argument("Number of lines in matrix is lower than number of vertices in time "+time1);
+	}
+}
+
+
+template<class T>
+inline void CompleteStructure<T>::addEdgesFromFile(){
+	char delim=',';
+
+	std::string line;
+	std::ifstream data;
+	try{
+		data.open(params.getGraphFileName());
+		if(!data){
+			throw std::system_error(errno, std::system_category(), "failed to open "+params.getGraphFileName());
+		}
+
+		std::getline(data, line);
+		double objValue=0;
+
+		std::cout << "Read big graph" << std::endl;
+		params.infoFile()<<"Read big graph" << std::endl;
+		std::vector<std::string> strings;
+
+
+		std::cout<<"Reading vertices from file. "<<std::endl;
+		params.infoFile()<<"Reading vertices from file. "<<std::endl;
+		params.infoFile().flush();
+		//Vertices that are not found have score=0. Appearance and disappearance cost are read here.
+		while (std::getline(data, line) && !line.empty()) {
+
+		}
+
+		std::cout<<"Reading base edges from file. "<<std::endl;
+		params.infoFile()<<"Reading base edges from file. "<<std::endl;
+		params.infoFile().flush();
+		size_t maxLabel=0;
+		while (std::getline(data, line) && !line.empty()) {
+
+			strings = split(line, delim);
+
+			unsigned int v = std::stoul(strings[0]);
+			unsigned int w = std::stoul(strings[1]);
+			size_t l0=vg.getGroupIndex(v);
+			size_t l1=vg.getGroupIndex(w);
+			if(v>vg.getMaxVertex()||w>vg.getMaxVertex()) continue;
+			//std::cout<<"edge "<<v<<" "<<w<<std::endl;
+
+			if(l1-l0<=params.getMaxTimeGapComplete()){
+				double score = std::stod(strings[2]);
+				completeGraph.insertEdge(v,w);
+				completeScore.push_back(score);
+			}
+
+		}
+
+
+		//objValue+=maxLabel*parameters.getInputCost()+maxLabel*parameters.getOutputCost();
+
+		data.close();
+	}
+	catch (std::system_error& er) {
+		std::clog << er.what() << " (" << er.code() << ")" << std::endl;
+
+	}
+}
 }
 
 
