@@ -32,7 +32,7 @@
 #include <set>
 #include <map>
 #include <list>
-#include "disjoint-paths/inputConfig.hxx"
+#include "disjoint-paths/disjointParams.hxx"
 #include <utility>
 
 

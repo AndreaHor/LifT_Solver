@@ -5,8 +5,6 @@
  *      Author: fuksova
  */
 
-#include <disjoint-paths/inputConfig.hxx>
-#include <disjoint-paths/inputConfig.hxx>
 #include <stdexcept>
 
 //#include <andres/ilp/gurobi-callback.hxx>
@@ -18,7 +16,7 @@
 //#include "disjoint-paths/ilp/gurobi-callback-disjoint.hxx"
 #include "disjoint-paths/ilp/solver-disjoint-ilp.hxx"
 //#include "disjoint-paths/ilp/MyCallback.hxx"
-#include "disjoint-paths/inputConfig.hxx"
+#include "disjoint-paths/disjointParams.hxx"
 #include "disjoint-paths/disjointPathsMethods.hxx"
 
 
