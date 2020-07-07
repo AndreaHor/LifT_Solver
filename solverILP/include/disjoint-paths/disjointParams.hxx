@@ -56,6 +56,9 @@ public:
 
 	DisjointParams(std::string fileName,char delim='=');
 
+	template<class STR>
+	void initFromStream(STR& data,char delim='=');
+
 	const std::string& getGraphFileName() const {
 		return graphFileName;
 	}
@@ -283,6 +286,10 @@ private:
 
 };
 
+
+
+
+
 template<class T>
 inline DisjointParams<T>::DisjointParams(std::string fileName,char delim){
 	parametersSet=false;
@@ -293,8 +300,21 @@ inline DisjointParams<T>::DisjointParams(std::string fileName,char delim){
 		if (!data){
 			throw std::system_error(errno, std::system_category(), "failed to open "+fileName);
 		}
+		initFromStream(data,delim);
+
+	}
+
+	catch (std::system_error& er) {
+		std::clog << er.what() << " (" << er.code() << ")" << std::endl;
+	}
+
+}
 
 
+
+template<class T>
+template<class STR>
+inline void DisjointParams<T>::initFromStream(STR& data,char delim){
 	std::string line;
 	std::vector<std::string> strings;
 	std::map<std::string,std::string> parameters;
@@ -742,12 +762,6 @@ inline DisjointParams<T>::DisjointParams(std::string fileName,char delim){
 	paramsFile.close();
 	parametersSet=true;
 		//}
-
-	}
-
-	catch (std::system_error& er) {
-		std::clog << er.what() << " (" << er.code() << ")" << std::endl;
-	}
 
 
 
