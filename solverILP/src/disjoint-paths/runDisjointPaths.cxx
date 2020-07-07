@@ -103,7 +103,7 @@ try
 
 
 	auto parameters = parseCommandLine(argc, argv);
-	disjointPaths::ConfigDisjoint<size_t> configDisjoint(parameters.configFile);
+	disjointPaths::DisjointParams<size_t> configDisjoint(parameters.configFile);
 	if(configDisjoint.isParametersSet()){
 		if(configDisjoint.getSmallIntervals()==0&&configDisjoint.getMaxTimeLifted()>0){
 			disjointPaths::DisjointStructure<> disjointP(configDisjoint);

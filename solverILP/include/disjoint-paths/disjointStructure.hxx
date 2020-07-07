@@ -43,7 +43,7 @@ public:
 	typedef T size_type;
 
 
-	DisjointStructure(disjointPaths::ConfigDisjoint<>& configParameters,char delim=',',CompleteStructure<>* cs=0,size_t minTime=0,size_t maxTime=0);
+	DisjointStructure(disjointPaths::DisjointParams<>& configParameters,char delim=',',CompleteStructure<>* cs=0,size_t minTime=0,size_t maxTime=0);
 	bool isReachable(size_t i,size_t j) const{
 		if(i==t_) return false;  //Assume no path from the terminal node
 		if(desc.size()==0) return true;
@@ -144,7 +144,7 @@ public:
 	}
 
 
-	disjointPaths::ConfigDisjoint<>& parameters;
+	disjointPaths::DisjointParams<>& parameters;
 
 	bool isTimeFramesEnabled(){
 		return useTimeFrames;
@@ -186,7 +186,7 @@ private:
 
 
 template<class T>
-inline DisjointStructure<T>::DisjointStructure(disjointPaths::ConfigDisjoint<>& configParameters,char delim,CompleteStructure<>* cs,size_t minTime,size_t maxTime):
+inline DisjointStructure<T>::DisjointStructure(disjointPaths::DisjointParams<>& configParameters,char delim,CompleteStructure<>* cs,size_t minTime,size_t maxTime):
 parameters(configParameters)
 {
 

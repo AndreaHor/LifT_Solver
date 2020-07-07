@@ -41,10 +41,10 @@ std::vector<std::string> split(
 
 
 template<class T = size_t>
-class ConfigDisjoint {
+class DisjointParams {
 public:
 
-	~ConfigDisjoint(){
+	~DisjointParams(){
 		std::cout<<"config disjoint destructor"<<std::endl;
 		infoFile()<<"config disjoint destructor"<<std::endl;
 		if(pInfoFile!=0){
@@ -54,7 +54,7 @@ public:
 	}
 
 
-	ConfigDisjoint(std::string fileName,char delim='=');
+	DisjointParams(std::string fileName,char delim='=');
 
 	const std::string& getGraphFileName() const {
 		return graphFileName;
@@ -225,8 +225,8 @@ public:
 
 
 private:
-	ConfigDisjoint<T>(const ConfigDisjoint<T>&);
-	ConfigDisjoint();
+	DisjointParams<T>(const DisjointParams<T>&);
+	DisjointParams();
 	//std::ofstream * fileForGeneralOutputs;
     std::ofstream* pInfoFile;
 	std::string graphFileName;
@@ -284,7 +284,7 @@ private:
 };
 
 template<class T>
-inline ConfigDisjoint<T>::ConfigDisjoint(std::string fileName,char delim){
+inline DisjointParams<T>::DisjointParams(std::string fileName,char delim){
 	parametersSet=false;
 	std::ifstream data;
 	//data.exceptions( std::ifstream::failbit | std::ifstream::badbit );

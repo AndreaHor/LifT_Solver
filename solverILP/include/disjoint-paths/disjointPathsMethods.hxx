@@ -117,7 +117,7 @@ public:
 		maxTime=0;
 	}
 
-	VertexGroups(disjointPaths::ConfigDisjoint<>& parameters,char delim){
+	VertexGroups(disjointPaths::DisjointParams<>& parameters,char delim){
 		//std::vector<std::vector<size_t>> groups;
 
 		std::string line;
@@ -312,7 +312,7 @@ std::vector<std::vector<size_t>> extractInnerPaths(VertexGroups<size_t>& vg,std:
 
 
 template<class T>
-	std::vector<std::unordered_set<size_t>> initReachableSet(T & graph,ConfigDisjoint<>& parameters,VertexGroups<size_t>* vg=0){
+	std::vector<std::unordered_set<size_t>> initReachableSet(T & graph,DisjointParams<>& parameters,VertexGroups<size_t>* vg=0){
 
 	levinkov::Timer tfw;
 			tfw.start();
@@ -414,7 +414,7 @@ template<class T>
 
 
 template<class T>
-	std::vector<std::vector<bool>> initReachable(T & graph,ConfigDisjoint<>& parameters,VertexGroups<size_t>* vg=0){
+	std::vector<std::vector<bool>> initReachable(T & graph,DisjointParams<>& parameters,VertexGroups<size_t>* vg=0){
 
 	levinkov::Timer tfw;
 			tfw.start();
@@ -523,7 +523,7 @@ template<class T = size_t>
 struct CompleteStructure {
 public:
 
-	CompleteStructure(ConfigDisjoint<T> & configParameters,char delim=','){
+	CompleteStructure(DisjointParams<T> & configParameters,char delim=','){
 
 		vg=VertexGroups<>(configParameters,delim);
 		maxTime=vg.getMaxTime();

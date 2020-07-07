@@ -83,7 +83,7 @@ public:
 	}
 
 
-	Data(CompleteStructure<>& cs,ConfigDisjoint<>& inpParameters) :
+	Data(CompleteStructure<>& cs,DisjointParams<>& inpParameters) :
 		parameters(inpParameters) {
 
 		std::cout<<"new constructor of data"<<std::endl;
@@ -145,7 +145,7 @@ public:
 
 
 
-	 const ConfigDisjoint<>* getParameters()  {
+	 const DisjointParams<>* getParameters()  {
 	 		 return &parameters;
 	 }
 
@@ -308,7 +308,7 @@ public:
 
 	levinkov::Timer timer;
 
-	disjointPaths::ConfigDisjoint<>& parameters;
+	disjointPaths::DisjointParams<>& parameters;
 
 private:
 //	bool isReachableInTemp(size_t v,size_t w){

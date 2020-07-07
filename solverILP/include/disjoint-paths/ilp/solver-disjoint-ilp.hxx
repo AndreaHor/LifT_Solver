@@ -699,7 +699,7 @@ std::unordered_map<size_t,std::vector<size_t>> doPathOptimization(Data<>& data,s
 
 
 template<class T=size_t>
-void solver_flow_only(ConfigDisjoint<>& parameters)
+void solver_flow_only(DisjointParams<>& parameters)
 {
 	std::cout<<"Using simple flow solver"<<std::endl;
 	DisjointStructure<> DS(parameters);
@@ -712,7 +712,7 @@ void solver_flow_only(ConfigDisjoint<>& parameters)
 
 
 template<class T=size_t>
-void solver_ilp(ConfigDisjoint<>& parameters)
+void solver_ilp(DisjointParams<>& parameters)
 {
 
 	char delim=',';
