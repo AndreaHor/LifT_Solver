@@ -117,6 +117,8 @@ public:
 		maxTime=0;
 	}
 
+
+
 	VertexGroups(disjointPaths::DisjointParams<>& parameters,char delim){
 		//std::vector<std::vector<size_t>> groups;
 
@@ -129,82 +131,8 @@ public:
 				throw std::system_error(errno, std::system_category(), "failed to open "+parameters.getTimeFileName());
 			}
 
-			size_t lineCounter=0;
-			std::vector<size_t> currentGroup;
+			initFromStream(timeData,parameters.getMaxTimeFrame());
 
-			unsigned int previousTime=0;
-			unsigned int time=0;
-
-			while (std::getline(timeData, line) && !line.empty()) {
-
-				//std::cout<<"time file line "<<lineCounter<<" delim "<<delim<<std::endl;
-				lineCounter++;
-
-				strings = split(line,delim);
-				//std::cout<<"split "<<std::endl;
-				if (strings.size() < 2) {
-					throw std::runtime_error(
-							std::string("Vertex and time frame expected"));
-				}
-
-				unsigned int v = std::stoul(strings[0]);
-				time = std::stoul(strings[1]);
-				if(time>parameters.getMaxTimeFrame()){
-					//groups[previousTime]=currentGroup;
-					break;
-				}
-				if(vToGroup.size()!=v){
-					throw std::runtime_error(
-							std::string("Wrong vertex numbering in time file"));
-				}
-				else{
-
-					vToGroup.push_back(time);
-					//if(time==groups.size()+1){  //Change groups to map?
-					if(time==previousTime||previousTime==0){
-						currentGroup.push_back(v);
-					}
-					//else if(time==groups.size()+2){
-					else{
-						//groups.push_back(currentGroup);
-						groups[previousTime]=currentGroup;
-						currentGroup=std::vector<size_t>();
-						currentGroup.push_back(v);
-					}
-					previousTime=time;
-					//				else{
-					//					throw std::runtime_error("Wrong time frame numbering.");
-					//				}
-
-				}
-			}
-			groups[previousTime]=currentGroup;
-
-
-			maxTime=*(vToGroup.rbegin());
-
-			//time frame of s is zero
-			vToGroup.push_back(0);
-			currentGroup=std::vector<size_t>();
-			currentGroup.push_back(vToGroup.size()-1);
-			groups[0]=currentGroup;
-
-			//time frame of t is maxTime
-			vToGroup.push_back(maxTime+1);
-			currentGroup=std::vector<size_t>();
-			currentGroup.push_back(vToGroup.size()-1);
-			groups[maxTime+1]=currentGroup;
-
-			maxVertex=vToGroup.size()-3;
-
-			//		for (int i = 0; i < maxTime+2; ++i) {
-			//			std::cout<<"group "<<i<<": ";
-			//			for (int j = 0; j < groups[i].size(); ++j) {
-			//				std::cout<<groups[i][j]<<",";
-			//			}
-			//			std::cout<<std::endl;
-			//
-			//		}
 		}
 		catch (std::system_error& er) {
 			std::clog << er.what() << " (" << er.code() << ")" << std::endl;
@@ -212,6 +140,11 @@ public:
 		}
 
 	}
+
+
+	template<class STR>
+	void initFromStream(STR& timeData,size_t maxTimeToRead);
+
 
 
 
@@ -233,6 +166,9 @@ public:
 			return maxTime;
     }
 
+
+
+
 private:
 	//std::vector<std::vector<size_t>> groups;
 	std::unordered_map<size_t,std::vector<size_t>> groups;
@@ -242,6 +178,87 @@ private:
 
 
 };
+
+
+
+
+
+template<class T>
+template<class STR>
+inline void VertexGroups<T>::initFromStream(STR& timeData,size_t maxTimeToRead){
+	size_t lineCounter=0;
+	std::vector<size_t> currentGroup;
+	std::vector<std::string> strings;
+	std::string line;
+	char delim=',';
+
+	unsigned int previousTime=0;
+	unsigned int time=0;
+
+	while (std::getline(timeData, line) && !line.empty()) {
+
+		//std::cout<<"time file line "<<lineCounter<<" delim "<<delim<<std::endl;
+		lineCounter++;
+
+		strings = split(line,delim);
+		//std::cout<<"split "<<std::endl;
+		if (strings.size() < 2) {
+			throw std::runtime_error(
+					std::string("Vertex and time frame expected"));
+		}
+
+		unsigned int v = std::stoul(strings[0]);
+		time = std::stoul(strings[1]);
+		if(time>maxTimeToRead){
+			//groups[previousTime]=currentGroup;
+			break;
+		}
+		if(vToGroup.size()!=v){
+			throw std::runtime_error(
+					std::string("Wrong vertex numbering in time file"));
+		}
+		else{
+
+			vToGroup.push_back(time);
+			//if(time==groups.size()+1){  //Change groups to map?
+			if(time==previousTime||previousTime==0){
+				currentGroup.push_back(v);
+			}
+			//else if(time==groups.size()+2){
+			else{
+				//groups.push_back(currentGroup);
+				groups[previousTime]=currentGroup;
+				currentGroup=std::vector<size_t>();
+				currentGroup.push_back(v);
+			}
+			previousTime=time;
+
+
+		}
+	}
+	groups[previousTime]=currentGroup;
+
+
+	maxTime=*(vToGroup.rbegin());
+
+	//time frame of s is zero
+	vToGroup.push_back(0);
+	currentGroup=std::vector<size_t>();
+	currentGroup.push_back(vToGroup.size()-1);
+	groups[0]=currentGroup;
+
+	//time frame of t is maxTime
+	vToGroup.push_back(maxTime+1);
+	currentGroup=std::vector<size_t>();
+	currentGroup.push_back(vToGroup.size()-1);
+	groups[maxTime+1]=currentGroup;
+
+	maxVertex=vToGroup.size()-3;
+
+
+
+
+}
 
 //
 //template<class T>
