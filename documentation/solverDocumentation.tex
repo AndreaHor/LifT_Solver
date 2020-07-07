@@ -191,5 +191,25 @@ Note that two special vertices $s$ and $t$ are added automatically. Vertices are
 \subsection{File with Time Frames}
 This file must provide list of vertices that belong to each time frame. Every vertex must be on a separate line. Every line must contain two comma separated values. The first value is the index of a graph vertex (numbered from zero), the second is the index of its time frame (numbered from one). The vertices must be stated in ascending order. That is, first line contains vertex 0, second line contains vertex 1, etc.
 
+\section{Output Files}
+All output files have the same prefix specified in \texttt{OUTPUT\_PREFIX}. 
+\paragraph{List of  Output Files}
+\begin{itemize}
+\item \texttt{-all-paths-FINAL.txt}\\
+File with final results. Each line contains one resulting track. Vertices within one track are space separated.
+\item \texttt{-all-paths-INTERVALS.txt}\\
+Tracks resulting from the first step. That is from the solution on subintervals of the whole graph.
+\item \texttt{-params.txt}\\
+List of parameter values used for the current solver run.
+\item \texttt{-info.txt}\\
+Contains log informations about the current state of solving. All the information contained in this file are in addition printed to standard output.
+\item \texttt{-gurobi.log, -tr-gurobi.log}\\
+Contains all logs output by gurobi. \texttt{-tr-gurobi.log} stores logs from gurobi solving the problem on tracklet graphs.
+\item \texttt{-optimization.log, -tr-optimization.log}\\
+Contains some additional logs of optimization tasks. 
+\item \texttt{-all-paths-FEASIBLE-0.txt, -tr-all-paths-FEASIBLE-0.txt}\\
+Tracklets obtained from intermediate feasible solutions. \texttt{-tr} stores tracklets produces from solver run on tracklet graphs. These files are produced only if \texttt{DEBUG\_OUTPUT\_FILES = 1}.
+\end{itemize}
+
 
 \end{document}
