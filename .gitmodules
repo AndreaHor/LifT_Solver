@@ -4,3 +4,6 @@
 [submodule "external/TCLAP"]
 	path = solverILP/external/TCLAP
 	url = https://github.com/mirror/tclap.git
+[submodule "external/pybind11"]
+	path = solverILP/external/pybind11
+	url = https://github.com/pybind/pybind11.git
