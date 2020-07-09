@@ -34,8 +34,12 @@
 #include <list>
 #include "disjoint-paths/disjointParams.hxx"
 #include <utility>
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include <pybind11/operators.h>
+#include <pybind11/numpy.h>
 
-
+namespace py = pybind11;
 namespace disjointPaths {
 
 
@@ -553,7 +557,8 @@ public:
 }
 
 	void addEdgesFromFile();
-	void addEdges(size_t time1,size_t time2,std::stringstream& data);
+    void addEdges(size_t time1,size_t time2,const py::array_t<double> inputMatrix);
+    //void addEdges(size_t time1,size_t time2,std::stringstream& data);
 
 	andres::graph::Digraph<> completeGraph;
 	std::vector<double> completeScore;
@@ -563,43 +568,71 @@ public:
 
 };
 
-
 template<class T>
-inline void CompleteStructure<T>::addEdges(size_t time1,size_t time2,std::stringstream& data){
-	std::string line;
-	std::vector<std::string> strings;
-	char delim=',';
+inline void CompleteStructure<T>::addEdges(size_t time1,size_t time2,const py::array_t<double> inputMatrix){
 
-	size_t lineCounter=0;
-	size_t transformIndex1=vg.getGroupVertices(time1)[0];
-	size_t numberOfVertices1=vg.getGroupVertices(time1).size();
-	size_t transformIndex2=vg.getGroupVertices(time2)[0];
-	size_t numberOfVertices2=vg.getGroupVertices(time2).size();
+    const auto matrix=inputMatrix.unchecked<2>();
+    const std::size_t dim1=matrix.shape(0);
+    const std::size_t dim2=matrix.shape(1);
 
-	while (std::getline(data, line) && !line.empty()) {
-		if(lineCounter>=numberOfVertices1){
-			throw std::invalid_argument("Attempt to add edges to non-existing vertices in time frame "+time1);
-		}
-		size_t vertex1=lineCounter+transformIndex1;
-		strings = split(line, delim);
-		if(strings.size()!=numberOfVertices2){
-			throw std::invalid_argument("Number of matrix columns does not match the number of vertices in time frame "+time2);
-		}
+    size_t transformIndex1=vg.getGroupVertices(time1)[0];
+    size_t numberOfVertices1=vg.getGroupVertices(time1).size();
+    size_t transformIndex2=vg.getGroupVertices(time2)[0];
+    size_t numberOfVertices2=vg.getGroupVertices(time2).size();
 
-		for (int i = 0; i < numberOfVertices2; ++i) {
-			double score=std::stoul(strings[i]);
-			if(score<std::numeric_limits<double>::infinity()){
-				size_t vertex2=i+transformIndex2;
-				completeGraph.insertEdge(vertex1,vertex2);
-				completeScore.push_back(score);
-			}
-		}
-    	lineCounter++;
-	}
-	if(lineCounter<numberOfVertices1){
-		throw std::invalid_argument("Number of lines in matrix is lower than number of vertices in time "+time1);
-	}
+    if(dim1!=numberOfVertices1||dim2!=numberOfVertices2){
+        std::string message="Dimension mismatch, expected dimensions: "+std::to_string(numberOfVertices1)+", "+std::to_string(numberOfVertices2)+", got: "+std::to_string(dim1)+", "+std::to_string(dim2);
+        throw std::invalid_argument(message);
+    }
+    for(std::size_t i=0; i<dim1; ++i) {
+        size_t vertex1=i+transformIndex1;
+        for(std::size_t j=0; j<dim2; ++j) {
+            double score=matrix(i,j);
+            size_t vertex2=j+transformIndex2;
+            completeGraph.insertEdge(vertex1,vertex2);
+            completeScore.push_back(score);
+        }
+    }
+
 }
+
+
+//template<class T>
+//inline void CompleteStructure<T>::addEdges(size_t time1,size_t time2,std::stringstream& data){
+//	std::string line;
+//	std::vector<std::string> strings;
+//	char delim=',';
+
+//	size_t lineCounter=0;
+//	size_t transformIndex1=vg.getGroupVertices(time1)[0];
+//	size_t numberOfVertices1=vg.getGroupVertices(time1).size();
+//	size_t transformIndex2=vg.getGroupVertices(time2)[0];
+//	size_t numberOfVertices2=vg.getGroupVertices(time2).size();
+
+//	while (std::getline(data, line) && !line.empty()) {
+//		if(lineCounter>=numberOfVertices1){
+//			throw std::invalid_argument("Attempt to add edges to non-existing vertices in time frame "+time1);
+//		}
+//		size_t vertex1=lineCounter+transformIndex1;
+//		strings = split(line, delim);
+//		if(strings.size()!=numberOfVertices2){
+//			throw std::invalid_argument("Number of matrix columns does not match the number of vertices in time frame "+time2);
+//		}
+
+//		for (int i = 0; i < numberOfVertices2; ++i) {
+//			double score=std::stoul(strings[i]);
+//			if(score<std::numeric_limits<double>::infinity()){
+//				size_t vertex2=i+transformIndex2;
+//				completeGraph.insertEdge(vertex1,vertex2);
+//				completeScore.push_back(score);
+//			}
+//		}
+//    	lineCounter++;
+//	}
+//	if(lineCounter<numberOfVertices1){
+//		throw std::invalid_argument("Number of lines in matrix is lower than number of vertices in time "+time1);
+//	}
+//}
 
 
 template<class T>

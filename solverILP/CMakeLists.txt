@@ -16,6 +16,7 @@ set(PYBIND11_CPP_STANDARD -std=c++14)
 include_directories(include)
 include_directories(include/disjoint-paths)
 add_subdirectory(external/pybind11)
+#include_directories(external/pybind11)
 
 #add_subdirectory(src)
 
@@ -29,12 +30,14 @@ if(GUROBI_FOUND)
     add_library(MyCallback src/disjoint-paths/MyCallback.cxx)
     target_include_directories(MyCallback PUBLIC external/andres-graph/include)
     target_include_directories(MyCallback PUBLIC external/TCLAP/include)
-    target_link_libraries(MyCallback ${GUROBI_CPP_LIBRARY} ${GUROBI_LIBRARY})
+    target_include_directories(MyCallback PUBLIC external/pybind11/include)
+    target_link_libraries(MyCallback ${GUROBI_CPP_LIBRARY} ${GUROBI_LIBRARY} pybind11::module)
 
     add_executable(run-disjoint-paths src/disjoint-paths/runDisjointPaths.cxx  ${headers} ${sources})
     target_include_directories(run-disjoint-paths PRIVATE external/andres-graph/include)
     target_include_directories(MyCallback PRIVATE external/TCLAP/include)
-    target_link_libraries(run-disjoint-paths ${GUROBI_CPP_LIBRARY} ${GUROBI_LIBRARY} MyCallback)
+    target_include_directories(run-disjoint-paths PUBLIC external/pybind11/include)
+    target_link_libraries(run-disjoint-paths ${GUROBI_CPP_LIBRARY} ${GUROBI_LIBRARY} MyCallback pybind11::module)
     
   
   
