@@ -126,28 +126,28 @@ public:
     VertexGroups(disjointPaths::DisjointParams<>& parameters){
 		//std::vector<std::vector<size_t>> groups;
 
-		std::string line;
-		std::vector<std::string> strings;
-		std::ifstream timeData;
-		try{
-			timeData.open(parameters.getTimeFileName());
-			if(!timeData){
-				throw std::system_error(errno, std::system_category(), "failed to open "+parameters.getTimeFileName());
-			}
+        initFromFile(parameters.getTimeFileName(),parameters);
+//		std::string line;
+//		std::vector<std::string> strings;
+//		std::ifstream timeData;
+//		try{
+//			timeData.open(parameters.getTimeFileName());
+//			if(!timeData){
+//				throw std::system_error(errno, std::system_category(), "failed to open "+parameters.getTimeFileName());
+//			}
 
-			initFromStream(timeData,parameters.getMaxTimeFrame());
+//			initFromStream(timeData,parameters.getMaxTimeFrame());
 
-		}
-		catch (std::system_error& er) {
-			std::clog << er.what() << " (" << er.code() << ")" << std::endl;
+//		}
+//		catch (std::system_error& er) {
+//			std::clog << er.what() << " (" << er.code() << ")" << std::endl;
 
-		}
+//		}
 
 	}
 
 
-	template<class STR>
-	void initFromStream(STR& timeData,size_t maxTimeToRead);
+    void initFromFile(const std::string& fileName,const DisjointParams<>& parameters);
 
     void initFromVector(const std::vector<size_t>& verticesInFrames);
 
@@ -230,13 +230,23 @@ inline void VertexGroups<T>::initFromVector(const std::vector<size_t>& verticesI
 
 
 template<class T>
-template<class STR>
-inline void VertexGroups<T>::initFromStream(STR& timeData,size_t maxTimeToRead){
+inline void VertexGroups<T>::initFromFile(const std::string& fileName,const DisjointParams<>& parameters){
 	size_t lineCounter=0;
 	std::vector<size_t> currentGroup;
 	std::vector<std::string> strings;
 	std::string line;
 	char delim=',';
+
+
+    size_t maxTimeToRead=parameters.getMaxTimeFrame();
+
+
+    std::ifstream timeData;
+    try{
+        timeData.open(fileName);
+        if(!timeData){
+            throw std::system_error(errno, std::system_category(), "failed to open "+fileName);
+        }
 
 	unsigned int previousTime=0;
 	unsigned int time=0;
@@ -300,6 +310,12 @@ inline void VertexGroups<T>::initFromStream(STR& timeData,size_t maxTimeToRead){
 	groups[maxTime+1]=currentGroup;
 
 	maxVertex=vToGroup.size()-3;
+    }
+    catch (std::system_error& er) {
+        std::clog << er.what() << " (" << er.code() << ")" << std::endl;
+
+    }
+
 }
 
 //
