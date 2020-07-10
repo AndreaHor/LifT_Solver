@@ -1073,7 +1073,7 @@ void solver_ilp(DisjointStructure<>& ds)
 
 
 
-} // namespace disjoint-paths
+} // namespace disjointPaths
 
 
 

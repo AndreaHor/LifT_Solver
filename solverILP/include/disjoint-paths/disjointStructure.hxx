@@ -198,7 +198,7 @@ parameters(configParameters)
 	size_t maxVertex;
 	if(cs==0){
 	//	if(useTimeFrames){
-			vertexGroups=VertexGroups<size_t>(configParameters,delim);
+            vertexGroups=VertexGroups<size_t>(configParameters);
 			maxVertex=vertexGroups.getMaxVertex();
 //		}
 //		else{

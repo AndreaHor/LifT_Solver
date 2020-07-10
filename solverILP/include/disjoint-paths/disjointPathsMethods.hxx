@@ -123,7 +123,7 @@ public:
 
 
 
-	VertexGroups(disjointPaths::DisjointParams<>& parameters,char delim){
+    VertexGroups(disjointPaths::DisjointParams<>& parameters){
 		//std::vector<std::vector<size_t>> groups;
 
 		std::string line;
@@ -584,7 +584,7 @@ public:
 	CompleteStructure(DisjointParams<T> & configParameters,char delim=','):
 		params(configParameters)
 {
-		vg=VertexGroups<>(configParameters,delim);
+        vg=VertexGroups<>(configParameters);
 		maxTime=vg.getMaxTime();
 		std::cout<<"max time "<<maxTime<<std::endl;
 		configParameters.infoFile()<<"max time "<<maxTime<<std::endl;
