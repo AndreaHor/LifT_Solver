@@ -12,6 +12,7 @@
 	4. `outputDir = LifT_Solver/tracker/results/` points to the folder where the results are stored
 	5. `saveImg`: Boolean variable deciding wether to create result videos. Works only if FFMPEG is accessable
 	6. `CALL_SOLVER`,`EVAL_SOLVER`, `CREATE_PROBLEM_FILE`: They can be used to speed-up the tracker if one sequence is computed with different parameters. If different solver parameters are used, `CREATE_PROBLEM_FILE` can be set to 0 after the first run. For a study on the post-processing, `CALL_SOLVER` and `CREATE_PROBLEM_FILE` can be set to 0. 
+	7. `gurobiLic` points to the gurobi license file 
 
 3. `runtime_configuration/params.ini`: Contains all relevant parameters for the solver as well as the tracker.
 	1. For all parameters related to the solver, please look in the documentary of the solver.
