@@ -212,6 +212,18 @@ inline void VertexGroups<T>::initFromVector(const std::vector<size_t>& verticesI
     maxVertex=vertexCounter;
     size_t s=maxVertex+1;
     size_t t=maxVertex+2;
+
+    verticesInGroup=std::vector<size_t>();
+    verticesInGroup.push_back(s);
+    vToGroup.push_back(0);
+    groups[0]=verticesInGroup;
+
+    verticesInGroup=std::vector<size_t>();
+    verticesInGroup.push_back(t);
+    vToGroup.push_back(frameCounter);
+    groups[frameCounter]=verticesInGroup;
+
+
     //TODO first and last frame for s and t!
 
 }
