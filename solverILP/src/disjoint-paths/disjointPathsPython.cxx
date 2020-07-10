@@ -27,8 +27,9 @@ PYBIND11_MODULE(disjointPathsPy, m) {
         .def("init_from_file", &disjointPaths::VertexGroups<>::initFromFile, "Initializes vertices in time frames from a file");
 
      py::class_<disjointPaths::CompleteStructure<>>(m, "GraphStructure")
-        .def(py::init<disjointPaths::DisjointParams<> &>())
-        .def("add_edges_from_array", &disjointPaths::CompleteStructure<>::addEdges, "Initializes edges of graph between two time frames from a matrix.");
+        .def(py::init<disjointPaths::VertexGroups<> &>())
+        .def("add_edges_from_array", &disjointPaths::CompleteStructure<>::addEdgesFromMatrix, "Initializes edges of the graph between two time frames from a matrix.")
+        .def("add_edges_from_file", &disjointPaths::CompleteStructure<>::addEdgesFromFile, "Initializes all edges of the graph from a file.");
 
      m.def("solve_ilp", py::overload_cast<disjointPaths::DisjointParams<>&, disjointPaths::CompleteStructure<>&>(&disjointPaths::solver_ilp<>), "Solve lifted disjoint paths");
 

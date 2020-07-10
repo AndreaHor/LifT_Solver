@@ -11,7 +11,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 
 set(PYBIND11_CPP_STANDARD -std=c++14)
-#set(PYBIND11_INSTALL ON CACHE BOOL "enable pybind11 bindings.")
+set(PYBIND11_INSTALL ON CACHE BOOL "enable pybind11 bindings.")
 
 include_directories(include)
 include_directories(include/disjoint-paths)
