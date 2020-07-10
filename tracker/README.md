@@ -19,7 +19,7 @@
 
 4. Precomputed features are provided for MOT17-02-DPM
 
-5. Pre-processing and post-processing is not part of this repository. We do not provide pre-process input detections, though. 
+5. Pre-processing and post-processing is not part of this repository. We do provide pre-processed input detections for MOT17, though. 
 
 
 ## Evaluation
