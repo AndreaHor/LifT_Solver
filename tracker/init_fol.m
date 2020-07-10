@@ -1,0 +1,5 @@
+addpath(genpath('tools'))
+addpath(genpath('features/computation'))
+addpath(genpath('graph'))
+addpath(genpath('solver'))
+addpath(genpath('postprocessing'))
