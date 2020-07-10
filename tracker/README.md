@@ -37,4 +37,18 @@ A call can thus be:
 
 `TrackingViaLiftedPath('MOT17-02-DPM','MOT17',true)`
 
+## Graph Weights
+
+Graph weight computations are not part of this repository. You can use your own definitions which must create a probability value for any edge within a defined time threshold (according to `LIFTED_SECONDS` and `BASE_SECONDS`). The function `computePairwiseCosts` should then load your pre-computed costs and call the solver on the resulting graph. The current format of the file containing pre-defined features can be seen in the `features/data/tmp/pairwise/fusion/` folder and is documented in the `computePairwiseCosts.m` function. 
+
+## Input detections
+
+Input detections are expected to be a CSV file with the column names "Frame,X_UL,Y_UL,W,H,PDET":
+
+`Frame`: the frame number of the detetection
+`X_UL`: x-coordinate of the detection box at the upper left corner
+`Y_UL`: y-coordinate of the detection box at the upper left corner
+`W`: width of the detection box
+`H`: height of the detection box
+`PDET: probability of the detection box
 
