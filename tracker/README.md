@@ -17,6 +17,10 @@
 	1. For all parameters related to the solver, please look in the documentary of the solver.
 	2. The parameters `LIFTED_SECONDS` and `BASE_SECONDS` control the maximal edge length in seconds.
 
+4. Precomputed features are provided for MOT17-02-DPM
+
+5. Pre-processing and post-processing is not part of this repository. We do not provide pre-process input detections, though. 
+
 
 ## Evaluation
 
