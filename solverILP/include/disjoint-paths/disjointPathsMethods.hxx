@@ -149,6 +149,8 @@ public:
 	template<class STR>
 	void initFromStream(STR& timeData,size_t maxTimeToRead);
 
+    void initFromVector(const std::vector<size_t>& verticesInFrames);
+
 
 
 
@@ -184,7 +186,35 @@ private:
 };
 
 
+template<class T>
+inline void VertexGroups<T>::initFromVector(const std::vector<size_t>& verticesInFrames){
+    maxTime=verticesInFrames.size();
+    size_t inFrameCounter=0;
+    size_t vertexCounter=0;
+    size_t frameCounter=1;
+    std::vector<size_t> verticesInGroup;
+    vToGroup=std::vector<size_t>();
+    while(frameCounter<=maxTime){
+        while(inFrameCounter==verticesInFrames[frameCounter-1]){
+            groups[frameCounter]=verticesInGroup;
+            inFrameCounter=0;
+            frameCounter++;
+            verticesInGroup=std::vector<size_t>();
+        }
+        if(frameCounter<=maxTime){
+            verticesInGroup.push_back(vertexCounter);
+            vToGroup.push_back(frameCounter);
+            inFrameCounter++;
+            vertexCounter++;
+        }
+    }
 
+    maxVertex=vertexCounter;
+    size_t s=maxVertex+1;
+    size_t t=maxVertex+2;
+    //TODO first and last frame for s and t!
+
+}
 
 
 template<class T>
@@ -258,10 +288,6 @@ inline void VertexGroups<T>::initFromStream(STR& timeData,size_t maxTimeToRead){
 	groups[maxTime+1]=currentGroup;
 
 	maxVertex=vToGroup.size()-3;
-
-
-
-
 }
 
 //
