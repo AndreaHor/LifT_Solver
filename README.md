@@ -11,10 +11,19 @@ This is the official implementation of our **ICML 2020** paper *Lifted Disjoint 
 We provide the solver implemented in C++, along with a Python wrapper.
 The tracker is implemented in Matlab.
 
-A [video](https://icml.cc/virtual/2020/paper/5878) explaining our work is also available.
 
 
+## Evaluation
+Using the features explained in our paper, we achieve the following results on MOT17:
 
+
+|           | MOTA         | IDF1           |       FP     |     FN     |     IDs      |
+|  :---:    | :---:        |     :---:      |    :---:     | :---:      |    :---:     |
+| **Train** |     67.0     |     72.4       |    2655      |   107803   |     791      |
+| **Test**  |     60.5     |     65.6       |    14966     | 206619     |     1189     |
+
+
+Note that all results on the training set have been calculated in a leave-one-out fashion so that values are actually meaningful. 
 
 ## Citation
 If you use our work in your research, please cite our publication:
