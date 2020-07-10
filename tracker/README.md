@@ -1,5 +1,10 @@
 # Lif_T Tracker 
 
+We provide a wrapper around the Lift solver that loads detections and graph weights, then calls the solver and stores the tracking results in the MOTChallenge format. It can also produce result videos. 
+
+Not contained in this repository are the feature computation, pre- and post-processing.
+
+
 ## Setup
 
 1. Make sure gurobi and the Lift solver are installed 
@@ -29,9 +34,9 @@ In order to run the tracker, call
 
 `TrackingViaLiftedPath(sequenceName,datasetName,isTrain)`.
 
-	* `sequenceName`: name of the sequence,
-	* `datasetName`: name of the dataset of the sequence.
-	* `isTrain`: Boolean stating if the sequence is part of the training or test set.
+* `sequenceName`: name of the sequence.
+* `datasetName`: name of the dataset of the sequence.
+* `isTrain`: Boolean stating if the sequence is part of the training or test set.
 
 A call can thus be:
 
