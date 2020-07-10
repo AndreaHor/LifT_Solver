@@ -431,7 +431,7 @@ if(parameters.count("INPUT_GRAPH")>0){
 		maxTimeBase=std::stoul(parameters["MAX_TIMEGAP_BASE"]);
 	}
 	else{
-		maxTimeBase=24;
+        maxTimeBase=60;
 	}
 	std::cout<<"max time gap base "<<maxTimeBase<<std::endl;
 	paramsFile<<"max time gap base "<<maxTimeBase<<std::endl;
@@ -485,7 +485,7 @@ if(parameters.count("INPUT_GRAPH")>0){
 		maxTimeLifted=std::stoul(parameters["MAX_TIMEGAP_LIFTED"]);
 	}
 	else{
-		maxTimeLifted=24;
+        maxTimeLifted=60;
 	}
 	std::cout<<"max time gap lifted "<<maxTimeLifted<<std::endl;
 	paramsFile<<"max time gap lifted "<<maxTimeLifted<<std::endl;
@@ -494,7 +494,7 @@ if(parameters.count("INPUT_GRAPH")>0){
 		denseTimeLifted=std::stoul(parameters["DENSE_TIMEGAP_LIFTED"]);
 	}
 	else{
-		denseTimeLifted=4;
+        denseTimeLifted=12;
 	}
 	std::cout<<"dense time gap lifted "<<denseTimeLifted<<std::endl;
 	paramsFile<<"dense time gap lifted "<<denseTimeLifted<<std::endl;
@@ -568,7 +568,8 @@ if(parameters.count("INPUT_GRAPH")>0){
 		}
 	}
 	else{
-		trackletSize=smallIntervals;
+        trackletSize=20;
+        trackletSize=std::min(trackletSize,smallIntervals);
 	}
 	std::cout<<"tracklet size "<<trackletSize<<std::endl;
 	paramsFile<<"tracklet size "<<trackletSize<<std::endl;

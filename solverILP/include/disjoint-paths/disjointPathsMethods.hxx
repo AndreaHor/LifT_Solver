@@ -597,8 +597,7 @@ template<class T>
 template<class T = size_t>
 struct CompleteStructure {
 public:
-	CompleteStructure(DisjointParams<T> & configParameters,char delim=','):
-		params(configParameters)
+    CompleteStructure(DisjointParams<T> & configParameters)
 {
         vg=VertexGroups<>(configParameters);
 		maxTime=vg.getMaxTime();
@@ -607,23 +606,36 @@ public:
 		completeGraph=andres::graph::Digraph<>(vg.getMaxVertex()+1);
 		std::cout<<"cg vertices "<<completeGraph.numberOfVertices()<<std::endl;
 		configParameters.infoFile()<<"cg vertices "<<completeGraph.numberOfVertices()<<std::endl;
+        addEdgesFromFile(configParameters.getGraphFileName(),configParameters);
 
 }
 
-	void addEdgesFromFile();
-    void addEdges(size_t time1,size_t time2,const py::array_t<double> inputMatrix);
+
+    CompleteStructure(VertexGroups<>& vg)
+{
+        maxTime=vg.getMaxTime();
+        std::cout<<"max time "<<maxTime<<std::endl;
+        completeGraph=andres::graph::Digraph<>(vg.getMaxVertex()+1);
+        std::cout<<"cg vertices "<<completeGraph.numberOfVertices()<<std::endl;
+
+
+}
+
+
+    void addEdgesFromFile(const std::string& fileName,DisjointParams<>& params);
+    void addEdgesFromMatrix(size_t time1,size_t time2,const py::array_t<double> inputMatrix);
     //void addEdges(size_t time1,size_t time2,std::stringstream& data);
 
 	andres::graph::Digraph<> completeGraph;
 	std::vector<double> completeScore;
 	VertexGroups<> vg;
 	size_t maxTime;
-	DisjointParams<T>& params;
+    //DisjointParams<T>& params;
 
 };
 
 template<class T>
-inline void CompleteStructure<T>::addEdges(size_t time1,size_t time2,const py::array_t<double> inputMatrix){
+inline void CompleteStructure<T>::addEdgesFromMatrix(size_t time1,size_t time2,const py::array_t<double> inputMatrix){
 
     const auto matrix=inputMatrix.unchecked<2>();
     const std::size_t dim1=matrix.shape(0);
@@ -690,7 +702,7 @@ inline void CompleteStructure<T>::addEdges(size_t time1,size_t time2,const py::a
 
 
 template<class T>
-inline void CompleteStructure<T>::addEdgesFromFile(){
+inline void CompleteStructure<T>::addEdgesFromFile(const std::string& fileName,DisjointParams<>& params){
 	char delim=',';
 
 	std::string line;
