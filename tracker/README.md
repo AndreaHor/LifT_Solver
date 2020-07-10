@@ -27,11 +27,11 @@
 
 In order to run the tracker, call
 
-`TrackingViaLiftedPath(sequenceName,datasetName,isTrain)`, where
+`TrackingViaLiftedPath(sequenceName,datasetName,isTrain)`.
 
-	1. `sequenceName` is the name of the sequence,
-	2. `datasetName` is the name of the dataset of the sequence
-	3. `isTrain` is a Boolean stating if the sequence is part of the training or test set.
+	* `sequenceName`: name of the sequence,
+	* `datasetName`: name of the dataset of the sequence.
+	* `isTrain`: Boolean stating if the sequence is part of the training or test set.
 
 A call can thus be:
 
@@ -50,5 +50,5 @@ Input detections are expected to be a CSV file with the column names "Frame,X_UL
 * `Y_UL`: y-coordinate of the detection box at the upper left corner
 * `W`: width of the detection box
 * `H`: height of the detection box
-* `PDET: probability of the detection box
+* `PDET`: probability of the detection box
 
