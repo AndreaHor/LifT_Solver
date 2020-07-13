@@ -6,8 +6,8 @@ Created on Fri Jul 10 11:37:09 2020
 @author: fuksova
 """
 
-#import numpy as np
-#import disjointPathsPy as ldpPy
+
+import disjointPathsPy as ldpPy
 
 params=ldpPy.DisjointParams("/home/fuksova/codes/higher-order-disjoint-paths/params_test.ini")
 
