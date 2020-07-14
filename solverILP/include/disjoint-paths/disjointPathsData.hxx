@@ -95,7 +95,7 @@ public:
 		pGraphComplete=&cs.completeGraph;
 		pCompleteScore=&cs.completeScore;
 
-		pVertexGroups=&cs.vg;
+        pVertexGroups=&cs.getVertexGroups();
 
 		numberOfVertices=pGraphComplete->numberOfVertices();
 
@@ -342,7 +342,7 @@ private:
 
 	andres::graph::Digraph<>* pGraphComplete;
 
-	VertexGroups<>* pVertexGroups;
+    const VertexGroups<>* pVertexGroups;
 
 	std::vector<double> costs;
 

@@ -154,12 +154,12 @@ public:
 
 
 
-	size_t getGroupIndex(size_t v){
+    size_t getGroupIndex(size_t v) const{
 		return vToGroup[v];
 	}
 
-	const std::vector<size_t>& getGroupVertices(size_t index){
-		return groups[index];
+    const std::vector<size_t>& getGroupVertices(size_t index)const{
+        return groups.at(index);
 	}
 
 	//ID of maximal valid vertex (i.e. without s and t)
@@ -361,7 +361,7 @@ inline void VertexGroups<T>::initFromFile(const std::string& fileName,const Disj
 
 
 template<class T>
-std::vector<std::vector<size_t>> extractInnerPaths(VertexGroups<size_t>& vg,std::vector<std::vector<size_t>>& paths,T minT,T maxT){
+std::vector<std::vector<size_t>> extractInnerPaths(const VertexGroups<size_t>& vg,std::vector<std::vector<size_t>>& paths,T minT,T maxT){
 	//maxT inclusive
 	std::vector<std::vector<size_t>> outputPaths;
 	for (int i = 0; i < paths.size(); ++i) {
@@ -599,7 +599,8 @@ struct CompleteStructure {
 public:
     CompleteStructure(DisjointParams<T> & configParameters)
 {
-        vg=VertexGroups<>(configParameters);
+        pVertexGroups=new VertexGroups<>(configParameters);
+        VertexGroups<>& vg=*pVertexGroups;
 		maxTime=vg.getMaxTime();
 		std::cout<<"max time "<<maxTime<<std::endl;
 		configParameters.infoFile()<<"max time "<<maxTime<<std::endl;
@@ -607,17 +608,20 @@ public:
 		std::cout<<"cg vertices "<<completeGraph.numberOfVertices()<<std::endl;
 		configParameters.infoFile()<<"cg vertices "<<completeGraph.numberOfVertices()<<std::endl;
         addEdgesFromFile(configParameters.getGraphFileName(),configParameters);
+        deleteVG=true;
 
 }
 
 
     CompleteStructure(VertexGroups<>& vertexGroups):
-        vg(vertexGroups)
+        pVertexGroups(&vertexGroups)
 {
+        VertexGroups<>& vg=*pVertexGroups;
         maxTime=vg.getMaxTime();
         std::cout<<"max time "<<maxTime<<std::endl;
         completeGraph=andres::graph::Digraph<>(vg.getMaxVertex()+1);
         std::cout<<"cg vertices "<<completeGraph.numberOfVertices()<<std::endl;
+        deleteVG=false;
 
 
 }
@@ -625,19 +629,27 @@ public:
 
     void addEdgesFromFile(const std::string& fileName,DisjointParams<>& params);
     void addEdgesFromMatrix(size_t time1,size_t time2,const py::array_t<double> inputMatrix);
+    const VertexGroups<>& getVertexGroups(){
+        return *pVertexGroups;
+    }
     //void addEdges(size_t time1,size_t time2,std::stringstream& data);
 
 	andres::graph::Digraph<> completeGraph;
 	std::vector<double> completeScore;
-	VertexGroups<> vg;
+
 	size_t maxTime;
     //DisjointParams<T>& params;
+
+private:
+    bool deleteVG;
+    VertexGroups<>* pVertexGroups;
 
 };
 
 template<class T>
 inline void CompleteStructure<T>::addEdgesFromMatrix(size_t time1,size_t time2,const py::array_t<double> inputMatrix){
 
+    VertexGroups<>& vg=*pVertexGroups;
     const auto matrix=inputMatrix.unchecked<2>();
     const std::size_t dim1=matrix.shape(0);
     const std::size_t dim2=matrix.shape(1);
@@ -705,6 +717,7 @@ inline void CompleteStructure<T>::addEdgesFromMatrix(size_t time1,size_t time2,c
 template<class T>
 inline void CompleteStructure<T>::addEdgesFromFile(const std::string& fileName,DisjointParams<>& params){
 	char delim=',';
+    VertexGroups<>& vg=*pVertexGroups;
 
 	std::string line;
 	std::ifstream data;

@@ -725,16 +725,16 @@ void solver_ilp(DisjointParams<>& parameters,CompleteStructure<>& cs)
 	else{
 
 		//CompleteStructure<> cs=CompleteStructure<>(parameters,delim);
-		std::cout<<"vg max time "<<cs.vg.getMaxTime()<<std::endl;
-		std::cout<<"vg max vertex "<<cs.vg.getMaxVertex()<<std::endl;
-		std::cout<<"vg last frame size "<<cs.vg.getGroupVertices(cs.vg.getMaxTime()).size()<<std::endl;
+        std::cout<<"vg max time "<<cs.getVertexGroups().getMaxTime()<<std::endl;
+        std::cout<<"vg max vertex "<<cs.getVertexGroups().getMaxVertex()<<std::endl;
+        std::cout<<"vg last frame size "<<cs.getVertexGroups().getGroupVertices(cs.getVertexGroups().getMaxTime()).size()<<std::endl;
 
 
 		size_t maxTime=cs.maxTime;  //maxTime withou t
 		size_t intervalSize=parameters.getSmallIntervals();
 		size_t numberOfIntervals=maxTime/intervalSize;
-		std::cout<<"cs max vertex: "<<cs.vg.getMaxVertex()<<", frame: "<<cs.vg.getGroupIndex(cs.vg.getMaxVertex())<<std::endl;
-		parameters.infoFile()<<"cs max vertex: "<<cs.vg.getMaxVertex()<<", frame: "<<cs.vg.getGroupIndex(cs.vg.getMaxVertex())<<std::endl;
+        std::cout<<"cs max vertex: "<<cs.getVertexGroups().getMaxVertex()<<", frame: "<<cs.getVertexGroups().getGroupIndex(cs.getVertexGroups().getMaxVertex())<<std::endl;
+        parameters.infoFile()<<"cs max vertex: "<<cs.getVertexGroups().getMaxVertex()<<", frame: "<<cs.getVertexGroups().getGroupIndex(cs.getVertexGroups().getMaxVertex())<<std::endl;
 		//parameters.output("cs max vertex: "+cs.vg.getMaxVertex()+", frame: "+cs.vg.getGroupIndex(cs.vg.getMaxVertex())+"\n");
 
 		if(maxTime%intervalSize!=0){
@@ -836,7 +836,7 @@ void solver_ilp(DisjointParams<>& parameters,CompleteStructure<>& cs)
 //						std::cout<<std::endl;
 //					}
 					if(overlap>0){
-						newPaths=extractInnerPaths(cs.vg,newPaths,minT,maxT-1);
+                        newPaths=extractInnerPaths(cs.getVertexGroups(),newPaths,minT,maxT-1);
 					}
 
 					if(halfIntervals){
@@ -856,7 +856,7 @@ void solver_ilp(DisjointParams<>& parameters,CompleteStructure<>& cs)
 						else{
 							maxTForExtract=((i+1)*intervalSize)/2+intervalSize/4;
 						}
-						newPaths=extractInnerPaths(cs.vg,newPaths,minTForExtract,maxTForExtract);
+                        newPaths=extractInnerPaths(cs.getVertexGroups(),newPaths,minTForExtract,maxTForExtract);
 					}
 
 					allPaths.insert(allPaths.end(),newPaths.begin(),newPaths.end());

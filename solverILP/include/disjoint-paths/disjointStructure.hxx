@@ -315,7 +315,7 @@ inline void DisjointStructure<T>::readGraphWithTime(size_t minTime,size_t maxTim
 
 	andres::graph::Digraph<>& completeGraph=cs->completeGraph;
 	std::vector<double>& completeScore=cs->completeScore;
-	VertexGroups<> vg=cs->vg;
+    const VertexGroups<>& vg=cs->getVertexGroups();
 
 	std::unordered_map<size_t,std::vector<size_t>> groups;
 
