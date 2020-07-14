@@ -44,8 +44,7 @@ if(GUROBI_FOUND)
     pybind11_add_module(disjointPathsPy src/disjoint-paths/disjointPathsPython.cxx)
     target_include_directories(disjointPathsPy PRIVATE external/pybind11/include)  
     target_link_libraries(disjointPathsPy PRIVATE ${GUROBI_CPP_LIBRARY} ${GUROBI_LIBRARY} MyCallback)
-   # CONFIGURE_FILE(__init__.py ${CMAKE_CURRENT_BINARY_DIR}/__init__.py)
-   # CONFIGURE_FILE(setup.py ${CMAKE_CURRENT_BINARY_DIR}/setup.py)
+    configure_file(LifT_py/solveFromFiles.py ${CMAKE_CURRENT_BINARY_DIR}/solveFromFiles.py)
   
 endif()
 

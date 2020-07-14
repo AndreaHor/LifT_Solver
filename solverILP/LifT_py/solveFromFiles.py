@@ -9,12 +9,12 @@ Created on Fri Jul 10 11:37:09 2020
 
 import disjointPathsPy as ldpPy
 
-params=ldpPy.DisjointParams("/home/fuksova/codes/higher-order-disjoint-paths/params_test.ini")
+params=ldpPy.DisjointParams("../data/exampleSolverILP/params_sequence.ini")
 
 timeFrames=ldpPy.TimeFramesToVertices()
-timeFrames.init_from_file("/home/fuksova/codes/higher-order-disjoint-paths/data/error13_5_20/problemDesc_frames",params)
+timeFrames.init_from_file("../data/exampleSolverILP/problemDesc_frames",params)
 
 completeGraphStructure=ldpPy.GraphStructure(timeFrames)
-completeGraphStructure.add_edges_from_file("/home/fuksova/codes/higher-order-disjoint-paths/data/error13_5_20/problemDesc",params)
-ldpPy.solve_ilp(completeGraphStructure)
-
+completeGraphStructure.add_edges_from_file("../data/exampleSolverILP/problemDesc",params)
+ldpPy.solve_ilp(params,completeGraphStructure)
+	

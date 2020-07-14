@@ -21,8 +21,8 @@ namespace disjointPaths {
 
 
 template<class T=size_t>
-std::vector<std::string> split(
-		std::string inputString, char delim) {
+std::vector<std::string> split(const
+        std::string& inputString, char delim) {
 	size_t occurence = 0;
 	size_t newOccurence = 0;
 	std::vector<std::string> strings;

@@ -611,7 +611,8 @@ public:
 }
 
 
-    CompleteStructure(VertexGroups<>& vg)
+    CompleteStructure(VertexGroups<>& vertexGroups):
+        vg(vertexGroups)
 {
         maxTime=vg.getMaxTime();
         std::cout<<"max time "<<maxTime<<std::endl;
@@ -708,9 +709,9 @@ inline void CompleteStructure<T>::addEdgesFromFile(const std::string& fileName,D
 	std::string line;
 	std::ifstream data;
 	try{
-		data.open(params.getGraphFileName());
+        data.open(fileName);
 		if(!data){
-			throw std::system_error(errno, std::system_category(), "failed to open "+params.getGraphFileName());
+            throw std::system_error(errno, std::system_category(), "failed to open "+fileName);
 		}
 
 		std::getline(data, line);
@@ -735,12 +736,16 @@ inline void CompleteStructure<T>::addEdgesFromFile(const std::string& fileName,D
 		size_t maxLabel=0;
 		while (std::getline(data, line) && !line.empty()) {
 
+            //std::cout<<line<<std::endl;
 			strings = split(line, delim);
 
 			unsigned int v = std::stoul(strings[0]);
+            //std::cout<<v<<std::endl;
 			unsigned int w = std::stoul(strings[1]);
+            //std::cout<<w<<std::endl;
 			size_t l0=vg.getGroupIndex(v);
 			size_t l1=vg.getGroupIndex(w);
+            //std::cout<<std::to_string(l0)<<", "<<std::to_string(l1)<<std::endl;
 			if(v>vg.getMaxVertex()||w>vg.getMaxVertex()) continue;
 			//std::cout<<"edge "<<v<<" "<<w<<std::endl;
 
