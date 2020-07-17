@@ -20,8 +20,6 @@ add_subdirectory(external/pybind11)
 
 #add_subdirectory(src)
 
-
-
 find_package(GUROBI)
 if(GUROBI_FOUND)
     include_directories(${GUROBI_INCLUDE_DIR})
@@ -31,19 +29,19 @@ if(GUROBI_FOUND)
     target_include_directories(MyCallback PUBLIC external/andres-graph/include)
     target_include_directories(MyCallback PUBLIC external/TCLAP/include)
     target_include_directories(MyCallback PUBLIC external/pybind11/include)
-    target_link_libraries(MyCallback ${GUROBI_CPP_LIBRARY} ${GUROBI_LIBRARY} pybind11::module)
+    target_link_libraries(MyCallback ${GUROBI_LIBRARIES} pybind11::module)
 
     add_executable(run-disjoint-paths src/disjoint-paths/runDisjointPaths.cxx  ${headers} ${sources})
     target_include_directories(run-disjoint-paths PRIVATE external/andres-graph/include)
     target_include_directories(MyCallback PRIVATE external/TCLAP/include)
     target_include_directories(run-disjoint-paths PUBLIC external/pybind11/include)
-    target_link_libraries(run-disjoint-paths ${GUROBI_CPP_LIBRARY} ${GUROBI_LIBRARY} MyCallback pybind11::module)
+    target_link_libraries(run-disjoint-paths ${GUROBI_LIBRARIES} MyCallback pybind11::module)
     
   
   
     pybind11_add_module(disjointPathsPy src/disjoint-paths/disjointPathsPython.cxx)
     target_include_directories(disjointPathsPy PRIVATE external/pybind11/include)  
-    target_link_libraries(disjointPathsPy PRIVATE ${GUROBI_CPP_LIBRARY} ${GUROBI_LIBRARY} MyCallback)
+    target_link_libraries(disjointPathsPy PRIVATE ${GUROBI_LIBRARIES} MyCallback)
     configure_file(LifT_py/solveFromFiles.py ${CMAKE_CURRENT_BINARY_DIR}/solveFromFiles.py)
   
 endif()
