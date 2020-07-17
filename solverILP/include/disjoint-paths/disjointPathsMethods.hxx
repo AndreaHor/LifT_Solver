@@ -111,10 +111,14 @@ template<class T = size_t>
 struct VertexGroups {
 public:
 	VertexGroups(std::unordered_map<size_t,std::vector<size_t>> groups_,std::vector<size_t> vToGroup_):
-		groups(groups_),vToGroup(vToGroup_)
+        vToGroup(vToGroup_)
 	{
 		maxVertex=vToGroup_.size()-3;
 		maxTime=*(vToGroup.rbegin());
+        groups=std::vector<std::vector<size_t>>(maxTime+2);
+        for(auto pair:groups_){
+            groups[pair.first]=pair.second;
+        }
 	}
 	VertexGroups(){
 		maxVertex=0;
@@ -177,7 +181,7 @@ public:
 
 private:
 	//std::vector<std::vector<size_t>> groups;
-	std::unordered_map<size_t,std::vector<size_t>> groups;
+    std::vector<std::vector<size_t>> groups;
 	std::vector<size_t> vToGroup;
 	size_t maxVertex;
 	size_t maxTime;
@@ -189,6 +193,7 @@ private:
 template<class T>
 inline void VertexGroups<T>::initFromVector(const std::vector<size_t>& verticesInFrames){
     maxTime=verticesInFrames.size();
+    groups=std::vector<std::vector<size_t>>(maxTime+2);
     size_t inFrameCounter=0;
     size_t vertexCounter=0;
     size_t frameCounter=1;
@@ -238,6 +243,11 @@ inline void VertexGroups<T>::initFromFile(const std::string& fileName,const Disj
 	char delim=',';
 
 
+    currentGroup=std::vector<size_t>();
+    groups.push_back(currentGroup);
+    currentGroup=std::vector<size_t>();
+
+
     size_t maxTimeToRead=parameters.getMaxTimeFrame();
 
 
@@ -248,8 +258,8 @@ inline void VertexGroups<T>::initFromFile(const std::string& fileName,const Disj
             throw std::system_error(errno, std::system_category(), "failed to open "+fileName);
         }
 
-	unsigned int previousTime=0;
-	unsigned int time=0;
+    unsigned int previousTime=1;
+    unsigned int time;
 
 	while (std::getline(timeData, line) && !line.empty()) {
 
@@ -277,14 +287,19 @@ inline void VertexGroups<T>::initFromFile(const std::string& fileName,const Disj
 
 			vToGroup.push_back(time);
 			//if(time==groups.size()+1){  //Change groups to map?
-			if(time==previousTime||previousTime==0){
+            if(time==previousTime){
 				currentGroup.push_back(v);
 			}
 			//else if(time==groups.size()+2){
 			else{
 				//groups.push_back(currentGroup);
-				groups[previousTime]=currentGroup;
+                //groups[previousTime]=currentGroup;
+                groups.push_back(currentGroup);
 				currentGroup=std::vector<size_t>();
+                while(groups.size()<time){
+                    groups.push_back(currentGroup);
+                    currentGroup=std::vector<size_t>();
+                }
 				currentGroup.push_back(v);
 			}
 			previousTime=time;
@@ -298,10 +313,13 @@ inline void VertexGroups<T>::initFromFile(const std::string& fileName,const Disj
 	maxTime=*(vToGroup.rbegin());
 
 	//time frame of s is zero
-	vToGroup.push_back(0);
-	currentGroup=std::vector<size_t>();
-	currentGroup.push_back(vToGroup.size()-1);
-	groups[0]=currentGroup;
+    vToGroup.push_back(0);
+//	currentGroup=std::vector<size_t>();
+//	currentGroup.push_back(vToGroup.size()-1);
+//	groups[0]=currentGroup;
+//    currentGroup=std::vector<size_t>();
+//	currentGroup.push_back(vToGroup.size()-1);
+    groups[0].push_back(vToGroup.size()-1);
 
 	//time frame of t is maxTime
 	vToGroup.push_back(maxTime+1);

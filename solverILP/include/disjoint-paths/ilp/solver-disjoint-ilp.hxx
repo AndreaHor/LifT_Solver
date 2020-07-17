@@ -822,10 +822,10 @@ void solver_ilp_tracklets(DisjointParams<>& parameters,CompleteStructure<>& cs, 
 
 template<class T=size_t>
 void solver_ilp_no_intervals(DisjointParams<>& parameters,CompleteStructure<>& cs){
-    size_t minT=0;
-    size_t maxT=cs.maxTime;
+    size_t minT=1;
+    size_t maxT=cs.maxTime+1;
     char delim=',';
-    DisjointStructure<> DS=DisjointStructure<>(parameters,delim,&cs,minT,maxT+1);
+    DisjointStructure<> DS=DisjointStructure<>(parameters,delim,&cs,minT,maxT);
 
     Data<> data0(DS);
 
@@ -841,8 +841,11 @@ void solver_ilp_no_intervals(DisjointParams<>& parameters,CompleteStructure<>& c
     solver_ilp_tracklets(parameters,cs,newPaths,false);
 }
 
+
+
+
 template<class T=size_t>
-void solver_ilp(DisjointParams<>& parameters,CompleteStructure<>& cs)
+void solver_ilp_intervals(DisjointParams<>& parameters,CompleteStructure<>& cs)
 {
 
     char delim=',';
@@ -995,7 +998,7 @@ void solver_ilp(DisjointParams<>& parameters,CompleteStructure<>& cs)
 
 //template<class ILP, class CALLBACK = ilp::Callback<ILP>>
 template<class T=size_t>
-void solver_ilp(DisjointStructure<>& ds)
+void solver_ilp_intervals(DisjointStructure<>& ds)
 {
 
 
@@ -1033,6 +1036,17 @@ void solver_ilp(DisjointStructure<>& ds)
 
 }
 
+template<class T=size_t>
+void solver_ilp(DisjointParams<>& parameters,CompleteStructure<>& cs)
+{
+    if(parameters.getSmallIntervals()>0){
+        solver_ilp_intervals(parameters,cs);
+    }
+    else{
+        solver_ilp_no_intervals(parameters,cs);
+    }
+
+}
 
 
 
