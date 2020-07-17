@@ -114,11 +114,24 @@ public:
         vToGroup(vToGroup_)
 	{
 		maxVertex=vToGroup_.size()-3;
-		maxTime=*(vToGroup.rbegin());
+        maxTime=*(vToGroup.rbegin())-1;
         groups=std::vector<std::vector<size_t>>(maxTime+2);
         for(auto pair:groups_){
             groups[pair.first]=pair.second;
         }
+
+//        for (int i = 0; i < groups.size(); ++i) {
+//            std::cout<<"group "<<i<<":";
+//            for (int j = 0; j < groups[i].size(); ++j) {
+//                std::cout<<groups[i][j]<<",";
+//                if(vToGroup[groups[i][j]]!=i){
+//                    std::cout<<"mismatch in indexing groups, v to group "<<vToGroup[groups[i][j]];
+//                }
+//            }
+//            std::cout<<std::endl;
+//        }
+//        std::cout<<"max vertex "<<maxVertex<<std::endl;
+//        std::cout<<"max time "<<maxTime<<std::endl;
 	}
 	VertexGroups(){
 		maxVertex=0;
@@ -307,7 +320,7 @@ inline void VertexGroups<T>::initFromFile(const std::string& fileName,const Disj
 
 		}
 	}
-	groups[previousTime]=currentGroup;
+    groups.push_back(currentGroup);
 
 
 	maxTime=*(vToGroup.rbegin());
@@ -325,9 +338,23 @@ inline void VertexGroups<T>::initFromFile(const std::string& fileName,const Disj
 	vToGroup.push_back(maxTime+1);
 	currentGroup=std::vector<size_t>();
 	currentGroup.push_back(vToGroup.size()-1);
-	groups[maxTime+1]=currentGroup;
+    groups.push_back(currentGroup);
+
 
 	maxVertex=vToGroup.size()-3;
+
+//    for (int i = 0; i < groups.size(); ++i) {
+//        std::cout<<"group "<<i<<":";
+//        for (int j = 0; j < groups[i].size(); ++j) {
+//            std::cout<<groups[i][j]<<",";
+//            if(vToGroup[groups[i][j]]!=i){
+//                std::cout<<"mismatch in indexing groups, v to group "<<vToGroup[groups[i][j]];
+//            }
+//        }
+//        std::cout<<std::endl;
+//    }
+//    std::cout<<"max vertex "<<maxVertex<<std::endl;
+//    std::cout<<"max time "<<maxTime<<std::endl;
     }
     catch (std::system_error& er) {
         std::clog << er.what() << " (" << er.code() << ")" << std::endl;
@@ -643,6 +670,11 @@ public:
 
 
 }
+    ~CompleteStructure(){
+        if(deleteVG){
+            delete pVertexGroups;
+        }
+    }
 
 
     void addEdgesFromFile(const std::string& fileName,DisjointParams<>& params);

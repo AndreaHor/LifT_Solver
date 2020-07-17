@@ -309,7 +309,7 @@ parameters(configParameters)
 	}
 }
 
-
+//includes minTime, excludes maxTime
 template<class T>
 inline void DisjointStructure<T>::readGraphWithTime(size_t minTime,size_t maxTime,CompleteStructure<>* cs){
 
@@ -358,6 +358,13 @@ inline void DisjointStructure<T>::readGraphWithTime(size_t minTime,size_t maxTim
 		std::vector<size_t> vToGroup(numberOfVertices);
 		vToGroup[s_]=0;
 		vToGroup[t_]=maxTime-minTime+1;
+        std::vector<size_t> startGroup(1);
+        startGroup[0]=s_;
+        std::vector<size_t> terminalGroup(1);
+        terminalGroup[0]=t_;
+        groups[0]=startGroup;
+        groups[maxTime-minTime+1]=terminalGroup;
+
 
 		for (int gi = minTime; gi < maxTime; ++gi) {
 			//groups[gi-minTime+1]=std::vector<size_t>();

@@ -823,7 +823,7 @@ void solver_ilp_tracklets(DisjointParams<>& parameters,CompleteStructure<>& cs, 
 template<class T=size_t>
 void solver_ilp_no_intervals(DisjointParams<>& parameters,CompleteStructure<>& cs){
     size_t minT=1;
-    size_t maxT=cs.maxTime+1;
+    size_t maxT=cs.maxTime+1;  //plus one because DS solver excludes maxT
     char delim=',';
     DisjointStructure<> DS=DisjointStructure<>(parameters,delim,&cs,minT,maxT);
 
@@ -912,7 +912,7 @@ void solver_ilp_intervals(DisjointParams<>& parameters,CompleteStructure<>& cs)
                 //				parameters.infoFile().flush();
                 //parameters.output("interval "+minT+","+maxT+"\n");
                 //DisjointStructure<> DS=DisjointStructure<>(parameters,delim,&cs,minT,maxT);
-                DisjointStructure<> DS=DisjointStructure<>(parameters,delim,&cs,minTOverlap,maxTOverlap);
+                DisjointStructure<> DS=DisjointStructure<>(parameters,delim,&cs,minTOverlap,maxTOverlap);  //last time used maxTOverlap-1
                 if(DS.getTerminalNode()==1){	levinkov::Timer timer;
                     std::cout<<"Empty interval "<<std::endl;
                     parameters.infoFile()<<"Empty interval "<<std::endl;

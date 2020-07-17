@@ -78,6 +78,8 @@ public:
 		pGraphComplete=0;
 		pCompleteScore=0;
 
+        deleteComplete=false;
+
 		useTimeTracks=false;
 
 	}
@@ -94,6 +96,8 @@ public:
 
 		pGraphComplete=&cs.completeGraph;
 		pCompleteScore=&cs.completeScore;
+
+        deleteComplete=false;
 
         pVertexGroups=&cs.getVertexGroups();
 
@@ -310,6 +314,8 @@ public:
 
 	disjointPaths::DisjointParams<>& parameters;
 
+
+
 private:
 //	bool isReachableInTemp(size_t v,size_t w){
 //		if(v==s||w==t){
@@ -360,6 +366,9 @@ private:
 	std::vector<int> vertexToPath;
 	std::vector<std::vector<size_t>> pathsForInit;
 	std::vector<double> initSolution;
+
+
+    bool deleteComplete;
 
 
 	char task='C';
@@ -524,7 +533,8 @@ inline std::vector<double> Data<T>::trackletsFromPaths(std::vector<std::vector<s
 
 template<class T>
 inline void Data<T>::deleteCompleteGraph(){
-	if(pGraphComplete!=0&&parameters.getSmallIntervals()==0){
+    if(deleteComplete){
+    //if(pGraphComplete!=0&&parameters.getSmallIntervals()==0){
 		std::cout<<"delete complete graph "<<std::endl;
 		parameters.infoFile()<<"delete complete graph "<<std::endl;
 		parameters.infoFile().flush();
@@ -555,6 +565,7 @@ inline void Data<T>::readCompleteGraph(){
 			size_t origVertexNumber=pVertexGroups->getMaxVertex()+1;
 			pGraphComplete=new andres::graph::Digraph<>(origVertexNumber);
 			pCompleteScore=new std::vector<double>();
+            deleteComplete= true;
 			double objValue=0;
 
 			std::cout << "Read complete graph" << std::endl;
@@ -889,10 +900,10 @@ inline void Data<T>::prepareGraphFromPathsAndBreaks(std::vector<std::vector<size
 	}
 
 
-	std::cout<<"display small paths"<<std::endl;
+    //std::cout<<"display small paths"<<std::endl;
 	for (int i = 0; i < smallPaths.size(); ++i) {
 		for (int j = 0; j < smallPaths[i].size(); ++j) {
-			std::cout<<smallPaths[i][j]<<", ";
+            //std::cout<<smallPaths[i][j]<<", ";
 			if(vertexToPath[smallPaths[i][j]]!=-1){
 				std::cout<<"multiple occurences of vertex "<<smallPaths[i][j]<<std::endl;
 				throw std::runtime_error("error in optimized paths, multiple occurrences of one vertex");
@@ -901,7 +912,7 @@ inline void Data<T>::prepareGraphFromPathsAndBreaks(std::vector<std::vector<size
 				vertexToPath[smallPaths[i][j]]=i;
 			}
 		}
-		std::cout<<std::endl;
+        //std::cout<<std::endl;
 	}
 	for (int i = 0; i < vertexToPath.size(); ++i) {
 		if(vertexToPath[i]==-1){
