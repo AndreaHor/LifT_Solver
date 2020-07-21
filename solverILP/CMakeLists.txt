@@ -43,6 +43,7 @@ if(GUROBI_FOUND)
     target_include_directories(disjointPathsPy PRIVATE external/pybind11/include)  
     target_link_libraries(disjointPathsPy PRIVATE ${GUROBI_LIBRARIES} MyCallback)
     configure_file(LifT_py/solveFromFiles.py ${CMAKE_CURRENT_BINARY_DIR}/solveFromFiles.py)
+    configure_file(LifT_py/solveFromMatrix.py ${CMAKE_CURRENT_BINARY_DIR}/solveFromMatrix.py)
   
 endif()
 

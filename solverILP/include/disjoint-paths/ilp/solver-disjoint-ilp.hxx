@@ -913,7 +913,8 @@ void solver_ilp_intervals(DisjointParams<>& parameters,CompleteStructure<>& cs)
                 //parameters.output("interval "+minT+","+maxT+"\n");
                 //DisjointStructure<> DS=DisjointStructure<>(parameters,delim,&cs,minT,maxT);
                 DisjointStructure<> DS=DisjointStructure<>(parameters,delim,&cs,minTOverlap,maxTOverlap);  //last time used maxTOverlap-1
-                if(DS.getTerminalNode()==1){	levinkov::Timer timer;
+                if(DS.getTerminalNode()==1){
+                    levinkov::Timer timer;
                     std::cout<<"Empty interval "<<std::endl;
                     parameters.infoFile()<<"Empty interval "<<std::endl;
                     //empty interval
@@ -996,45 +997,45 @@ void solver_ilp_intervals(DisjointParams<>& parameters,CompleteStructure<>& cs)
 
 
 
-//template<class ILP, class CALLBACK = ilp::Callback<ILP>>
-template<class T=size_t>
-void solver_ilp_intervals(DisjointStructure<>& ds)
-{
+////template<class ILP, class CALLBACK = ilp::Callback<ILP>>
+//template<class T=size_t>
+//void solver_ilp(DisjointStructure<>& ds)
+//{
 
 
-    levinkov::Timer timer;
-    timer.start();
+//    levinkov::Timer timer;
+//    timer.start();
 
-    Data<> data(ds);
+//    Data<> data(ds);
 
-    std::vector<double> labels=ilp_solve(data);
+//    std::vector<double> labels=ilp_solve(data);
 
-    std::vector<std::vector<size_t>> paths=data.pathsFromSolution(labels,false);
+//    std::vector<std::vector<size_t>> paths=data.pathsFromSolution(labels,false);
 
-    //If one more iteration would be done with cut into tracklets even if time breaks are empty, solution can be improved
-    if(data.parameters.isDenseTracklets()){
-        bool isNewGraph=data.prepareGraphFromIntervalsDense(paths,false);
-        while(isNewGraph){
-            std::cout<<"final graph not optimal, recomputing..."<<std::endl;
-            ds.parameters.infoFile()<<"final graph not optimal, recomputing..."<<std::endl;
-            ds.parameters.infoFile().flush();
+//    //If one more iteration would be done with cut into tracklets even if time breaks are empty, solution can be improved
+//    if(data.parameters.isDenseTracklets()){
+//        bool isNewGraph=data.prepareGraphFromIntervalsDense(paths,false);
+//        while(isNewGraph){
+//            std::cout<<"final graph not optimal, recomputing..."<<std::endl;
+//            ds.parameters.infoFile()<<"final graph not optimal, recomputing..."<<std::endl;
+//            ds.parameters.infoFile().flush();
 
-            labels=ilp_solve(data);
-            paths=data.pathsFromSolution(labels,true);
-            isNewGraph=data.prepareGraphFromIntervalsDense(paths,true);
-        }
-    }
+//            labels=ilp_solve(data);
+//            paths=data.pathsFromSolution(labels,true);
+//            isNewGraph=data.prepareGraphFromIntervalsDense(paths,true);
+//        }
+//    }
 
-    data.outputSolution(paths);
+//    data.outputSolution(paths);
 
-    timer.stop();
+//    timer.stop();
 
-    std::cout<<"solver complete"<<std::endl;
-    std::cout<<"time "<<timer.get_elapsed_seconds()<<std::endl;
-    ds.parameters.infoFile()<<"solver complete"<<std::endl<<"time "<<timer.get_elapsed_seconds()<<std::endl;
-    ds.parameters.infoFile().flush();
+//    std::cout<<"solver complete"<<std::endl;
+//    std::cout<<"time "<<timer.get_elapsed_seconds()<<std::endl;
+//    ds.parameters.infoFile()<<"solver complete"<<std::endl<<"time "<<timer.get_elapsed_seconds()<<std::endl;
+//    ds.parameters.infoFile().flush();
 
-}
+//}
 
 template<class T=size_t>
 void solver_ilp(DisjointParams<>& parameters,CompleteStructure<>& cs)

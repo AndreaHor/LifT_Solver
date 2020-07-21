@@ -266,7 +266,7 @@ public:
 	std::pair<double,double> evaluate(std::vector<std::vector<size_t>>& paths);
 	std::vector<std::vector<size_t>> pathsFromSolution(std::vector<double>& intervalLabels,bool decodeTracklets=false,size_t shift=0);
 
-	void readCompleteGraph();
+    void readCompleteGraph();
 	void deleteCompleteGraph();
 
 	const std::vector<double> * getPCosts(){
@@ -547,68 +547,68 @@ inline void Data<T>::deleteCompleteGraph(){
 //TODO make one procedure and use it in CS too
 template<class T>
 inline void Data<T>::readCompleteGraph(){
-	if(pGraphComplete==0){
+    if(pGraphComplete==0){
 
-		std::string line;
-		std::ifstream data;
-		try{
-			data.open(parameters.getGraphFileName());
-			if(!data){
+        std::string line;
+        std::ifstream data;
+        try{
+            data.open(parameters.getGraphFileName());
+            if(!data){
 
-				throw std::system_error(errno, std::system_category(), "failed to open "+parameters.getGraphFileName());
+                throw std::system_error(errno, std::system_category(), "failed to open "+parameters.getGraphFileName());
 
-			}
-			char delim=',';
-			std::getline(data, line);
+            }
+            char delim=',';
+            std::getline(data, line);
 
-			//size_t origVertexNumber=std::stoul(line);
-			size_t origVertexNumber=pVertexGroups->getMaxVertex()+1;
-			pGraphComplete=new andres::graph::Digraph<>(origVertexNumber);
-			pCompleteScore=new std::vector<double>();
+            //size_t origVertexNumber=std::stoul(line);
+            size_t origVertexNumber=pVertexGroups->getMaxVertex()+1;
+            pGraphComplete=new andres::graph::Digraph<>(origVertexNumber);
+            pCompleteScore=new std::vector<double>();
             deleteComplete= true;
-			double objValue=0;
+            double objValue=0;
 
-			std::cout << "Read complete graph" << std::endl;
-			parameters.infoFile()<< "Read complete graph" << std::endl;
-			std::vector<std::string> strings;
+            std::cout << "Read complete graph" << std::endl;
+            parameters.infoFile()<< "Read complete graph" << std::endl;
+            std::vector<std::string> strings;
 
 
-			std::cout<<"Skipping vertices in file. "<<std::endl;
-			parameters.infoFile()<<"Skipping vertices in file. "<<std::endl;
-			parameters.infoFile().flush();
-			//Vertices that are not found have score=0. Appearance and disappearance cost are read here.
-			while (std::getline(data, line) && !line.empty()) {
+            std::cout<<"Skipping vertices in file. "<<std::endl;
+            parameters.infoFile()<<"Skipping vertices in file. "<<std::endl;
+            parameters.infoFile().flush();
+            //Vertices that are not found have score=0. Appearance and disappearance cost are read here.
+            while (std::getline(data, line) && !line.empty()) {
 
-			}
+            }
 
-			std::cout<<"Reading base edges from file. "<<std::endl;
-			parameters.infoFile()<<"Reading base edges from file. "<<std::endl;
-			parameters.infoFile().flush();
-			size_t maxLabel=0;
-			while (std::getline(data, line) && !line.empty()) {
+            std::cout<<"Reading base edges from file. "<<std::endl;
+            parameters.infoFile()<<"Reading base edges from file. "<<std::endl;
+            parameters.infoFile().flush();
+            size_t maxLabel=0;
+            while (std::getline(data, line) && !line.empty()) {
 
-				strings = split(line, delim);
+                strings = split(line, delim);
 
-				unsigned int v = std::stoul(strings[0]);
-				unsigned int w = std::stoul(strings[1]);
-				size_t l0=pVertexGroups->getGroupIndex(v);
-				size_t l1=pVertexGroups->getGroupIndex(w);
-				if(v>=origVertexNumber||w>=origVertexNumber) continue;
-				if(l1-l0<=parameters.getMaxTimeGapComplete()){
-					double score = std::stod(strings[2]);
-					pGraphComplete->insertEdge(v,w);
-					pCompleteScore->push_back(score);
-				}
+                unsigned int v = std::stoul(strings[0]);
+                unsigned int w = std::stoul(strings[1]);
+                size_t l0=pVertexGroups->getGroupIndex(v);
+                size_t l1=pVertexGroups->getGroupIndex(w);
+                if(v>=origVertexNumber||w>=origVertexNumber) continue;
+                if(l1-l0<=parameters.getMaxTimeGapComplete()){
+                    double score = std::stod(strings[2]);
+                    pGraphComplete->insertEdge(v,w);
+                    pCompleteScore->push_back(score);
+                }
 
-			}
+            }
 
-			data.close();
-		}
-		catch (std::system_error& er) {
-			std::clog << er.what() << " (" << er.code() << ")" << std::endl;
+            data.close();
+        }
+        catch (std::system_error& er) {
+            std::clog << er.what() << " (" << er.code() << ")" << std::endl;
 
-		}
-	}
+        }
+    }
 
 }
 
@@ -618,7 +618,7 @@ inline void Data<T>::readCompleteGraph(){
 template<class T>
 inline void Data<T>::onePathGraph(std::vector<size_t>& path,bool zeroInOut){
 	//std::cout<<"call one path graph"<<std::endl;
-	readCompleteGraph();
+    readCompleteGraph();
 	std::vector<size_t> newToOrigVertices(path.size());
 	//andres::graph::Digraph<> oneTrackGraph(path.size()+2);
 	//andres::graph::Digraph<> oneTrackGraphLifted(path.size()+2);
@@ -856,6 +856,7 @@ inline void Data<T>::prepareGraphFromPathsAndBreaks(std::vector<std::vector<size
 	//parameters.output("tracklets from paths\n");
 
 	vertexToPath=std::vector<int> (pGraphComplete->numberOfVertices(),-1);
+    std::cout<<"complete graph vertices "<<pGraphComplete->numberOfVertices()<<std::endl;
 	smallPaths=std::vector<std::vector<size_t>>();
 	pathsForInit=std::vector<std::vector<size_t>>();
 
@@ -903,7 +904,7 @@ inline void Data<T>::prepareGraphFromPathsAndBreaks(std::vector<std::vector<size
     //std::cout<<"display small paths"<<std::endl;
 	for (int i = 0; i < smallPaths.size(); ++i) {
 		for (int j = 0; j < smallPaths[i].size(); ++j) {
-            //std::cout<<smallPaths[i][j]<<", ";
+           // std::cout<<smallPaths[i][j]<<", ";
 			if(vertexToPath[smallPaths[i][j]]!=-1){
 				std::cout<<"multiple occurences of vertex "<<smallPaths[i][j]<<std::endl;
 				throw std::runtime_error("error in optimized paths, multiple occurrences of one vertex");
@@ -914,12 +915,15 @@ inline void Data<T>::prepareGraphFromPathsAndBreaks(std::vector<std::vector<size
 		}
         //std::cout<<std::endl;
 	}
+    //std::cout<<"vertex to path"<<std::endl;
 	for (int i = 0; i < vertexToPath.size(); ++i) {
+        //std::cout<<i<<": "<<vertexToPath[i]<<std::endl;
 		if(vertexToPath[i]==-1){
 			std::vector<size_t> oneVertexPath;
 			oneVertexPath.push_back(i);
 			vertexToPath[i]=smallPaths.size();
 			smallPaths.push_back(oneVertexPath);
+           // std::cout<<"new path with vertex "<<i<<std::endl;
 		}
 	}
 
@@ -951,7 +955,7 @@ inline bool Data<T>::graphFromOptimizedPaths(std::vector<std::vector<size_t>>& p
 template<class T>
 inline bool Data<T>::prepareGraphFromIntervalsDense(std::vector<std::vector<size_t>>& paths,bool finalCheckOnly){
 
-	readCompleteGraph();
+    readCompleteGraph();
 
 	//bool createGraph=smallPathsFromTimeBreaks(paths,finalCheckOnly);
 	bool createGraph=smallPathsFromTrajectoryBreaks(paths,finalCheckOnly);
@@ -1492,7 +1496,7 @@ inline std::pair<double,double> Data<T>::evaluate(std::vector<std::vector<size_t
 	//std::ofstream infoFile;
 	//infoFile.open(infoFileName);
 
-	readCompleteGraph();
+    readCompleteGraph();
 
 	std::vector<size_t> labels(pGraphComplete->numberOfVertices(),0);
 	for (int i = 0; i < paths.size(); ++i) {

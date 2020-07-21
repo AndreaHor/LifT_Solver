@@ -227,7 +227,7 @@ inline void VertexGroups<T>::initFromVector(const std::vector<size_t>& verticesI
         }
     }
 
-    maxVertex=vertexCounter;
+    maxVertex=vertexCounter-1;
     size_t s=maxVertex+1;
     size_t t=maxVertex+2;
 
@@ -241,8 +241,28 @@ inline void VertexGroups<T>::initFromVector(const std::vector<size_t>& verticesI
     vToGroup.push_back(frameCounter);
     groups[frameCounter]=verticesInGroup;
 
+    for (int i = 0; i < groups.size(); ++i) {
+        for (int j = 0; j < groups[i].size(); ++j) {
+         assert(vToGroup[groups[i][j]]==i);
+        }
+    }
+    std::cout<<"max vertex "<<maxVertex<<std::endl;
+    std::cout<<"max time "<<maxTime<<std::endl;
 
-    //TODO first and last frame for s and t!
+//        for (int i = 0; i < groups.size(); ++i) {
+//            std::cout<<"group "<<i<<":";
+//            for (int j = 0; j < groups[i].size(); ++j) {
+//                std::cout<<groups[i][j]<<",";
+//                if(vToGroup[groups[i][j]]!=i){
+//                    std::cout<<"mismatch in indexing groups, v to group "<<vToGroup[groups[i][j]];
+//                }
+//            }
+//            std::cout<<std::endl;
+//        }
+//        std::cout<<"max vertex "<<maxVertex<<std::endl;
+//        std::cout<<"max time "<<maxTime<<std::endl;
+
+
 
 }
 
