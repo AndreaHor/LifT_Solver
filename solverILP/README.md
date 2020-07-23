@@ -1,11 +1,9 @@
 # LifT_Solver
-Solver for lifted disjoint paths problem
+Solver for lifted disjoint paths problem.
 
 This is a c++ solver for the lifted disjoint paths problem. Given an input graph structure with edge costs, it extracts the base graph and the lifted graph from it and solves the lifted disjoint paths problem on those graphs. Its output is the list of found tracks. Each track is a list of graph vertices.
 
 The solver can either be used independently or within our tracker pipeline. The whole pipeline for the tracker is contained in the directory `LifT_Solver/tracker`. The tracker provides suitable input files for the c++ solver, runs the solver on them and processes its output.
-
-A documentation for the c++ solver itself is contained in LifT_Solver/solverILP/documentation/solverDocumentation.pdf.
 
 # Cloning the repository
 
@@ -185,3 +183,8 @@ All output files have the same prefix specified in `OUTPUT_PREFIX`.
   - `-all-paths-FEASIBLE-0.txt, -tr-all-paths-FEASIBLE-0.txt`  
     Tracklets obtained from intermediate feasible solutions. `-tr` stores tracklets produces from solver run on tracklet graphs. These files are produced only if `DEBUG_OUTPUT_FILES = 1`.
 
+# Use from Python
+There are two possibilities of using the solver from Python. They are demonstrated in two example scripts in directory `/home/fuksova/codes/LifT_Solver/solverILP/LifT_py`. These two scripts are copied during solver compilation into the build directory and can be directly run from there.  
+
+1. The problem graph is initialized from input files. See script `solveFromFiles.py`. Its usage is similar to directly running the solver from the command line. The difference is that the path to the graph file `problemDesc` and to the time frame file `problemDesc_frames` have to be specified directly in the script. They are not read from `params_sequence.ini`.
+2. The problem graph is initialized from python arrays. See script `solveFromFiles.py`. In this case, the only file needed is the parameter file  `params_sequence.ini`. The graph structure and the mapping between time frames and graph vertices are given defined by python arrays.

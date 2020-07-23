@@ -14,7 +14,7 @@ import disjointPathsPy as ldpPy
 import numpy as np
 
 #Initializes structure for holding solver parameters. It expects the path to the solver parameter file.
-params=ldpPy.DisjointParams("../data/exampleSolverILP/params_sequence.ini")
+params=ldpPy.DisjointParams("../data/exampleSolverILP/params_sequence_py.ini")
 
 #Constructor of structure for holding the mapping between time frames and graph vertices
 timeFrames=ldpPy.TimeFramesToVertices()
