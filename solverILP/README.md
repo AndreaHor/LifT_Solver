@@ -23,6 +23,7 @@ A documentation for the c++ solver itself is contained in LifT_Solver/solverILP/
 #### Linux
 
 Open `.bash_profile` in your home directory and add the following lines containing location of your files: 
+
 `export GUROBI_HOME="/your/path/to/gurobi/gurobi902/linux64"`
 
 `export PATH="$PATH:$GUROBI_HOME/bin" export LD_LIBRARY_PATH="$GUROBI_HOME/lib"`
