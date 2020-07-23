@@ -28,14 +28,17 @@ timeFrames.init_from_vector(vect)
 #Initializing the graph structure from timeFrames. For now, no edges are present. 
 completeGraphStructure=ldpPy.GraphStructure(timeFrames)
 
-#noEdge=float("inf")
-#Three adjacency matrices that specify costs of edges between pairs of time frames. The number of rows of each matrix must correspond to the number of detections in the first time frame. The number of matrix columns must correspond to the number of detections in the second time frame.
+
+#This ininity variable will be used as an edge weight indicating that an edge is missing.
+noEdge=float("inf")
+
+#Three adjacency matrices that specify costs of edges between pairs of time frames. The number of rows of each matrix must correspond to the number of detections in the lower time frame. The number of matrix columns must correspond to the number of detections in the higher time frame.
 matrix12=np.array([[-2.2,-1.0],[-1.0,-2.2],[-1.0,-1.0]])
 matrix23=np.array([[-2.2,-1.0,-1.0],[-1.0,-2.2,-1.0]])
-matrix13=np.array([[-2.2,-1.0,-1.0],[-1.0,-2.2,-1.0],[-1.0,-1.0,-2.2]])
+matrix13=np.array([[-2.2,-1.0,2.3],[-1.0,-2.2,-1.0],[noEdge,-1.0,-2.2]])
 
 #Adding edges to graph structure from adjacency matrices.
-#Arguments: index of first frame, index of second frame, adjacency matrix
+#Arguments: index of the lower frame, index of the higher frame, adjacency matrix
 completeGraphStructure.add_edges_from_array(1,2,matrix12)
 completeGraphStructure.add_edges_from_array(2,3,matrix23)
 completeGraphStructure.add_edges_from_array(1,3,matrix13)
