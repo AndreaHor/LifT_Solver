@@ -827,7 +827,7 @@ inline void DisjointStructure<T>::keepFractionOfLifted(){
 			int l0=vertexGroups.getGroupIndex(v0);
 			int l1=vertexGroups.getGroupIndex(v1);
 			double cost=getLiftedEdgeScore(i);
-			bool goodCost=(cost<negMaxValue)||(cost>posMinValue);
+            bool goodCost=(cost<=negMaxValue)||(cost>=posMinValue);
 			//if(isReachable(v0,v1)){
 			if(isReachableNew(v0,v1)){
 

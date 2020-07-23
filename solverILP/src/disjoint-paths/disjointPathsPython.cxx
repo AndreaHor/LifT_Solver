@@ -22,7 +22,6 @@ PYBIND11_MODULE(disjointPathsPy, m) {
         
      py::class_<disjointPaths::VertexGroups<>>(m, "TimeFramesToVertices")
         .def(py::init<>())
-        .def(py::init<disjointPaths::DisjointParams<>&>())
         .def("init_from_vector", &disjointPaths::VertexGroups<>::initFromVector, "Initializes vertices in time frames from a vector of size_t")
         .def("init_from_file", &disjointPaths::VertexGroups<>::initFromFile, "Initializes vertices in time frames from a file");
 

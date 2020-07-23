@@ -737,9 +737,11 @@ inline void CompleteStructure<T>::addEdgesFromMatrix(size_t time1,size_t time2,c
         size_t vertex1=i+transformIndex1;
         for(std::size_t j=0; j<dim2; ++j) {
             double score=matrix(i,j);
-            size_t vertex2=j+transformIndex2;
-            completeGraph.insertEdge(vertex1,vertex2);
-            completeScore.push_back(score);
+            if(!isinf(score)){
+                size_t vertex2=j+transformIndex2;
+                completeGraph.insertEdge(vertex1,vertex2);
+                completeScore.push_back(score);
+            }
         }
     }
 
