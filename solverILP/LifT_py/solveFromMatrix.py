@@ -43,6 +43,10 @@ completeGraphStructure.add_edges_from_array(1,2,matrix12)
 completeGraphStructure.add_edges_from_array(2,3,matrix23)
 completeGraphStructure.add_edges_from_array(1,3,matrix13)
 
-#Calling se solver on the given problem. 
-ldpPy.solve_ilp(params,completeGraphStructure)
-	
+#Calling se solver on the given problem and get the resulting paths. 
+paths=ldpPy.solve_ilp(params,completeGraphStructure)
+
+for path in paths:
+  for v in path:
+    print(v, end =" ")
+  print("")

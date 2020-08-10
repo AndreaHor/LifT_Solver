@@ -699,7 +699,7 @@ std::unordered_map<size_t,std::vector<size_t>> doPathOptimization(Data<>& data,s
 
 
 template<class T=size_t>
-void solver_flow_only(DisjointParams<>& parameters)
+std::vector<std::vector<size_t>> solver_flow_only(DisjointParams<>& parameters)
 {
     std::cout<<"Using simple flow solver"<<std::endl;
     DisjointStructure<> DS(parameters);
@@ -708,10 +708,11 @@ void solver_flow_only(DisjointParams<>& parameters)
     std::vector<std::vector<size_t>> paths=data.pathsFromSolution(solution,false);
     data.outputSolution(paths,false);
     std::cout<<"Simple flow solved"<<std::endl;
+    return paths;
 }
 
 template<class T=size_t>
-void solver_ilp_tracklets(DisjointParams<>& parameters,CompleteStructure<>& cs,  std::vector<std::vector<size_t>>& allPaths,bool loadIntervals)
+std::vector<std::vector<size_t>> solver_ilp_tracklets(DisjointParams<>& parameters,CompleteStructure<>& cs,  std::vector<std::vector<size_t>>& allPaths,bool loadIntervals)
 {
     levinkov::Timer trackletTimer;
     trackletTimer.start();
@@ -802,9 +803,6 @@ void solver_ilp_tracklets(DisjointParams<>& parameters,CompleteStructure<>& cs, 
 
     data.outputSolution(paths);
 
-
-
-
     trackletTimer.stop();
 
 
@@ -815,13 +813,16 @@ void solver_ilp_tracklets(DisjointParams<>& parameters,CompleteStructure<>& cs, 
     parameters.infoFile()<<"Last phase time "<<trackletTimer.get_elapsed_seconds()<<std::endl;
     parameters.infoFile().flush();
 
-
+    return paths;
 
 
 }
 
 template<class T=size_t>
-void solver_ilp_no_intervals(DisjointParams<>& parameters,CompleteStructure<>& cs){
+std::vector<std::vector<size_t>> solver_ilp_no_intervals(DisjointParams<>& parameters,CompleteStructure<>& cs){
+    levinkov::Timer timer;
+    timer.start();
+
     size_t minT=1;
     size_t maxT=cs.maxTime+1;  //plus one because DS solver excludes maxT
     char delim=',';
@@ -836,24 +837,44 @@ void solver_ilp_no_intervals(DisjointParams<>& parameters,CompleteStructure<>& c
     parameters.infoFile().flush();
 
     std::vector<double> labels=ilp_solve(data0);
+
     std::vector<std::vector<size_t>> newPaths=data0.pathsFromSolution(labels,false);
 
-    solver_ilp_tracklets(parameters,cs,newPaths,false);
+    if(parameters.isDenseTracklets()){
+        std::vector<std::vector<size_t>> paths=solver_ilp_tracklets(parameters,cs,newPaths,false);
+        timer.stop();
+        std::cout<<"Time from start "<<timer.get_elapsed_seconds()<<std::endl;
+        parameters.infoFile()<<"Time from start "<<timer.get_elapsed_seconds()<<std::endl;
+        parameters.infoFile().flush();
+        return paths;
+    }
+    else{
+        data0.outputSolution(newPaths);
+        timer.stop();
+        std::cout<<"Time from start "<<timer.get_elapsed_seconds()<<std::endl;
+        parameters.infoFile()<<"Time from start "<<timer.get_elapsed_seconds()<<std::endl;
+        parameters.infoFile().flush();
+        return newPaths;
+    }
+
+
 }
 
 
 
 
 template<class T=size_t>
-void solver_ilp_intervals(DisjointParams<>& parameters,CompleteStructure<>& cs)
+std::vector<std::vector<size_t>> solver_ilp_intervals(DisjointParams<>& parameters,CompleteStructure<>& cs)
 {
 
     char delim=',';
     levinkov::Timer timer;
     timer.start();
 
+    std::vector<std::vector<size_t>> paths;
+
     if(parameters.getMaxTimeLifted()==0){
-        solver_flow_only(parameters);
+        paths=solver_flow_only(parameters);
     }
     else{
 
@@ -986,13 +1007,15 @@ void solver_ilp_intervals(DisjointParams<>& parameters,CompleteStructure<>& cs)
 
             }
         }
-        solver_ilp_tracklets<>(parameters,cs,allPaths,loadIntervals);
+        paths=solver_ilp_tracklets<>(parameters,cs,allPaths,loadIntervals);
 
         timer.stop();
         std::cout<<"Time from start "<<timer.get_elapsed_seconds()<<std::endl;
         parameters.infoFile()<<"Time from start "<<timer.get_elapsed_seconds()<<std::endl;
         parameters.infoFile().flush();
+
     }
+    return paths;
 }
 
 
@@ -1038,13 +1061,15 @@ void solver_ilp_intervals(DisjointParams<>& parameters,CompleteStructure<>& cs)
 //}
 
 template<class T=size_t>
-void solver_ilp(DisjointParams<>& parameters,CompleteStructure<>& cs)
+std::vector<std::vector<size_t>> solver_ilp(DisjointParams<>& parameters,CompleteStructure<>& cs)
 {
     if(parameters.getSmallIntervals()>0){
-        solver_ilp_intervals(parameters,cs);
+        std::vector<std::vector<size_t>> paths=solver_ilp_intervals(parameters,cs);
+        return paths;
     }
     else{
-        solver_ilp_no_intervals(parameters,cs);
+        std::vector<std::vector<size_t>> paths=solver_ilp_no_intervals(parameters,cs);
+        return paths;
     }
 
 }

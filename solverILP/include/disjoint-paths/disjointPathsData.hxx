@@ -249,7 +249,7 @@ public:
 	void onePathGraph(std::vector<size_t>& path,bool zeroInOut=false);
 	std::vector<size_t> cutsInOnePathSolution(std::vector<double>& labels);
 	std::vector<std::vector<size_t>> pathsFromOnePathSolution(std::vector<double>& labels);
-	bool smallPathsFromTimeBreaks(std::vector<std::vector<size_t>>& paths,bool finalCheckOnly=false);
+    //bool smallPathsFromTimeBreaks(std::vector<std::vector<size_t>>& paths,bool finalCheckOnly=false);
 	bool prepareGraphFromIntervalsDense(std::vector<std::vector<size_t>>& paths,bool finalCheckOnly=false);
 	bool graphFromOptimizedPaths(std::vector<std::vector<size_t>>& paths,std::unordered_map<size_t,std::vector<size_t>>& breaks,bool finalCheckOnly);
 	std::unordered_map<size_t,std::vector<size_t>> findTrajectoryBreaks(std::vector<std::vector<size_t>>& paths);
@@ -257,7 +257,7 @@ public:
 
 	bool smallPathsFromTrajectoryBreaks(std::vector<std::vector<size_t>>& paths,bool finalCheckOnly);
 	void prepareGraphFromPathsAndBreaks(std::vector<std::vector<size_t>>& paths,std::unordered_map<size_t,std::vector<size_t>>& breaks);
-	std::vector<double> trackletsFromPaths(std::vector<std::vector<size_t>>& paths,std::unordered_map<size_t,std::set<size_t>>* timeBreaks=0);
+    //std::vector<double> trackletsFromPaths(std::vector<std::vector<size_t>>& paths,std::unordered_map<size_t,std::set<size_t>>* timeBreaks=0);
 
 
 	void outputSolution(std::vector<std::vector<size_t>>& paths,bool isIntervals=false);
@@ -378,156 +378,156 @@ private:
 
 
 
-template<class T>
-inline std::vector<double> Data<T>::trackletsFromPaths(std::vector<std::vector<size_t>>& paths,std::unordered_map<size_t,std::set<size_t>>* timeBreaks){
-	std::cout<<"tracklets from paths"<<std::endl;
-	parameters.infoFile()<<"tracklets from paths"<<std::endl;
-	//parameters.output("tracklets from paths\n");
+//template<class T>
+//inline std::vector<double> Data<T>::trackletsFromPaths(std::vector<std::vector<size_t>>& paths,std::unordered_map<size_t,std::set<size_t>>* timeBreaks){
+//	std::cout<<"tracklets from paths"<<std::endl;
+//	parameters.infoFile()<<"tracklets from paths"<<std::endl;
+//	//parameters.output("tracklets from paths\n");
 
-	vertexToPath=std::vector<int> (pGraphComplete->numberOfVertices(),-1);
-	smallPaths=std::vector<std::vector<size_t>>();
-	std::cout<<"find small paths"<<std::endl;
-	parameters.infoFile()<<"find small paths"<<std::endl;
-	parameters.infoFile().flush();
-	//parameters.output("find small paths\n");
-	size_t maxTime=0;
-	std::vector<double> nodeCosts;
+//	vertexToPath=std::vector<int> (pGraphComplete->numberOfVertices(),-1);
+//	smallPaths=std::vector<std::vector<size_t>>();
+//	std::cout<<"find small paths"<<std::endl;
+//	parameters.infoFile()<<"find small paths"<<std::endl;
+//	parameters.infoFile().flush();
+//	//parameters.output("find small paths\n");
+//	size_t maxTime=0;
+//	std::vector<double> nodeCosts;
 
-	bool createNodeCosts=parameters.getSmallIntervals()==0&&!parameters.isDenseTracklets();
+//	bool createNodeCosts=parameters.getSmallIntervals()==0&&!parameters.isDenseTracklets();
 
-	//bool halfIntervals=parameters.isOverlappingIntervals();
-	bool halfIntervals=false;
+//	//bool halfIntervals=parameters.isOverlappingIntervals();
+//	bool halfIntervals=false;
 
 
-	std::vector<size_t> vertexToInterval(pGraphComplete->numberOfVertices());
-	//TODO s and t separately
-	if(parameters.getSmallIntervals()>0){
-		if(!halfIntervals){
-			size_t I=parameters.getSmallIntervals();
-			size_t trSize=parameters.getTrackletSize();
-			size_t trNumber=I/trSize;
-			if(I%trSize!=0){
-				trNumber++;
-			}
-			std::vector<size_t> timeToTr(pVertexGroups->getMaxTime());
-
-			for (int v = 0; v < pGraphComplete->numberOfVertices(); ++v) {
-				size_t g=pVertexGroups->getGroupIndex(v);
-				g--;  //compensate numbering from 1
-				vertexToInterval[v]=trNumber*(g/I)+(g%I)/trSize+1;
-				timeToTr[g]=vertexToInterval[v];
-			}
-//			std::cout<<"time to tr. number "<<std::endl;
-//			for (int t = 0; t <= pVertexGroups->getMaxTime(); ++t) {
-//			    std::cout<<t<<":"<<timeToTr[t]<<std::endl;
-//			}
-			std::cout<<"vertex to interval done"<<std::endl;
-			parameters.infoFile()<<"vertex to interval done"<<std::endl;
-			parameters.infoFile().flush();
-		}
-//		else{
-//			size_t I=parameters.getSmallIntervals()/2;
+//	std::vector<size_t> vertexToInterval(pGraphComplete->numberOfVertices());
+//	//TODO s and t separately
+//	if(parameters.getSmallIntervals()>0){
+//		if(!halfIntervals){
+//			size_t I=parameters.getSmallIntervals();
 //			size_t trSize=parameters.getTrackletSize();
 //			size_t trNumber=I/trSize;
 //			if(I%trSize!=0){
 //				trNumber++;
 //			}
-//			for (int v = 0; v < numberOfVertices-2; ++v) {
+//			std::vector<size_t> timeToTr(pVertexGroups->getMaxTime());
+
+//			for (int v = 0; v < pGraphComplete->numberOfVertices(); ++v) {
 //				size_t g=pVertexGroups->getGroupIndex(v);
 //				g--;  //compensate numbering from 1
-//				size_t indexI=0;
-//				size_t indexTr=0;
-//				size_t finalIndex=0;
-//				if(g<I+I/2){
-//					indexI=0;
-//					indexTr=g/trSize;
-//					finalIndex=indexTr+1;
+//				vertexToInterval[v]=trNumber*(g/I)+(g%I)/trSize+1;
+//				timeToTr[g]=vertexToInterval[v];
+//			}
+////			std::cout<<"time to tr. number "<<std::endl;
+////			for (int t = 0; t <= pVertexGroups->getMaxTime(); ++t) {
+////			    std::cout<<t<<":"<<timeToTr[t]<<std::endl;
+////			}
+//			std::cout<<"vertex to interval done"<<std::endl;
+//			parameters.infoFile()<<"vertex to interval done"<<std::endl;
+//			parameters.infoFile().flush();
+//		}
+////		else{
+////			size_t I=parameters.getSmallIntervals()/2;
+////			size_t trSize=parameters.getTrackletSize();
+////			size_t trNumber=I/trSize;
+////			if(I%trSize!=0){
+////				trNumber++;
+////			}
+////			for (int v = 0; v < numberOfVertices-2; ++v) {
+////				size_t g=pVertexGroups->getGroupIndex(v);
+////				g--;  //compensate numbering from 1
+////				size_t indexI=0;
+////				size_t indexTr=0;
+////				size_t finalIndex=0;
+////				if(g<I+I/2){
+////					indexI=0;
+////					indexTr=g/trSize;
+////					finalIndex=indexTr+1;
+////				}
+////				else{
+////					g=g-I/2;
+////					indexI=g/I;
+////					indexTr=(g-indexI*I)/trSize;
+////					finalIndex=(I+I/2)/trSize+2+indexI*(trNumber)+indexTr;
+////				}
+////				vertexToInterval[v]=finalIndex;
+////			}
+////		}
+//	}
+//	else if(parameters.getTrackletSize()>0){
+//		size_t trSize=parameters.getTrackletSize();
+//		for (int v = 0; v < numberOfVertices; ++v) {
+//			size_t g=pVertexGroups->getGroupIndex(v);
+//			g--;  //compensate numbering from 1
+//			vertexToInterval[v]=g/trSize+1;
+//		}
+//	}
+
+//	for (int i = 0; i < paths.size(); ++i) {
+//	//	std::cout<<"path "<<i<<std::endl;
+//		double currentNodeCost=0;
+//		std::vector<size_t> path;
+//		for (int j = 0; j < paths[i].size(); ++j) {
+//			size_t v=paths[i][j];
+//			path.push_back(v);
+//			//vertexToPath[v]=smallPaths.size();
+
+//			if(j!=paths[i].size()-1){
+//				size_t w=paths[i][j+1];
+
+
+//				if(vertexToInterval[v]!=vertexToInterval[w]||(*timeBreaks)[i].count(pVertexGroups->getGroupIndex(v))>0){
+//					smallPaths.push_back(path);
+//					nodeCosts.push_back(currentNodeCost);
+//					path=std::vector<size_t>();
+//					currentNodeCost=0;
+
 //				}
-//				else{
-//					g=g-I/2;
-//					indexI=g/I;
-//					indexTr=(g-indexI*I)/trSize;
-//					finalIndex=(I+I/2)/trSize+2+indexI*(trNumber)+indexTr;
+//				else if(createNodeCosts){
+//					auto findEdge=pGraph->findEdge(v,w);
+//					currentNodeCost+=costs[getEdgeVarIndex(findEdge.second)];
 //				}
-//				vertexToInterval[v]=finalIndex;
+//			}
+//			else{
+//				smallPaths.push_back(path);
+//				nodeCosts.push_back(currentNodeCost);
+//				path=std::vector<size_t>();
+//									currentNodeCost=0;
+//			}
+
+
+//		}
+
+//	}
+
+//	std::cout<<"tracklets from paths"<<std::endl;
+//	parameters.infoFile()<<"tracklets from paths"<<std::endl;
+//	parameters.infoFile().flush();
+//	//parameters.output("small paths created. Creating single node paths\n");
+//	for (int i = 0; i < smallPaths.size(); ++i) {
+//		for (int j = 0; j < smallPaths[i].size(); ++j) {
+//			if(vertexToPath[smallPaths[i][j]]!=-1){
+//				std::cout<<"multiple occurences of vertex "<<smallPaths[i][j]<<std::endl;
+//				throw std::runtime_error("error in optimized paths, multiple occurrences of one vertex");
+//			}
+//			else{
+//				vertexToPath[smallPaths[i][j]]=i;
 //			}
 //		}
-	}
-	else if(parameters.getTrackletSize()>0){
-		size_t trSize=parameters.getTrackletSize();
-		for (int v = 0; v < numberOfVertices; ++v) {
-			size_t g=pVertexGroups->getGroupIndex(v);
-			g--;  //compensate numbering from 1
-			vertexToInterval[v]=g/trSize+1;
-		}
-	}
-
-	for (int i = 0; i < paths.size(); ++i) {
-	//	std::cout<<"path "<<i<<std::endl;
-		double currentNodeCost=0;
-		std::vector<size_t> path;
-		for (int j = 0; j < paths[i].size(); ++j) {
-			size_t v=paths[i][j];
-			path.push_back(v);
-			//vertexToPath[v]=smallPaths.size();
-
-			if(j!=paths[i].size()-1){
-				size_t w=paths[i][j+1];
+//	}
 
 
-				if(vertexToInterval[v]!=vertexToInterval[w]||(*timeBreaks)[i].count(pVertexGroups->getGroupIndex(v))>0){
-					smallPaths.push_back(path);
-					nodeCosts.push_back(currentNodeCost);
-					path=std::vector<size_t>();
-					currentNodeCost=0;
+//	for (int i = 0; i < vertexToPath.size(); ++i) {
+//		if(vertexToPath[i]==-1){
+//			std::vector<size_t> path;
+//			path.push_back(i);
+//			vertexToPath[i]=smallPaths.size();
+//			smallPaths.push_back(path);
+//			nodeCosts.push_back(0);
+//		}
+//	}
 
-				}
-				else if(createNodeCosts){
-					auto findEdge=pGraph->findEdge(v,w);
-					currentNodeCost+=costs[getEdgeVarIndex(findEdge.second)];
-				}
-			}
-			else{
-				smallPaths.push_back(path);
-				nodeCosts.push_back(currentNodeCost);
-				path=std::vector<size_t>();
-									currentNodeCost=0;
-			}
-
-
-		}
-
-	}
-
-	std::cout<<"tracklets from paths"<<std::endl;
-	parameters.infoFile()<<"tracklets from paths"<<std::endl;
-	parameters.infoFile().flush();
-	//parameters.output("small paths created. Creating single node paths\n");
-	for (int i = 0; i < smallPaths.size(); ++i) {
-		for (int j = 0; j < smallPaths[i].size(); ++j) {
-			if(vertexToPath[smallPaths[i][j]]!=-1){
-				std::cout<<"multiple occurences of vertex "<<smallPaths[i][j]<<std::endl;
-				throw std::runtime_error("error in optimized paths, multiple occurrences of one vertex");
-			}
-			else{
-				vertexToPath[smallPaths[i][j]]=i;
-			}
-		}
-	}
-
-
-	for (int i = 0; i < vertexToPath.size(); ++i) {
-		if(vertexToPath[i]==-1){
-			std::vector<size_t> path;
-			path.push_back(i);
-			vertexToPath[i]=smallPaths.size();
-			smallPaths.push_back(path);
-			nodeCosts.push_back(0);
-		}
-	}
-
-    return nodeCosts;
-}
+//    return nodeCosts;
+//}
 
 
 
@@ -769,38 +769,38 @@ inline bool Data<T>::smallPathsFromTrajectoryBreaks(std::vector<std::vector<size
 
 
 
-template<class T>
-inline bool Data<T>::smallPathsFromTimeBreaks(std::vector<std::vector<size_t>>& paths,bool finalCheckOnly){
-	std::unordered_map<size_t,std::set<size_t>> timeBreaks=findTimeBreaks(paths,true);
-	numberOfVertices=pGraphComplete->numberOfVertices();
+//template<class T>
+//inline bool Data<T>::smallPathsFromTimeBreaks(std::vector<std::vector<size_t>>& paths,bool finalCheckOnly){
+//	std::unordered_map<size_t,std::set<size_t>> timeBreaks=findTimeBreaks(paths,true);
+//	numberOfVertices=pGraphComplete->numberOfVertices();
 
-	if(!finalCheckOnly||!timeBreaks.empty()){
+//	if(!finalCheckOnly||!timeBreaks.empty()){
 
-		trackletsFromPaths(paths,&timeBreaks);
+//		trackletsFromPaths(paths,&timeBreaks);
 
-		std::cout<<"evaluate small paths"<<std::endl;
-		parameters.infoFile()<<"evaluate small paths"<<std::endl;
-		parameters.infoFile().flush();
-		timeBreaks=findTimeBreaks(smallPaths,true);
+//		std::cout<<"evaluate small paths"<<std::endl;
+//		parameters.infoFile()<<"evaluate small paths"<<std::endl;
+//		parameters.infoFile().flush();
+//		timeBreaks=findTimeBreaks(smallPaths,true);
 
-		while(!timeBreaks.empty()){
-			std::cout<<"cutting small paths "<<std::endl;
-			parameters.infoFile()<<"cutting small paths "<<std::endl;
-			parameters.infoFile().flush();
-			std::vector<std::vector<size_t>> oldSmallPaths=smallPaths;
-			numberOfVertices=pGraphComplete->numberOfVertices();
-			trackletsFromPaths(oldSmallPaths,&timeBreaks);
-			timeBreaks=findTimeBreaks(smallPaths,true);
-		}
+//		while(!timeBreaks.empty()){
+//			std::cout<<"cutting small paths "<<std::endl;
+//			parameters.infoFile()<<"cutting small paths "<<std::endl;
+//			parameters.infoFile().flush();
+//			std::vector<std::vector<size_t>> oldSmallPaths=smallPaths;
+//			numberOfVertices=pGraphComplete->numberOfVertices();
+//			trackletsFromPaths(oldSmallPaths,&timeBreaks);
+//			timeBreaks=findTimeBreaks(smallPaths,true);
+//		}
 
-		return true;
-	}
-	else{
-		return false;
-	}
+//		return true;
+//	}
+//	else{
+//		return false;
+//	}
 
 
-}
+//}
 
 
 template<class T>
@@ -851,8 +851,8 @@ template<class T>
 inline void Data<T>::prepareGraphFromPathsAndBreaks(std::vector<std::vector<size_t>>& paths,std::unordered_map<size_t,std::vector<size_t>>& breaks){
 
 
-	std::cout<<"tracklets from optimized paths"<<std::endl;
-	parameters.infoFile()<<"tracklets from optimized paths"<<std::endl;
+    std::cout<<"tracklets from paths"<<std::endl;
+    parameters.infoFile()<<"tracklets from paths"<<std::endl;
 	//parameters.output("tracklets from paths\n");
 
 	vertexToPath=std::vector<int> (pGraphComplete->numberOfVertices(),-1);
