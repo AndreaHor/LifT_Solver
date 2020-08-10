@@ -43,8 +43,12 @@ completeGraphStructure.add_edges_from_array(1,2,matrix12)
 completeGraphStructure.add_edges_from_array(2,3,matrix23)
 completeGraphStructure.add_edges_from_array(1,3,matrix13)
 
-#Calling se solver on the given problem and get the resulting paths. 
+#Calling the solver on the given problem and get the resulting paths. 
 paths=ldpPy.solve_ilp(params,completeGraphStructure)
+
+#The resulting paths are allways automatically saved into the file with suffix "-all-paths-FINAL" in the output directory. 
+#You can optionally save the resulting paths into another file. 
+ldpPy.write_output_to_file(paths,"../data/exampleSolverILP/my_python_output.txt")
 
 for path in paths:
   for v in path:

@@ -260,7 +260,7 @@ public:
     //std::vector<double> trackletsFromPaths(std::vector<std::vector<size_t>>& paths,std::unordered_map<size_t,std::set<size_t>>* timeBreaks=0);
 
 
-	void outputSolution(std::vector<std::vector<size_t>>& paths,bool isIntervals=false);
+    void outputSolution(const std::vector<std::vector<size_t> > &paths, bool isIntervals=false);
 
 	std::unordered_map<size_t,std::set<size_t>> findTimeBreaks(std::vector<std::vector<size_t>>& paths,bool origOnly=false);
 	std::pair<double,double> evaluate(std::vector<std::vector<size_t>>& paths);
@@ -1794,30 +1794,40 @@ inline std::unordered_map<size_t,std::set<size_t>> Data<T>::findTimeBreaks(std::
 
 
 template<class T>
-inline void Data<T>::outputSolution(std::vector<std::vector<size_t>>& paths,bool isIntervals){
+inline void Data<T>::outputSolution(const std::vector<std::vector<size_t>>& paths,bool isIntervals){
 
 
-	std::ofstream file;
-	if(isIntervals){
-		file.open(parameters.getOutputFileName() + "-all-paths-INTERVALS.txt");
-	}
-	else{
-		file.open(parameters.getOutputFileName() + "-all-paths-FINAL.txt");
-	}
+//	std::ofstream file;
+//	if(isIntervals){
+//		file.open(parameters.getOutputFileName() + "-all-paths-INTERVALS.txt");
+//	}
+//	else{
+//		file.open(parameters.getOutputFileName() + "-all-paths-FINAL.txt");
+//	}
 
 
-	for (int i = 0; i < paths.size(); ++i) {
-		//std::cout<<"output path "<<i<<std::endl;
-		for (int j = 0; j < paths[i].size(); ++j) {
-			size_t v=paths[i][j];
-			file<<v<<" ";
-		//	labels[v]=i+1;
-		}
-		file<<std::endl;
-	}
+//	for (int i = 0; i < paths.size(); ++i) {
+//		//std::cout<<"output path "<<i<<std::endl;
+//		for (int j = 0; j < paths[i].size(); ++j) {
+//			size_t v=paths[i][j];
+//			file<<v<<" ";
+//		//	labels[v]=i+1;
+//		}
+//		file<<std::endl;
+//	}
 
 
-	file.close();
+//	file.close();
+    std::string fileName;
+    if(isIntervals){
+        fileName=parameters.getOutputFileName() + "-all-paths-INTERVALS.txt";
+    }
+    else{
+        fileName=parameters.getOutputFileName() + "-all-paths-FINAL.txt";
+    }
+
+    writeOutputToFile(paths,fileName);
+
 	std::cout<<"file closed "<<std::endl;
 	parameters.infoFile()<<"file closed "<<std::endl;
 	parameters.infoFile().flush();

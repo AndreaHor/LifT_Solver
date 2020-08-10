@@ -106,6 +106,29 @@ template<class T=char>
 }
 
 
+ inline void writeOutputToFile(const std::vector<std::vector<size_t>>& paths,std::string outputFileName){
+
+
+     std::ofstream file;
+     file.open(outputFileName);
+
+
+     for (int i = 0; i < paths.size(); ++i) {
+         //std::cout<<"output path "<<i<<std::endl;
+         for (int j = 0; j < paths[i].size(); ++j) {
+             size_t v=paths[i][j];
+             file<<v<<" ";
+         //	labels[v]=i+1;
+         }
+         file<<std::endl;
+     }
+
+
+     file.close();
+
+
+
+ }
 
 template<class T = size_t>
 struct VertexGroups {

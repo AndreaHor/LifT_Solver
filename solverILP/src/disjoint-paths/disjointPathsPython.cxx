@@ -34,6 +34,8 @@ PYBIND11_MODULE(disjointPathsPy, m) {
 
      m.def("solve_ilp", &disjointPaths::solver_ilp<>, "Solve lifted disjoint paths");
 
+     m.def("write_output_to_file", &disjointPaths::writeOutputToFile, "Write output tracks to a specified file");
+
      m.def("solve_standard_disjoit_paths", &disjointPaths::solver_flow_only<>, "Solve standard disjoint paths problem");
 
 
