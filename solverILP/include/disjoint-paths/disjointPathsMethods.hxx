@@ -163,7 +163,8 @@ public:
 
 
 
-    VertexGroups(disjointPaths::DisjointParams<>& parameters){
+
+    template<class PAR> VertexGroups(PAR& parameters){
 		//std::vector<std::vector<size_t>> groups;
 
         initFromFile(parameters.getTimeFileName(),parameters);
@@ -186,8 +187,8 @@ public:
 
 	}
 
-
-    void initFromFile(const std::string& fileName,const DisjointParams<>& parameters);
+    template<class PAR>
+    void initFromFile(const std::string& fileName,const PAR& parameters);
 
     void initFromVector(const std::vector<size_t>& verticesInFrames);
 
@@ -291,7 +292,8 @@ inline void VertexGroups<T>::initFromVector(const std::vector<size_t>& verticesI
 
 
 template<class T>
-inline void VertexGroups<T>::initFromFile(const std::string& fileName,const DisjointParams<>& parameters){
+template<class PAR>
+inline void VertexGroups<T>::initFromFile(const std::string& fileName, const PAR &parameters){
 	size_t lineCounter=0;
 	std::vector<size_t> currentGroup;
 	std::vector<std::string> strings;
@@ -474,8 +476,8 @@ std::vector<std::vector<size_t>> extractInnerPaths(const VertexGroups<size_t>& v
 
 
 
-template<class T>
-	std::vector<std::unordered_set<size_t>> initReachableSet(T & graph,DisjointParams<>& parameters,VertexGroups<size_t>* vg=0){
+template<class T,class PAR>
+    std::vector<std::unordered_set<size_t>> initReachableSet(T & graph,PAR& parameters,VertexGroups<size_t>* vg=0){
 
 	levinkov::Timer tfw;
 			tfw.start();
@@ -576,8 +578,8 @@ template<class T>
 
 
 
-template<class T>
-	std::vector<std::vector<bool>> initReachable(T & graph,DisjointParams<>& parameters,VertexGroups<size_t>* vg=0){
+template<class T,class PAR>
+    std::vector<std::vector<bool>> initReachable(T & graph,PAR& parameters,VertexGroups<size_t>* vg=0){
 
 	levinkov::Timer tfw;
 			tfw.start();
@@ -685,7 +687,8 @@ template<class T>
 template<class T = size_t>
 struct CompleteStructure {
 public:
-    CompleteStructure(DisjointParams<T> & configParameters)
+    template<class PAR>
+    CompleteStructure(PAR & configParameters)
 {
         pVertexGroups=new VertexGroups<>(configParameters);
         VertexGroups<>& vg=*pVertexGroups;
@@ -720,7 +723,8 @@ public:
     }
 
 
-    void addEdgesFromFile(const std::string& fileName,DisjointParams<>& params);
+    template<class PAR>
+    void addEdgesFromFile(const std::string& fileName,PAR& params);
     void addEdgesFromMatrix(size_t time1,size_t time2,const py::array_t<double> inputMatrix);
     const VertexGroups<>& getVertexGroups(){
         return *pVertexGroups;
@@ -810,7 +814,8 @@ inline void CompleteStructure<T>::addEdgesFromMatrix(size_t time1,size_t time2,c
 
 
 template<class T>
-inline void CompleteStructure<T>::addEdgesFromFile(const std::string& fileName,DisjointParams<>& params){
+template<class PAR>
+inline void CompleteStructure<T>::addEdgesFromFile(const std::string& fileName,PAR& params){
 	char delim=',';
     VertexGroups<>& vg=*pVertexGroups;
 
