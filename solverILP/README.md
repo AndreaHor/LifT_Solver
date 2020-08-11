@@ -82,6 +82,26 @@ parameter file. You find an example parameter file in directory `data/exampleSol
     
   - `GUROBI_REL_GAP_TRACKLET = 0`  
     Expects a non-negative real value. Setting Gurobi relative gap. Influences the second step of the two-step procedure. That is, when the problem graph nodes correspond to tracklets.
+  - `TRACKLET_SIZE=20`  
+    Expects a non-negative integer. Maximal length of tracklets used in the second step of our two-step procedure. After finishing the first step, resulting tracks are further cut in time frames given by multiples of `TRACKLET_SIZE`. If this parameter is set to 0, no splitting after the first step is done and the whole tracks resulting from the first step are used as tracklets. Default value is 20.
+    
+  - `ALL_BASE_TRACKLET=1`  
+    Expects 0/1. If set to 1, all base edges from the input graph (before sparsification) can be used for connecting two tracklets. If set to zero, only those tracklets can be connected with a new base edge, if the cumulative cost between them is lower or equal to `BASE_THRESHOLD`.
+    
+ - `DENSE_TRACKLETS = 1`  
+    Expects 0/1. It has influence only if `SMALL_INTERVALS=0`. That is, when problem is solved directly on the whole input graphs without dividing into intervals. If set to zero, no second step is performed. If set to one, resulting tracks are cut into tracklets and the second step of the two-step procedure is run on the obtained tracklet graphs.
+    
+  - `OPTIMIZE_PATHS = 0`  
+    Expects 0/1. Influences creating tracklets from tracks. In order to understand this parameter, first see the "Note to sparsification" below this parameter list. In the second step, all edges of the input graphs up to certain time gap are used for evaluating cost and enable connections between tracklets. Therefore, it may be beneficial to split some tracks with respect to this more accurate evaluation. If this parameter is one, optimal splitting is searched for every initial track. If set to zero, only simple search for advantageous break points is done.
+
+- ` COMPLETE_GAP_IN_TRACKLET= 1  `  
+    Expects 0/1. Influences how long edges are used for creating tracklet graph and for evaluating cost between tracklets. If set to one, all base and lifted edges up to `MAX_TIMEGAP_COMPLETE` are used. If set to zero, `MAX_TIMEGAP_BASE` and `MAX_TIMEGAP_LIFTED`are used for selecting the base and the lifted edges.
+- `MAX_TIMEGAP_COMPLETE = 60`  
+  Expects a positive integer. Influences the second step of the two-step procedure. If `COMPLETE_GAP_IN_TRACKLET` is set to one, this value is used for selection of base and lifted edges in creating the tracklet graph. Its default value is the maximum from `MAX_TIMEGAP_BASE` and `MAX_TIMEGAP_LIFTED`.
+- `INTERVAL_FILE=/home/LifT_Solver/data/exampleSolverILP/output-all-paths-INTERVALS.txt`  
+  Can be used for loading the results of the first step and directly running the second step. For this scenario, parameter `TASK` must be set to `T`. Expects path to a file where results of the first step are stored. These files have suffix `"-all-paths-INTERVALS.txt"`.
+- `TASK=C`  
+  Expects either character `C` for performing the complete task, that is both steps of the two-step procedure, or `T` for only performing the second step. In this case, `INTERVAL_FILE` must be set to a valid path to a file.
 
 **Base graph sparsificatioin parameters**
 
@@ -96,6 +116,8 @@ parameter file. You find an example parameter file in directory `data/exampleSol
     
   - `BASE_THRESHOLD = 0.0`  
     Expects a real value. Upper threshold for cost of base edges with a bigger time gap than `KNN_GAP`. Edges longer than `KNN_GAP` have to have cost lower than this threshold in order to be used. Default value is 0.
+    
+    
 
 **Lifted graph sparsification parameters**
 
@@ -114,26 +136,7 @@ parameter file. You find an example parameter file in directory `data/exampleSol
   - `LONGER_LIFTED_INTERVAL = 4`  
     Expects a positive integer. Influences lifted edges with time gap between `DENSE_TIMEGAP_LIFTED` and `MAX_TIMEGAP_LIFTED`. If set to value \(n\), only every \(n\)-th time gap will be used for adding lifted edges.
     
-  - `TRACKLET_SIZE=20`  
-    Expects a non-negative integer. Maximal length of tracklets used in the second step of our two-step procedure. After finishing the first step, resulting tracks are further cut in time frames given by multiples of `TRACKLET_SIZE`. If this parameter is set to 0, no splitting after the first step is done and the whole tracks resulting from the first step are used as tracklets. Default value is 20.
-    
-  - `ALL_BASE_TRACKLET=1`  
-    Expects 0/1. If set to 1, all base edges from the input graph (before sparsification) can be used for connecting two tracklets. If set to zero, only those tracklets can be connected with a new base edge, if the cumulative cost between them is lower or equal to `BASE_THRESHOLD`.
-    
-  - `DENSE_TRACKLETS = 1`  
-    Expects 0/1. It has influence only if `SMALL_INTERVALS=0`. That is, when problem is solved directly on the whole input graphs without dividing into intervals. If set to zero, no second step is performed. If set to one, resulting tracks are cut into tracklets and the second step of the two-step procedure is run on the obtained tracklet graphs.
-    
-  - `OPTIMIZE_PATHS = 0`  
-    Expects 0/1. Influences creating tracklets from tracks. In order to understand this parameter, first see the "Note to sparsification" below this parameter list. In the second step, all edges of the input graphs up to certain time gap are used for evaluating cost and enable connections between tracklets. Therefore, it may be beneficial to split some tracks with respect to this more accurate evaluation. If this parameter is one, optimal splitting is searched for every initial track. If set to zero, only simple search for advantageous break points is done.
 
-- ` COMPLETE_GAP_IN_TRACKLET= 1  `  
-    Expects 0/1. Influences how long edges are used for creating tracklet graph and for evaluating cost between tracklets. If set to one, all base and lifted edges up to `MAX_TIMEGAP_COMPLETE` are used. If set to zero, `MAX_TIMEGAP_BASE` and `MAX_TIMEGAP_LIFTED`are used for selecting the base and the lifted edges.
-- `MAX_TIMEGAP_COMPLETE = 60`  
-  Expects a positive integer. Influences the second step of the two-step procedure. If `COMPLETE_GAP_IN_TRACKLET` is set to one, this value is used for selection of base and lifted edges in creating the tracklet graph. Its default value is the maximum from `MAX_TIMEGAP_BASE` and `MAX_TIMEGAP_LIFTED`.
-- `INTERVAL_FILE=/home/LifT_Solver/data/exampleSolverILP/output-all-paths-INTERVALS.txt`  
-  Can be used for loading the results of the first step and directly running the second step. For this scenario, parameter `TASK` must be set to `T`. Expects path to a file where results of the first step are stored. These files have suffix `"-all-paths-INTERVALS.txt"`.
-- `TASK=C`  
-  Expects either character `C` for performing the complete task, that is both steps of the two-step procedure, or `T` for only performing the second step. In this case, `INTERVAL_FILE` must be set to a valid path to a file.
 
 #### Note to sparsification
 
