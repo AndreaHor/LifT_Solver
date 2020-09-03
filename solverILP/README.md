@@ -9,7 +9,7 @@ The solver can either be used independently or within our tracker pipeline. The 
 
 1.  Type `git clone https://github.com/AndreaHor/LifT_Solver.git` for  cloning the repository.
 
-2.  Type `git submodule update –remote –recursive –init` for getting the submodules.
+2.  Type `git submodule update --remote --recursive --init` for getting the submodules.
     
 
 # Setting up Gurobi
