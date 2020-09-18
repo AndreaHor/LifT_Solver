@@ -190,9 +190,8 @@ inline DisjointStructure<T>::DisjointStructure(disjointPaths::DisjointParams<>& 
 parameters(configParameters)
 {
 
-	std::cout<<"interval "<<minTime<<","<<maxTime<<std::endl;
-	parameters.infoFile()<<"interval "<<minTime<<","<<maxTime<<std::endl;
-	parameters.infoFile().flush();
+    parameters.getControlOutput()<<"interval "<<minTime<<","<<maxTime<<std::endl;
+    parameters.writeControlOutput();
 
 	useTimeFrames=parameters.isRestrictFrames()||parameters.isSparsify();
 	size_t maxVertex;
@@ -213,7 +212,8 @@ parameters(configParameters)
 			readGraph(graphFile,maxVertex,delim);
 			if(!parameters.isAutomaticLifted()){
 				//std::vector<std::vector<bool>> secOrderDesc=automaticLifted(graph_);
-				std::cout<<"Reading lifted edges from file."<<std::endl;
+                parameters.getControlOutput()<<"Reading lifted edges from file."<<std::endl;
+                parameters.writeControlOutput();
 				std::string line;
 				std::vector<std::string> strings;
 				while (std::getline(graphFile, line) && !line.empty()) {
@@ -264,9 +264,9 @@ parameters(configParameters)
 	if(graph_.numberOfVertices()>2){
 
 		if(parameters.getMaxTimeLifted()>0&&parameters.isAutomaticLifted()){
-			std::cout<<"Adding automatic lifted edges"<<std::endl;
-			parameters.infoFile()<<"Adding automatic lifted edges"<<std::endl;
-			parameters.infoFile().flush();
+
+            parameters.getControlOutput()<<"Adding automatic lifted edges"<<std::endl;
+            parameters.writeControlOutput();
 			for (int i = 0; i < graph_.numberOfEdges(); ++i) {
 				size_t v0=graph_.vertexOfEdge(i,0);
 				size_t v1=graph_.vertexOfEdge(i,1);
@@ -280,16 +280,15 @@ parameters(configParameters)
 					//				}
 				}
 			}
-			std::cout<<"done"<<std::endl;
-			parameters.infoFile()<<"done"<<std::endl;
-			parameters.infoFile().flush();
+
+            parameters.getControlOutput()<<"done"<<std::endl;
+            parameters.writeControlOutput();
 
 		}
 
 
-		std::cout<<"number of vertices "<<graph_.numberOfVertices()<<std::endl;
-		parameters.infoFile()<<"number of vertices "<<graph_.numberOfVertices()<<std::endl;
-		parameters.infoFile().flush();
+        parameters.getControlOutput()<<"number of vertices "<<graph_.numberOfVertices()<<std::endl;
+        parameters.writeControlOutput();
 		if(parameters.isSparsify()){
 			createKnnBaseGraph();
 
@@ -332,11 +331,13 @@ inline void DisjointStructure<T>::readGraphWithTime(size_t minTime,size_t maxTim
 		t_ = 1;
 		graphLifted_ = andres::graph::Digraph<>(2);
 		graph_ = andres::graph::Digraph<>(2);
-		std::cout<<"empty interval in ds constructor"<<std::endl;
+        parameters.getControlOutput()<<"empty interval in ds constructor"<<std::endl;
+        parameters.writeControlOutput();
 
 	}
 	else{
-		std::cout<<"valid interval in ds constructor"<<std::endl;
+        parameters.getControlOutput()<<"valid interval in ds constructor"<<std::endl;
+        parameters.writeControlOutput();
 		size_t minVertex=vg.getGroupVertices(minVertexTime)[0];
 
 		mt=maxTime-1;
@@ -400,7 +401,8 @@ inline void DisjointStructure<T>::readGraphWithTime(size_t minTime,size_t maxTim
 		}
 		minV=minVertex;
 		maxV=maxVertex;
-		std::cout<<"DS constructor max Vertex "<<maxV<<std::endl;
+        parameters.getControlOutput()<<"DS constructor max Vertex "<<maxV<<std::endl;
+        parameters.writeControlOutput();
 		//}
 	}
 
@@ -419,8 +421,9 @@ inline void DisjointStructure<T>::readGraph(std::ifstream& data,size_t maxVertex
 	size_t lineCounter=0;
 	std::getline(data, line);
 	lineCounter++;
-	std::cout << "called read graph" << std::endl;
-	parameters.infoFile()<<"called read graph" << std::endl;
+
+    parameters.getControlOutput()<<"called read graph" << std::endl;
+    parameters.writeControlOutput();
 	std::vector<std::string> strings = split(line, delim);
 	size_t numberOfVertices;
 
@@ -453,9 +456,9 @@ inline void DisjointStructure<T>::readGraph(std::ifstream& data,size_t maxVertex
 	// std::vector<std::pair<size_t,siz  Data<>e_t> > liftedEdges;
 	vertexScore = std::vector<double>(numberOfVertices, 0);
 
-	std::cout<<"Reading vertices from file. "<<std::endl;
-	parameters.infoFile()<<"Reading vertices from file. "<<std::endl;
-	parameters.infoFile().flush();
+
+    parameters.getControlOutput()<<"Reading vertices from file. "<<std::endl;
+    parameters.writeControlOutput();
 	//Vertices that are not found have score=0. Appearance and disappearance cost are read here.
 	bool vertexAndInOutScore=false;
 	while (std::getline(data, line) && !line.empty()) {
@@ -490,9 +493,9 @@ inline void DisjointStructure<T>::readGraph(std::ifstream& data,size_t maxVertex
 
 	size_t maxGap=parameters.getMaxTimeGapComplete();
 
-	std::cout<<"Reading base edges from file. "<<std::endl;
-	parameters.infoFile()<<"Reading base edges from file. "<<std::endl;
-	parameters.infoFile().flush();
+
+    parameters.getControlOutput()<<"Reading base edges from file. "<<std::endl;
+    parameters.writeControlOutput();
 	while (std::getline(data, line) && !line.empty()) {
 		lineCounter++;
 		strings = split(line, delim);
@@ -537,8 +540,9 @@ inline void DisjointStructure<T>::readGraph(std::ifstream& data,size_t maxVertex
 
 template<class T>
 inline void DisjointStructure<T>::createKnnBaseGraph(){
-	std::cout<<"Sparsify base graph"<<std::endl;
-	parameters.infoFile()<<"Sparsify base graph"<<std::endl;
+
+    parameters.getControlOutput()<<"Sparsify base graph"<<std::endl;
+    parameters.writeControlOutput();
 	andres::graph::Digraph<> tempGraph(graph_.numberOfVertices());
 	std::vector<double> newBaseCosts;
 	//std::vector<size_t> inOutEdges;
@@ -675,14 +679,14 @@ inline void DisjointStructure<T>::createKnnBaseGraph(){
 	edgeScore=newBaseCosts;
 
 	if(graph_.numberOfEdges()!=newBaseCosts.size()){
-		parameters.infoFile()<<"edge number mismatch, graph: "<<graph_.numberOfEdges()<<", cost vector "<<newBaseCosts.size()<<std::endl;
-		parameters.infoFile().flush();
-		std::cout<<"edge number mismatch, graph: "<<graph_.numberOfEdges()<<", cost vector "<<newBaseCosts.size()<<std::endl;
+        parameters.getControlOutput()<<"edge number mismatch, graph: "<<graph_.numberOfEdges()<<", cost vector "<<newBaseCosts.size()<<std::endl;
+        parameters.writeControlOutput();
+
 	}
 	else{
-		std::cout<<"edge number and graph size match "<<std::endl;
-		parameters.infoFile()<<"edge number and graph size match "<<std::endl;
-		parameters.infoFile().flush();
+
+        parameters.getControlOutput()<<"edge number and graph size match "<<std::endl;
+        parameters.writeControlOutput();
 	}
 
 
@@ -695,12 +699,13 @@ inline void DisjointStructure<T>::createKnnBaseGraph(){
 		reachable=initReachableSet(graph_,parameters);
 
 
-		std::cout<<"Left "<<newBaseCosts.size()<<" base edges"<<std::endl;
-		parameters.infoFile()<<"Left "<<newBaseCosts.size()<<" base edges"<<std::endl;
-		parameters.infoFile().flush();
+
+        parameters.getControlOutput()<<"Left "<<newBaseCosts.size()<<" base edges"<<std::endl;
+        parameters.writeControlOutput();
 	}
 	else{
-		std::cout<<"FW skipped"<<std::endl;
+        parameters.getControlOutput()<<"FW skipped"<<std::endl;
+        parameters.writeControlOutput();
 	}
 
 }
@@ -709,9 +714,9 @@ inline void DisjointStructure<T>::createKnnBaseGraph(){
 template<class T>
 inline void DisjointStructure<T>::keepFractionOfLifted(){
 
-		std::cout<<"Sparsify lifted graph"<<std::endl;
-		parameters.infoFile()<<"Sparsify lifted graph"<<std::endl;
-		parameters.infoFile().flush();
+
+        parameters.getControlOutput()<<"Sparsify lifted graph"<<std::endl;
+        parameters.writeControlOutput();
 		//TODO run automaticLifted to find candidates first
 
 		double negMaxValue=0;
@@ -760,14 +765,15 @@ inline void DisjointStructure<T>::keepFractionOfLifted(){
 			if(!allNegative.empty()){
 				negMaxValue=-allNegative.top();
 			}
-			std::cout<<"max negative lifted "<<negMaxValue<<std::endl;
-			parameters.infoFile()<<"max negative lifted "<<negMaxValue<<std::endl;
+
+            parameters.getControlOutput()<<"max negative lifted "<<negMaxValue<<std::endl;
 
 			if(!allPositive.empty()){
 				posMinValue=allPositive.top();
 			}
-			std::cout<<"min positive lifted "<<posMinValue<<std::endl;
-			parameters.infoFile()<<"min positive lifted "<<posMinValue<<std::endl;
+
+            parameters.getControlOutput()<<"min positive lifted "<<posMinValue<<std::endl;
+            parameters.writeControlOutput();
 
 		}
 		else{
@@ -816,9 +822,8 @@ inline void DisjointStructure<T>::keepFractionOfLifted(){
 		}
 
 
-			std::cout<<"done"<<std::endl;
-			parameters.infoFile()<<"done"<<std::endl;
-			parameters.infoFile().flush();
+            parameters.getControlOutput()<<"done"<<std::endl;
+            parameters.writeControlOutput();
 
 
 		for (int i = 0; i < graphLifted_.numberOfEdges(); ++i) {
@@ -863,20 +868,20 @@ inline void DisjointStructure<T>::keepFractionOfLifted(){
 		liftedEdgeScore=newLiftedCosts;
 
 		graphLifted_=tempGraphLifted;
-		std::cout<<"Left "<<newLiftedCosts.size()<<" lifted edges."<<std::endl;
-		parameters.infoFile()<<"Left "<<newLiftedCosts.size()<<" lifted edges."<<std::endl;
-		parameters.infoFile().flush();
+
+        parameters.getControlOutput()<<"Left "<<newLiftedCosts.size()<<" lifted edges."<<std::endl;
+        parameters.writeControlOutput();
 
 		if(graphLifted_.numberOfEdges()!=newLiftedCosts.size()){
-			std::cout<<"lifted edge number mismatch, lifted graph: "<<graphLifted_.numberOfEdges()<<", cost vector "<<newLiftedCosts.size()<<std::endl;
-			parameters.infoFile()<<"lifted edge number mismatch, lifted graph: "<<graphLifted_.numberOfEdges()<<", cost vector "<<newLiftedCosts.size()<<std::endl;
+
+            parameters.getControlOutput()<<"lifted edge number mismatch, lifted graph: "<<graphLifted_.numberOfEdges()<<", cost vector "<<newLiftedCosts.size()<<std::endl;
 		}
 		else{
-			std::cout<<"lifted edge number and lifted graph size match "<<std::endl;
-			parameters.infoFile()<<"lifted edge number and lifted graph size match "<<std::endl;
+
+            parameters.getControlOutput()<<"lifted edge number and lifted graph size match "<<std::endl;
 
 		}
-		parameters.infoFile().flush();
+        parameters.writeControlOutput();
 
 	}
 
@@ -886,9 +891,9 @@ inline void DisjointStructure<T>::keepFractionOfLifted(){
 
 template<class T>
 inline void DisjointStructure<T>::keepFractionOfLifted3(){
-	std::cout<<"Sparsify lifted graph"<<std::endl;
-	parameters.infoFile()<<"Sparsify lifted graph"<<std::endl;
-	parameters.infoFile().flush();
+
+    parameters.getControlOutput()<<"Sparsify lifted graph"<<std::endl;
+    parameters.writeControlOutput();
 
 	double negMaxValue=parameters.getNegativeThresholdLifted();
 	double posMinValue=parameters.getPositiveThresholdLifted();
@@ -917,9 +922,9 @@ inline void DisjointStructure<T>::keepFractionOfLifted3(){
 			if(w!=t_&&alternativePath[w]) liftedEdges[v].insert(w);
 		}
 	}
-	std::cout<<"second order reachability done"<<std::endl;
-	parameters.infoFile()<<"second order reachability done"<<std::endl;
-	parameters.infoFile().flush();
+
+    parameters.getControlOutput()<<"second order reachability done"<<std::endl;
+    parameters.writeControlOutput();
 
 
 
@@ -1034,19 +1039,19 @@ inline void DisjointStructure<T>::keepFractionOfLifted3(){
 	liftedEdgeScore=newLiftedCosts;
 
 	graphLifted_=tempGraphLifted;
-	std::cout<<"Left "<<newLiftedCosts.size()<<" lifted edges."<<std::endl;
-	parameters.infoFile()<<"Left "<<newLiftedCosts.size()<<" lifted edges."<<std::endl;
+
+    parameters.getControlOutput()<<"Left "<<newLiftedCosts.size()<<" lifted edges."<<std::endl;
 
 	if(graphLifted_.numberOfEdges()!=newLiftedCosts.size()){
-		std::cout<<"lifted edge number mismatch, lifted graph: "<<graphLifted_.numberOfEdges()<<", cost vector "<<newLiftedCosts.size()<<std::endl;
-		parameters.infoFile()<<"lifted edge number mismatch, lifted graph: "<<graphLifted_.numberOfEdges()<<", cost vector "<<newLiftedCosts.size()<<std::endl;
+
+        parameters.getControlOutput()<<"lifted edge number mismatch, lifted graph: "<<graphLifted_.numberOfEdges()<<", cost vector "<<newLiftedCosts.size()<<std::endl;
 	}
 	else{
-		std::cout<<"lifted edge number and lifted graph size match "<<std::endl;
-		parameters.infoFile()<<"lifted edge number and lifted graph size match "<<std::endl;
+
+        parameters.getControlOutput()<<"lifted edge number and lifted graph size match "<<std::endl;
 
 	}
-	parameters.infoFile().flush();
+    parameters.writeControlOutput();
 
 }
 
