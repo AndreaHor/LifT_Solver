@@ -88,9 +88,9 @@ public:
 	Data(CompleteStructure<>& cs,DisjointParams<>& inpParameters) :
 		parameters(inpParameters) {
 
-		std::cout<<"new constructor of data"<<std::endl;
-		parameters.infoFile()<<"new constructor of data"<<std::endl;
-		parameters.infoFile().flush();
+
+        parameters.getControlOutput()<<"new constructor of data"<<std::endl;
+        parameters.writeControlOutput();
 		pGraph=0;
 		pGraphLifted=0;
 
@@ -107,8 +107,8 @@ public:
 		useTimeTracks=false;
 
 		//numberOfVertices=pGraphComplete->numberOfVertices();
-		std::cout<<"init pointers set"<<std::endl;
-		parameters.infoFile()<<"init pointers set"<<std::endl;
+
+        parameters.getControlOutput()<<"init pointers set"<<std::endl;
 		s=0;
 		t=0;
 		numberOfVertices=pGraphComplete->numberOfVertices();
@@ -121,9 +121,9 @@ public:
 	}
 
 	~Data(){
-		std::cout<<"call data destructor "<<std::endl;
-		parameters.infoFile()<<"call data destructor "<<std::endl;
-		parameters.infoFile().flush();
+
+        parameters.getControlOutput()<<"call data destructor "<<std::endl;
+        parameters.writeControlOutput();
 		deleteCompleteGraph();
 	}
 
@@ -535,9 +535,9 @@ template<class T>
 inline void Data<T>::deleteCompleteGraph(){
     if(deleteComplete){
     //if(pGraphComplete!=0&&parameters.getSmallIntervals()==0){
-		std::cout<<"delete complete graph "<<std::endl;
-		parameters.infoFile()<<"delete complete graph "<<std::endl;
-		parameters.infoFile().flush();
+
+        parameters.getControlOutput()<<"delete complete graph "<<std::endl;
+        parameters.writeControlOutput();
 		//parameters.output("delete complete graph\n");
 		delete pGraphComplete;
 		delete pCompleteScore;
@@ -568,22 +568,19 @@ inline void Data<T>::readCompleteGraph(){
             deleteComplete= true;
             double objValue=0;
 
-            std::cout << "Read complete graph" << std::endl;
-            parameters.infoFile()<< "Read complete graph" << std::endl;
+
+            parameters.getControlOutput()<< "Read complete graph" << std::endl;
             std::vector<std::string> strings;
 
-
-            std::cout<<"Skipping vertices in file. "<<std::endl;
-            parameters.infoFile()<<"Skipping vertices in file. "<<std::endl;
-            parameters.infoFile().flush();
+            parameters.getControlOutput()<<"Skipping vertices in file. "<<std::endl;
+            parameters.writeControlOutput();
             //Vertices that are not found have score=0. Appearance and disappearance cost are read here.
             while (std::getline(data, line) && !line.empty()) {
 
             }
 
-            std::cout<<"Reading base edges from file. "<<std::endl;
-            parameters.infoFile()<<"Reading base edges from file. "<<std::endl;
-            parameters.infoFile().flush();
+            parameters.getControlOutput()<<"Reading base edges from file. "<<std::endl;
+            parameters.writeControlOutput();
             size_t maxLabel=0;
             while (std::getline(data, line) && !line.empty()) {
 
@@ -743,15 +740,14 @@ inline bool Data<T>::smallPathsFromTrajectoryBreaks(std::vector<std::vector<size
 		prepareGraphFromPathsAndBreaks(paths,trajBreaks);
 
 
-		std::cout<<"evaluate small paths"<<std::endl;
-		parameters.infoFile()<<"evaluate small paths"<<std::endl;
-		parameters.infoFile().flush();
+        parameters.getControlOutput()<<"evaluate small paths"<<std::endl;
+        parameters.writeControlOutput();
 		trajBreaks=findTrajectoryBreaks(smallPaths);
 
 		while(!trajBreaks.empty()){
-			std::cout<<"cutting small paths "<<std::endl;
-			parameters.infoFile()<<"cutting small paths "<<std::endl;
-			parameters.infoFile().flush();
+
+            parameters.getControlOutput()<<"cutting small paths "<<std::endl;
+            parameters.writeControlOutput();
 			std::vector<std::vector<size_t>> oldSmallPaths=smallPaths;
 			numberOfVertices=pGraphComplete->numberOfVertices();
 			prepareGraphFromPathsAndBreaks(oldSmallPaths,trajBreaks);
@@ -851,15 +847,15 @@ template<class T>
 inline void Data<T>::prepareGraphFromPathsAndBreaks(std::vector<std::vector<size_t>>& paths,std::unordered_map<size_t,std::vector<size_t>>& breaks){
 
 
-    std::cout<<"tracklets from paths"<<std::endl;
-    parameters.infoFile()<<"tracklets from paths"<<std::endl;
+    parameters.getControlOutput()<<"tracklets from paths"<<std::endl;
 	//parameters.output("tracklets from paths\n");
 
 	vertexToPath=std::vector<int> (pGraphComplete->numberOfVertices(),-1);
-    std::cout<<"complete graph vertices "<<pGraphComplete->numberOfVertices()<<std::endl;
+    parameters.getControlOutput()<<"complete graph vertices "<<pGraphComplete->numberOfVertices()<<std::endl;
 	smallPaths=std::vector<std::vector<size_t>>();
 	pathsForInit=std::vector<std::vector<size_t>>();
 
+    parameters.writeControlOutput();
 //	std::cout<<"all paths"<<std::endl;
 //	for(auto& path:paths){
 //		for(size_t v:path){
@@ -906,7 +902,8 @@ inline void Data<T>::prepareGraphFromPathsAndBreaks(std::vector<std::vector<size
 		for (int j = 0; j < smallPaths[i].size(); ++j) {
            // std::cout<<smallPaths[i][j]<<", ";
 			if(vertexToPath[smallPaths[i][j]]!=-1){
-				std::cout<<"multiple occurences of vertex "<<smallPaths[i][j]<<std::endl;
+                parameters.getControlOutput()<<"multiple occurences of vertex "<<smallPaths[i][j]<<std::endl;
+                parameters.writeControlOutput();
 				throw std::runtime_error("error in optimized paths, multiple occurrences of one vertex");
 			}
 			else{
@@ -976,7 +973,8 @@ template<class T>
 inline void Data<T>::graphFromIntervalsDense(){
 
 	    initSolution=std::vector<double>();
-	    std::cout<<"all small paths"<<std::endl;
+        parameters.getControlOutput()<<"all small paths"<<std::endl;
+        parameters.writeControlOutput();
 	    std::ofstream pathsFile;
 	    pathsFile.open(parameters.getOutputFileName()+"paths.txt",std::ofstream::out | std::ofstream::app);
 
@@ -998,16 +996,15 @@ inline void Data<T>::graphFromIntervalsDense(){
 		andres::graph::Digraph<> trGraphLifted(smallPaths.size()+2);
 		std::vector<double> nodeCosts(smallPaths.size()+2,0);
 
-		std::cout<<"small paths size "<<smallPaths.size()<<std::endl;
-		parameters.infoFile()<<"small paths size "<<smallPaths.size()<<std::endl;
+
+        parameters.getControlOutput()<<"small paths size "<<smallPaths.size()<<std::endl;
 
 		std::unordered_map<size_t,size_t> insideBaseEdges; //would be enough to have only simple map
 		std::unordered_map<size_t,std::unordered_set<size_t>> originalEdges; //would be enough to have map to set
 
 
-		std::cout<<"check time consistency of tracklets"<<std::endl;
-		parameters.infoFile()<<"check time consistency of tracklets"<<std::endl;
-		parameters.infoFile().flush();
+        parameters.getControlOutput()<<"check time consistency of tracklets"<<std::endl;
+        parameters.writeControlOutput();
 
 
 		for (int i = 0; i < smallPaths.size(); ++i) {
@@ -1016,10 +1013,10 @@ inline void Data<T>::graphFromIntervalsDense(){
 			size_t gFirst=vertexToPath[firstVertex];
 			size_t gLast=vertexToPath[lastVertex];
 			if(gFirst!=i||gLast!=i){
-				std::cout<<"gFirst "<<gFirst<<", gLast "<<gLast<<", i "<<i<<std::endl;
-				parameters.infoFile()<<"Error: Mismatch in tracklet numbers and vertexTOPath array"<<std::endl;
-				parameters.infoFile()<<"gFirst "<<gFirst<<", gLast "<<gLast<<", i "<<i<<std::endl;
-				parameters.infoFile().flush();
+
+                parameters.getControlOutput()<<"Error: Mismatch in tracklet numbers and vertexTOPath array"<<std::endl;
+                parameters.getControlOutput()<<"gFirst "<<gFirst<<", gLast "<<gLast<<", i "<<i<<std::endl;
+                parameters.writeControlOutput();
 				throw std::runtime_error("Mismatch in tracklet numbers and vertexTOPath array");
 			}
 
@@ -1036,11 +1033,10 @@ inline void Data<T>::graphFromIntervalsDense(){
 				size_t gFirst2=vertexToPath[firstVertex2];
 				size_t gLast2=vertexToPath[lastVertex2];
 				if(gFirst2!=j||gLast2!=j){
-					parameters.infoFile()<<"Error: Mismatch in tracklet numbers and vertexTOPath array"<<std::endl;
-					parameters.infoFile()<<"gFirst "<<gFirst<<", gLast "<<gLast<<", i "<<i<<std::endl;
-					parameters.infoFile().flush();
-					std::cout<<"gFirst2 "<<gFirst2<<", gLast2 "<<gLast2<<", j "<<j<<std::endl;
-					throw std::runtime_error("Mismatch in tracklet numbers and vertexTOPath array");
+                    parameters.getControlOutput()<<"Error: Mismatch in tracklet numbers and vertexTOPath array"<<std::endl;
+                    parameters.getControlOutput()<<"gFirst "<<gFirst<<", gLast "<<gLast<<", i "<<i<<std::endl;
+                    parameters.writeControlOutput();
+                    throw std::runtime_error("Mismatch in tracklet numbers and vertexTOPath array");
 				}
 
 
@@ -1072,8 +1068,8 @@ inline void Data<T>::graphFromIntervalsDense(){
 			}
 		}
 
-		std::cout<<"base for graphs, edges: "<<trGraphBase.numberOfEdges()<<", lifted edges: "<<trGraphLifted.numberOfEdges()<<std::endl;
-		parameters.infoFile()<<"base for graphs, edges: "<<trGraphBase.numberOfEdges()<<", lifted edges: "<<trGraphLifted.numberOfEdges()<<std::endl;
+
+        parameters.getControlOutput()<<"base for graphs, edges: "<<trGraphBase.numberOfEdges()<<", lifted edges: "<<trGraphLifted.numberOfEdges()<<std::endl;
 
 
 
@@ -1082,8 +1078,9 @@ inline void Data<T>::graphFromIntervalsDense(){
 
 
 		std::unordered_map<size_t,std::unordered_set<size_t>> usedEdges;
-		std::cout<<"insert original costs into tracklet costs"<<std::endl;
-		parameters.infoFile()<<"insert original costs into tracklet costs"<<std::endl;
+
+        parameters.getControlOutput()<<"insert original costs into tracklet costs"<<std::endl;
+        parameters.writeControlOutput();
 		for (int e = 0; e < pGraphComplete->numberOfEdges(); ++e) {
 
 			size_t v=pGraphComplete->vertexOfEdge(e,0);
@@ -1155,9 +1152,8 @@ inline void Data<T>::graphFromIntervalsDense(){
 		std::vector<double> liftedEdgeCostNew;
 		double baseThreshold=parameters.getInputCost()+parameters.getOutputCost();
 
-		std::cout<<"Construct base tracklet graph"<<std::endl;
-		parameters.infoFile()<<"Construct base tracklet graph"<<std::endl;
-		parameters.infoFile().flush();
+        parameters.getControlOutput()<<"Construct base tracklet graph"<<std::endl;
+        parameters.writeControlOutput();
 
 		for (int e = 0; e < trGraphBase.numberOfEdges(); ++e) {
 			size_t v0=trGraphBase.vertexOfEdge(e,0);
@@ -1190,9 +1186,8 @@ inline void Data<T>::graphFromIntervalsDense(){
 		s=newS;
 		t=newT;
 
-		std::cout<<"s t edges insert"<<std::endl;
-		parameters.infoFile()<<"s t edges insert"<<std::endl;
-		parameters.infoFile().flush();
+        parameters.getControlOutput()<<"s t edges insert"<<std::endl;
+        parameters.writeControlOutput();
 		for (int v = 0; v < trackletGraph.numberOfVertices()-2; ++v) {
 			trackletGraph.insertEdge(newS,v);
 			baseEdgeCostNew.push_back(parameters.getInputCost());
@@ -1206,10 +1201,8 @@ inline void Data<T>::graphFromIntervalsDense(){
 		pReachable=&newReachable;
 
 
-
-		std::cout<<"Find unnecessary lifted edges"<<std::endl;
-		parameters.infoFile()<<"Find unnecessary lifted edges"<<std::endl;
-		parameters.infoFile().flush();
+        parameters.getControlOutput()<<"Find unnecessary lifted edges"<<std::endl;
+        parameters.writeControlOutput();
 
 		std::unordered_map<size_t,std::set<size_t>> leToKeep;
 		for (int v = 0; v < trackletGraph.numberOfVertices()-2; ++v) {
@@ -1230,9 +1223,8 @@ inline void Data<T>::graphFromIntervalsDense(){
 		}
 
 
-		std::cout<<"Construct tracklet graph lifted"<<std::endl;
-		parameters.infoFile()<<"Construct tracklet graph lifted"<<std::endl;
-		parameters.infoFile().flush();
+        parameters.getControlOutput()<<"Construct tracklet graph lifted"<<std::endl;
+        parameters.writeControlOutput();
 		for (int e = 0; e < trGraphLifted.numberOfEdges(); ++e) {
 			size_t v0=trGraphLifted.vertexOfEdge(e,0);
 			size_t v1=trGraphLifted.vertexOfEdge(e,1);
@@ -1267,12 +1259,8 @@ inline void Data<T>::graphFromIntervalsDense(){
 
 
 
-
-
-
-		std::cout<<"set pointers"<<std::endl;
-		parameters.infoFile()<<"set pointers"<<std::endl;
-		parameters.infoFile().flush();
+        parameters.getControlOutput()<<"set pointers"<<std::endl;
+        parameters.writeControlOutput();
 		pGraph=&trackletGraph;
 		pGraphLifted=&trackletGraphLifted;
 		numberOfEdges=pGraph->numberOfEdges();
@@ -1282,13 +1270,13 @@ inline void Data<T>::graphFromIntervalsDense(){
 		costs=nodeCosts;
 		costs.insert(costs.end(),baseEdgeCostNew.begin(),baseEdgeCostNew.end());
 		costs.insert(costs.end(),liftedEdgeCostNew.begin(),liftedEdgeCostNew.end());
-		std::cout<<"number of vertices "<<numberOfVertices<<std::endl;
-		std::cout<<"number of edges "<<numberOfEdges<<std::endl;
-		std::cout<<"number of lifted edges "<<numberOfLiftedEdges<<std::endl;
-		std::cout<<"cost size "<<costs.size()<<" sum "<<numberOfEdges+numberOfLiftedEdges+numberOfVertices<<std::endl;
+//		std::cout<<"number of vertices "<<numberOfVertices<<std::endl;
+//		std::cout<<"number of edges "<<numberOfEdges<<std::endl;
+//		std::cout<<"number of lifted edges "<<numberOfLiftedEdges<<std::endl;
+//		std::cout<<"cost size "<<costs.size()<<" sum "<<numberOfEdges+numberOfLiftedEdges+numberOfVertices<<std::endl;
 
 
-		std::cout<<"paths for init size "<<pathsForInit.size()<<std::endl;
+        //std::cout<<"paths for init size "<<pathsForInit.size()<<std::endl;
 		if((task=='T'&&!pathsForInit.empty())||parameters.getSmallIntervals()==0){ //Do not do this in the first iteration where paths are obtained from intervals
 			initSolution=std::vector<double>(costs.size(),0);
 			for (int i = 0; i < pathsForInit.size(); ++i) {
@@ -1309,7 +1297,8 @@ inline void Data<T>::graphFromIntervalsDense(){
 					size_t w=pathsForInit[i][j+1];
 					findEdge=pGraph->findEdge(v,w);
 					if(!findEdge.first){
-						std::cout<<"Warning: Base graph does not contain possibly good edge "<<v<<","<<w<<std::endl;
+                        parameters.getControlOutput()<<"Warning: Base graph does not contain possibly good edge "<<v<<","<<w<<std::endl;
+                        parameters.writeControlOutput();
 						findEdge=pGraph->findEdge(v,t);
 						if(!findEdge.first){
 							throw std::runtime_error("Edge to end vertex missing in tracklet graph");
@@ -1353,17 +1342,16 @@ inline void Data<T>::graphFromIntervalsDense(){
 
 		}
 
-		parameters.infoFile()<<"number of vertices "<<numberOfVertices<<std::endl;
-		parameters.infoFile()<<"number of edges "<<numberOfEdges<<std::endl;
-		parameters.infoFile()<<"number of lifted edges "<<numberOfLiftedEdges<<std::endl;
-		parameters.infoFile()<<"cost size "<<costs.size()<<" sum "<<numberOfEdges+numberOfLiftedEdges+numberOfVertices<<std::endl;
-		parameters.infoFile().flush();
+        parameters.getControlOutput()<<"number of vertices "<<numberOfVertices<<std::endl;
+        parameters.getControlOutput()<<"number of edges "<<numberOfEdges<<std::endl;
+        parameters.getControlOutput()<<"number of lifted edges "<<numberOfLiftedEdges<<std::endl;
+        parameters.getControlOutput()<<"cost size "<<costs.size()<<" sum "<<numberOfEdges+numberOfLiftedEdges+numberOfVertices<<std::endl;
+        parameters.writeControlOutput();
 
 
 
-		std::cout<<"new graphs complete"<<std::endl;
-		parameters.infoFile()<<"new graphs complete"<<std::endl;
-		parameters.infoFile().flush();
+        parameters.getControlOutput()<<"new graphs complete"<<std::endl;
+        parameters.writeControlOutput();
 		useTimeFrames=false;
 
 
@@ -1522,9 +1510,8 @@ inline std::pair<double,double> Data<T>::evaluate(std::vector<std::vector<size_t
 
 	//std::map<size_t,std::map<size_t,double>> originalEdges;
 
-	std::cout<<"Getting base edges from complete graph. "<<std::endl;
-	parameters.infoFile()<<"Getting base edges from complete graph. "<<std::endl;
-	parameters.infoFile().flush();
+    parameters.getControlOutput()<<"Getting base edges from complete graph. "<<std::endl;
+    parameters.writeControlOutput();
 	//parameters.paramsFile<<"Getting base edges from complete graph. "<<std::endl;
 	size_t maxLabel=0;
 	for (int i = 0; i < pGraphComplete->numberOfEdges(); ++i) {
@@ -1550,15 +1537,13 @@ inline std::pair<double,double> Data<T>::evaluate(std::vector<std::vector<size_t
 	}
 
 
-
-	std::cout<<"clustering_evaluation "<<objValue<<std::endl;
-	parameters.infoFile()<<"clustering_evaluation "<<objValue<<std::endl;
+    parameters.getControlOutput()<<"clustering_evaluation "<<objValue<<std::endl;
 
 	//solverObjective+=objValue;
 	solverObjective+=(parameters.getInputCost()+parameters.getOutputCost())*paths.size();
-	std::cout<<"solver objective "<<solverObjective<<std::endl;
-	parameters.infoFile()<<"solver objective "<<solverObjective<<std::endl;
-	parameters.infoFile().flush();
+
+    parameters.getControlOutput()<<"solver objective "<<solverObjective<<std::endl;
+    parameters.writeControlOutput();
 
 	std::pair<double,double> toReturn(objValue,solverObjective);
 
@@ -1582,7 +1567,8 @@ inline std::unordered_map<size_t,std::vector<size_t>> Data<T>::findTrajectoryBre
 	double inOutCost=parameters.getInputCost()+parameters.getOutputCost();
 	std::unordered_map<size_t,std::vector<size_t>> outputBrakes;
 
-		std::cout<<"finding track break points, number of tracks "<<paths.size()<<std::endl;
+        parameters.getControlOutput()<<"finding track break points, number of tracks "<<paths.size()<<std::endl;
+        parameters.writeControlOutput();
 		for (int i = 0; i < paths.size(); ++i) {
 
 			std::map<size_t,double> origBrakes;
@@ -1619,8 +1605,8 @@ inline std::unordered_map<size_t,std::vector<size_t>> Data<T>::findTrajectoryBre
 			for(auto tB:origBrakes){
 				if(tB.second>inOutCost){
 					outputBrakes[i].push_back(tB.first);
-					std::cout<<"Not good track "<<i<<" better cut in vertex "<<paths[i][tB.first]<<", cost"<<tB.second<<std::endl;
-					parameters.infoFile()<<"Not good track "<<i<<" better cut in vertex "<<paths[i][tB.first]<<", cost"<<tB.second<<std::endl;
+                    parameters.getControlOutput()<<"Not good track "<<i<<" better cut in vertex "<<paths[i][tB.first]<<", cost"<<tB.second<<std::endl;
+                    parameters.writeControlOutput();
 				}
 			}
 			//std::cout<<std::endl;
@@ -1628,9 +1614,8 @@ inline std::unordered_map<size_t,std::vector<size_t>> Data<T>::findTrajectoryBre
 		}
 
 
-	std::cout<<"trajectory break points checked "<<std::endl;
-	parameters.infoFile()<<"trajectory break points checked "<<std::endl;
-	parameters.infoFile().flush();
+    parameters.getControlOutput()<<"trajectory break points checked "<<std::endl;
+    parameters.writeControlOutput();
 	//parameters.paramsFile<<"time break points checked "<<std::endl;
 	return outputBrakes;
 
@@ -1706,15 +1691,17 @@ inline std::unordered_map<size_t,std::set<size_t>> Data<T>::findTimeBreaks(std::
 			//std::cout<<"check track "<<i<<std::endl;
 			for(auto tB:timeBrakes){
 				if(tB.second>inOutCost){
-					std::cout<<"Wrong track "<<i<<" better cut in time "<<tB.first<<"cost"<<tB.second<<std::endl;
-					parameters.infoFile()<<"Wrong track "<<i<<" better cut in time "<<tB.first<<" cost "<<tB.second<<std::endl;
+
+                    parameters.getControlOutput()<<"Wrong track "<<i<<" better cut in time "<<tB.first<<" cost "<<tB.second<<std::endl;
+                    parameters.writeControlOutput();
 				}
 			}
 			for(auto tB:origTimeBrakes){
 				if(tB.second>inOutCost){
 					outputBrakes[i].insert(tB.first);
-					std::cout<<"Not good track "<<i<<" better cut in time "<<tB.first<<" cost "<<tB.second<<std::endl;
-					parameters.infoFile()<<"Not good track "<<i<<" better cut in time "<<tB.first<<" cost "<<tB.second<<std::endl;
+
+                    parameters.getControlOutput()<<"Not good track "<<i<<" better cut in time "<<tB.first<<" cost "<<tB.second<<std::endl;
+                    parameters.writeControlOutput();
 				}
 			}
 			//std::cout<<std::endl;
@@ -1726,7 +1713,8 @@ inline std::unordered_map<size_t,std::set<size_t>> Data<T>::findTimeBreaks(std::
 		//TODO another value where direct neighbors are count two times (due to base edge),
 		//the new value should be used to judge if a new computation makes sense
 		//TODO maybe store just index in path instead of time
-		std::cout<<"finding track break points, number of tracks "<<paths.size()<<std::endl;
+        parameters.getControlOutput()<<"finding track break points, number of tracks "<<paths.size()<<std::endl;
+        parameters.writeControlOutput();
 		for (int i = 0; i < paths.size(); ++i) {
 
 			std::map<size_t,double> origTimeBrakes;
@@ -1772,8 +1760,9 @@ inline std::unordered_map<size_t,std::set<size_t>> Data<T>::findTimeBreaks(std::
 			for(auto tB:origTimeBrakes){
 				if(tB.second>inOutCost){
 					outputBrakes[i].insert(tB.first);
-					std::cout<<"Not good track "<<i<<" better cut in time "<<tB.first<<"cost"<<tB.second<<std::endl;
-					parameters.infoFile()<<"Not good track "<<i<<" better cut in time "<<tB.first<<"cost"<<tB.second<<std::endl;
+
+                    parameters.getControlOutput()<<"Not good track "<<i<<" better cut in time "<<tB.first<<"cost"<<tB.second<<std::endl;
+                    parameters.writeControlOutput();
 				}
 			}
 			//std::cout<<std::endl;
@@ -1781,9 +1770,9 @@ inline std::unordered_map<size_t,std::set<size_t>> Data<T>::findTimeBreaks(std::
 		}
 
 	}
-	std::cout<<"time break points checked "<<std::endl;
-	parameters.infoFile()<<"time break points checked "<<std::endl;
-	parameters.infoFile().flush();
+
+    parameters.getControlOutput()<<"time break points checked "<<std::endl;
+    parameters.writeControlOutput();
 	//parameters.paramsFile<<"time break points checked "<<std::endl;
 	return outputBrakes;
 
@@ -1828,9 +1817,9 @@ inline void Data<T>::outputSolution(const std::vector<std::vector<size_t>>& path
 
     writeOutputToFile(paths,fileName);
 
-	std::cout<<"file closed "<<std::endl;
-	parameters.infoFile()<<"file closed "<<std::endl;
-	parameters.infoFile().flush();
+
+    parameters.getControlOutput()<<"file closed "<<std::endl;
+    parameters.writeControlOutput();
 
 
 
