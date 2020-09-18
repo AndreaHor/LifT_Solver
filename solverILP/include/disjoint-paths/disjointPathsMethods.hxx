@@ -481,8 +481,8 @@ template<class T,class PAR>
 
 	levinkov::Timer tfw;
 			tfw.start();
-		std::cout<<"Run Floyd Warshall"<<std::endl;
-		parameters.infoFile()<<"Run Floyd Warshall"<<std::endl;
+
+        parameters.getControlOutput()<<"Run Floyd Warshall"<<std::endl;
 		const size_t n=graph.numberOfVertices();
 
 		// todo: use some matrix structure
@@ -570,8 +570,8 @@ template<class T,class PAR>
 
 		tfw.stop();
 
-		std::cout << "fw finished in time "<<tfw.get_elapsed_seconds() << std::endl;
-		parameters.infoFile()<<"fw finished in time "<<tfw.get_elapsed_seconds() << std::endl;
+
+        parameters.getControlOutput()<<"fw finished in time "<<tfw.get_elapsed_seconds() << std::endl;
 		return desc;
 
 }
@@ -583,8 +583,8 @@ template<class T,class PAR>
 
 	levinkov::Timer tfw;
 			tfw.start();
-		std::cout<<"Run Floyd Warshall"<<std::endl;
-		parameters.infoFile()<<"Run Floyd Warshall"<<std::endl;
+
+        parameters.getControlOutput()<<"Run Floyd Warshall"<<std::endl;
 		const size_t n=graph.numberOfVertices();
 
 		// todo: use some matrix structure
@@ -674,8 +674,7 @@ template<class T,class PAR>
 
 		tfw.stop();
 
-		std::cout << "fw finished in time "<<tfw.get_elapsed_seconds() << std::endl;
-		parameters.infoFile()<<"fw finished in time "<<tfw.get_elapsed_seconds() << std::endl;
+        parameters.getControlOutput()<<"fw finished in time "<<tfw.get_elapsed_seconds() << std::endl;
 		return desc;
 
 }
@@ -693,11 +692,11 @@ public:
         pVertexGroups=new VertexGroups<>(configParameters);
         VertexGroups<>& vg=*pVertexGroups;
 		maxTime=vg.getMaxTime();
-		std::cout<<"max time "<<maxTime<<std::endl;
-		configParameters.infoFile()<<"max time "<<maxTime<<std::endl;
+
+        configParameters.getControlOutput()<<"max time "<<maxTime<<std::endl;
 		completeGraph=andres::graph::Digraph<>(vg.getMaxVertex()+1);
-		std::cout<<"cg vertices "<<completeGraph.numberOfVertices()<<std::endl;
-		configParameters.infoFile()<<"cg vertices "<<completeGraph.numberOfVertices()<<std::endl;
+
+        configParameters.getControlOutput()<<"cg vertices "<<completeGraph.numberOfVertices()<<std::endl;
         addEdgesFromFile(configParameters.getGraphFileName(),configParameters);
         deleteVG=true;
 
@@ -830,22 +829,19 @@ inline void CompleteStructure<T>::addEdgesFromFile(const std::string& fileName,P
 		std::getline(data, line);
 		double objValue=0;
 
-		std::cout << "Read big graph" << std::endl;
-		params.infoFile()<<"Read big graph" << std::endl;
+
+        params.getControlOutput()<<"Read big graph" << std::endl;
 		std::vector<std::string> strings;
 
-
-		std::cout<<"Reading vertices from file. "<<std::endl;
-		params.infoFile()<<"Reading vertices from file. "<<std::endl;
-		params.infoFile().flush();
+        params.getControlOutput()<<"Reading vertices from file. "<<std::endl;
+        params.writeControlOutput();
 		//Vertices that are not found have score=0. Appearance and disappearance cost are read here.
 		while (std::getline(data, line) && !line.empty()) {
 
 		}
 
-		std::cout<<"Reading base edges from file. "<<std::endl;
-		params.infoFile()<<"Reading base edges from file. "<<std::endl;
-		params.infoFile().flush();
+        params.getControlOutput()<<"Reading base edges from file. "<<std::endl;
+        params.writeControlOutput();
 		size_t maxLabel=0;
 		while (std::getline(data, line) && !line.empty()) {
 
