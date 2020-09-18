@@ -35,7 +35,7 @@ struct Parameters {
 };
 
 
-Parameters parseCommandLine(int argc, char** argv)
+Parameters parseCommandLine(int argc, char** argv){
 try
 {
     Parameters parameters;
@@ -85,12 +85,13 @@ try
 //    		parameters.outputName=parameters.graphFileName;
 //    	}
 //    }
-
-    return parameters;
+return parameters;
 }
 catch(TCLAP::ArgException& e)
 {
     throw std::runtime_error(e.error());
+}
+
 }
 
 
@@ -109,14 +110,17 @@ try
 		}
 		else{
 
-			if(configDisjoint.getSmallIntervals()==0){
-				disjointPaths::DisjointStructure<> disjointP(configDisjoint);
-				disjointPaths::solver_ilp<size_t>(disjointP);
-			}
-			else{
-				disjointPaths::CompleteStructure<> cs(configDisjoint);
-                disjointPaths::solver_ilp<size_t>(configDisjoint,cs);
-			}
+            disjointPaths::CompleteStructure<> cs(configDisjoint);
+            disjointPaths::solver_ilp<size_t>(configDisjoint,cs);
+
+//			if(configDisjoint.getSmallIntervals()==0){
+//				disjointPaths::DisjointStructure<> disjointP(configDisjoint);
+//				disjointPaths::solver_ilp_intervals<size_t>(disjointP);
+//			}
+//			else{
+//				disjointPaths::CompleteStructure<> cs(configDisjoint);
+//                disjointPaths::solver_ilp_intervals<size_t>(configDisjoint,cs);
+//			}
 		}
 	}
 	else{

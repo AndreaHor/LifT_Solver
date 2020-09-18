@@ -43,6 +43,25 @@ namespace py = pybind11;
 namespace disjointPaths {
 
 
+template<class T=char>
+ std::vector<std::string> split(
+                std::string inputString, T delim) {
+        size_t occurence = 0;
+        size_t newOccurence = 0;
+        std::vector<std::string> strings;
+        while (newOccurence < inputString.size()) {
+                newOccurence = std::min(inputString.find_first_of(delim, occurence),
+                                inputString.size());
+
+                std::string newString(inputString, occurence, newOccurence - occurence);
+                strings.push_back(newString);
+                newOccurence = newOccurence + 1;
+                occurence = newOccurence;
+        }
+
+        return strings;
+}
+
 
 template<class T=size_t>
 std::vector<std::vector<T>> readLines(std::string inputFileName, char delim) {
@@ -86,35 +105,56 @@ std::vector<std::vector<T>> readLines(std::string inputFileName, char delim) {
 }
 
 
-template<class T=char>
- std::vector<std::string> split(
-		std::string inputString, T delim) {
-	size_t occurence = 0;
-	size_t newOccurence = 0;
-	std::vector<std::string> strings;
-	while (newOccurence < inputString.size()) {
-		newOccurence = std::min(inputString.find_first_of(delim, occurence),
-				inputString.size());
 
-		std::string newString(inputString, occurence, newOccurence - occurence);
-		strings.push_back(newString);
-		newOccurence = newOccurence + 1;
-		occurence = newOccurence;
-	}
-
-	return strings;
-}
+ inline void writeOutputToFile(const std::vector<std::vector<size_t>>& paths,std::string outputFileName){
 
 
+     std::ofstream file;
+     file.open(outputFileName);
+
+
+     for (int i = 0; i < paths.size(); ++i) {
+         //std::cout<<"output path "<<i<<std::endl;
+         for (int j = 0; j < paths[i].size(); ++j) {
+             size_t v=paths[i][j];
+             file<<v<<" ";
+         //	labels[v]=i+1;
+         }
+         file<<std::endl;
+     }
+
+
+     file.close();
+
+
+
+ }
 
 template<class T = size_t>
 struct VertexGroups {
 public:
 	VertexGroups(std::unordered_map<size_t,std::vector<size_t>> groups_,std::vector<size_t> vToGroup_):
-		groups(groups_),vToGroup(vToGroup_)
+        vToGroup(vToGroup_)
 	{
 		maxVertex=vToGroup_.size()-3;
-		maxTime=*(vToGroup.rbegin());
+        maxTime=*(vToGroup.rbegin())-1;
+        groups=std::vector<std::vector<size_t>>(maxTime+2);
+        for(auto pair:groups_){
+            groups[pair.first]=pair.second;
+        }
+
+//        for (int i = 0; i < groups.size(); ++i) {
+//            std::cout<<"group "<<i<<":";
+//            for (int j = 0; j < groups[i].size(); ++j) {
+//                std::cout<<groups[i][j]<<",";
+//                if(vToGroup[groups[i][j]]!=i){
+//                    std::cout<<"mismatch in indexing groups, v to group "<<vToGroup[groups[i][j]];
+//                }
+//            }
+//            std::cout<<std::endl;
+//        }
+//        std::cout<<"max vertex "<<maxVertex<<std::endl;
+//        std::cout<<"max time "<<maxTime<<std::endl;
 	}
 	VertexGroups(){
 		maxVertex=0;
@@ -123,7 +163,8 @@ public:
 
 
 
-    VertexGroups(disjointPaths::DisjointParams<>& parameters){
+
+    template<class PAR> VertexGroups(PAR& parameters){
 		//std::vector<std::vector<size_t>> groups;
 
         initFromFile(parameters.getTimeFileName(),parameters);
@@ -146,20 +187,20 @@ public:
 
 	}
 
-
-    void initFromFile(const std::string& fileName,const DisjointParams<>& parameters);
+    template<class PAR>
+    void initFromFile(const std::string& fileName,const PAR& parameters);
 
     void initFromVector(const std::vector<size_t>& verticesInFrames);
 
 
 
 
-	size_t getGroupIndex(size_t v){
+    size_t getGroupIndex(size_t v) const{
 		return vToGroup[v];
 	}
 
-	const std::vector<size_t>& getGroupVertices(size_t index){
-		return groups[index];
+    const std::vector<size_t>& getGroupVertices(size_t index)const{
+        return groups.at(index);
 	}
 
 	//ID of maximal valid vertex (i.e. without s and t)
@@ -177,7 +218,7 @@ public:
 
 private:
 	//std::vector<std::vector<size_t>> groups;
-	std::unordered_map<size_t,std::vector<size_t>> groups;
+    std::vector<std::vector<size_t>> groups;
 	std::vector<size_t> vToGroup;
 	size_t maxVertex;
 	size_t maxTime;
@@ -189,6 +230,7 @@ private:
 template<class T>
 inline void VertexGroups<T>::initFromVector(const std::vector<size_t>& verticesInFrames){
     maxTime=verticesInFrames.size();
+    groups=std::vector<std::vector<size_t>>(maxTime+2);
     size_t inFrameCounter=0;
     size_t vertexCounter=0;
     size_t frameCounter=1;
@@ -209,7 +251,7 @@ inline void VertexGroups<T>::initFromVector(const std::vector<size_t>& verticesI
         }
     }
 
-    maxVertex=vertexCounter;
+    maxVertex=vertexCounter-1;
     size_t s=maxVertex+1;
     size_t t=maxVertex+2;
 
@@ -223,19 +265,45 @@ inline void VertexGroups<T>::initFromVector(const std::vector<size_t>& verticesI
     vToGroup.push_back(frameCounter);
     groups[frameCounter]=verticesInGroup;
 
+    for (int i = 0; i < groups.size(); ++i) {
+        for (int j = 0; j < groups[i].size(); ++j) {
+         assert(vToGroup[groups[i][j]]==i);
+        }
+    }
+    std::cout<<"max vertex "<<maxVertex<<std::endl;
+    std::cout<<"max time "<<maxTime<<std::endl;
 
-    //TODO first and last frame for s and t!
+//        for (int i = 0; i < groups.size(); ++i) {
+//            std::cout<<"group "<<i<<":";
+//            for (int j = 0; j < groups[i].size(); ++j) {
+//                std::cout<<groups[i][j]<<",";
+//                if(vToGroup[groups[i][j]]!=i){
+//                    std::cout<<"mismatch in indexing groups, v to group "<<vToGroup[groups[i][j]];
+//                }
+//            }
+//            std::cout<<std::endl;
+//        }
+//        std::cout<<"max vertex "<<maxVertex<<std::endl;
+//        std::cout<<"max time "<<maxTime<<std::endl;
+
+
 
 }
 
 
 template<class T>
-inline void VertexGroups<T>::initFromFile(const std::string& fileName,const DisjointParams<>& parameters){
+template<class PAR>
+inline void VertexGroups<T>::initFromFile(const std::string& fileName, const PAR &parameters){
 	size_t lineCounter=0;
 	std::vector<size_t> currentGroup;
 	std::vector<std::string> strings;
 	std::string line;
 	char delim=',';
+
+
+    currentGroup=std::vector<size_t>();
+    groups.push_back(currentGroup);
+    currentGroup=std::vector<size_t>();
 
 
     size_t maxTimeToRead=parameters.getMaxTimeFrame();
@@ -248,8 +316,8 @@ inline void VertexGroups<T>::initFromFile(const std::string& fileName,const Disj
             throw std::system_error(errno, std::system_category(), "failed to open "+fileName);
         }
 
-	unsigned int previousTime=0;
-	unsigned int time=0;
+    unsigned int previousTime=1;
+    unsigned int time;
 
 	while (std::getline(timeData, line) && !line.empty()) {
 
@@ -277,14 +345,19 @@ inline void VertexGroups<T>::initFromFile(const std::string& fileName,const Disj
 
 			vToGroup.push_back(time);
 			//if(time==groups.size()+1){  //Change groups to map?
-			if(time==previousTime||previousTime==0){
+            if(time==previousTime){
 				currentGroup.push_back(v);
 			}
 			//else if(time==groups.size()+2){
 			else{
 				//groups.push_back(currentGroup);
-				groups[previousTime]=currentGroup;
+                //groups[previousTime]=currentGroup;
+                groups.push_back(currentGroup);
 				currentGroup=std::vector<size_t>();
+                while(groups.size()<time){
+                    groups.push_back(currentGroup);
+                    currentGroup=std::vector<size_t>();
+                }
 				currentGroup.push_back(v);
 			}
 			previousTime=time;
@@ -292,24 +365,41 @@ inline void VertexGroups<T>::initFromFile(const std::string& fileName,const Disj
 
 		}
 	}
-	groups[previousTime]=currentGroup;
+    groups.push_back(currentGroup);
 
 
 	maxTime=*(vToGroup.rbegin());
 
 	//time frame of s is zero
-	vToGroup.push_back(0);
-	currentGroup=std::vector<size_t>();
-	currentGroup.push_back(vToGroup.size()-1);
-	groups[0]=currentGroup;
+    vToGroup.push_back(0);
+//	currentGroup=std::vector<size_t>();
+//	currentGroup.push_back(vToGroup.size()-1);
+//	groups[0]=currentGroup;
+//    currentGroup=std::vector<size_t>();
+//	currentGroup.push_back(vToGroup.size()-1);
+    groups[0].push_back(vToGroup.size()-1);
 
 	//time frame of t is maxTime
 	vToGroup.push_back(maxTime+1);
 	currentGroup=std::vector<size_t>();
 	currentGroup.push_back(vToGroup.size()-1);
-	groups[maxTime+1]=currentGroup;
+    groups.push_back(currentGroup);
+
 
 	maxVertex=vToGroup.size()-3;
+
+//    for (int i = 0; i < groups.size(); ++i) {
+//        std::cout<<"group "<<i<<":";
+//        for (int j = 0; j < groups[i].size(); ++j) {
+//            std::cout<<groups[i][j]<<",";
+//            if(vToGroup[groups[i][j]]!=i){
+//                std::cout<<"mismatch in indexing groups, v to group "<<vToGroup[groups[i][j]];
+//            }
+//        }
+//        std::cout<<std::endl;
+//    }
+//    std::cout<<"max vertex "<<maxVertex<<std::endl;
+//    std::cout<<"max time "<<maxTime<<std::endl;
     }
     catch (std::system_error& er) {
         std::clog << er.what() << " (" << er.code() << ")" << std::endl;
@@ -361,7 +451,7 @@ inline void VertexGroups<T>::initFromFile(const std::string& fileName,const Disj
 
 
 template<class T>
-std::vector<std::vector<size_t>> extractInnerPaths(VertexGroups<size_t>& vg,std::vector<std::vector<size_t>>& paths,T minT,T maxT){
+std::vector<std::vector<size_t>> extractInnerPaths(const VertexGroups<size_t>& vg,std::vector<std::vector<size_t>>& paths,T minT,T maxT){
 	//maxT inclusive
 	std::vector<std::vector<size_t>> outputPaths;
 	for (int i = 0; i < paths.size(); ++i) {
@@ -386,8 +476,8 @@ std::vector<std::vector<size_t>> extractInnerPaths(VertexGroups<size_t>& vg,std:
 
 
 
-template<class T>
-	std::vector<std::unordered_set<size_t>> initReachableSet(T & graph,DisjointParams<>& parameters,VertexGroups<size_t>* vg=0){
+template<class T,class PAR>
+    std::vector<std::unordered_set<size_t>> initReachableSet(T & graph,PAR& parameters,VertexGroups<size_t>* vg=0){
 
 	levinkov::Timer tfw;
 			tfw.start();
@@ -488,8 +578,8 @@ template<class T>
 
 
 
-template<class T>
-	std::vector<std::vector<bool>> initReachable(T & graph,DisjointParams<>& parameters,VertexGroups<size_t>* vg=0){
+template<class T,class PAR>
+    std::vector<std::vector<bool>> initReachable(T & graph,PAR& parameters,VertexGroups<size_t>* vg=0){
 
 	levinkov::Timer tfw;
 			tfw.start();
@@ -597,9 +687,11 @@ template<class T>
 template<class T = size_t>
 struct CompleteStructure {
 public:
-    CompleteStructure(DisjointParams<T> & configParameters)
+    template<class PAR>
+    CompleteStructure(PAR & configParameters)
 {
-        vg=VertexGroups<>(configParameters);
+        pVertexGroups=new VertexGroups<>(configParameters);
+        VertexGroups<>& vg=*pVertexGroups;
 		maxTime=vg.getMaxTime();
 		std::cout<<"max time "<<maxTime<<std::endl;
 		configParameters.infoFile()<<"max time "<<maxTime<<std::endl;
@@ -607,36 +699,54 @@ public:
 		std::cout<<"cg vertices "<<completeGraph.numberOfVertices()<<std::endl;
 		configParameters.infoFile()<<"cg vertices "<<completeGraph.numberOfVertices()<<std::endl;
         addEdgesFromFile(configParameters.getGraphFileName(),configParameters);
+        deleteVG=true;
 
 }
 
 
-    CompleteStructure(VertexGroups<>& vg)
+    CompleteStructure(VertexGroups<>& vertexGroups):
+        pVertexGroups(&vertexGroups)
 {
+        VertexGroups<>& vg=*pVertexGroups;
         maxTime=vg.getMaxTime();
         std::cout<<"max time "<<maxTime<<std::endl;
         completeGraph=andres::graph::Digraph<>(vg.getMaxVertex()+1);
         std::cout<<"cg vertices "<<completeGraph.numberOfVertices()<<std::endl;
+        deleteVG=false;
 
 
 }
+    ~CompleteStructure(){
+        if(deleteVG){
+            delete pVertexGroups;
+        }
+    }
 
 
-    void addEdgesFromFile(const std::string& fileName,DisjointParams<>& params);
+    template<class PAR>
+    void addEdgesFromFile(const std::string& fileName,PAR& params);
     void addEdgesFromMatrix(size_t time1,size_t time2,const py::array_t<double> inputMatrix);
+    const VertexGroups<>& getVertexGroups(){
+        return *pVertexGroups;
+    }
     //void addEdges(size_t time1,size_t time2,std::stringstream& data);
 
 	andres::graph::Digraph<> completeGraph;
 	std::vector<double> completeScore;
-	VertexGroups<> vg;
+
 	size_t maxTime;
     //DisjointParams<T>& params;
+
+private:
+    bool deleteVG;
+    VertexGroups<>* pVertexGroups;
 
 };
 
 template<class T>
 inline void CompleteStructure<T>::addEdgesFromMatrix(size_t time1,size_t time2,const py::array_t<double> inputMatrix){
 
+    VertexGroups<>& vg=*pVertexGroups;
     const auto matrix=inputMatrix.unchecked<2>();
     const std::size_t dim1=matrix.shape(0);
     const std::size_t dim2=matrix.shape(1);
@@ -654,9 +764,11 @@ inline void CompleteStructure<T>::addEdgesFromMatrix(size_t time1,size_t time2,c
         size_t vertex1=i+transformIndex1;
         for(std::size_t j=0; j<dim2; ++j) {
             double score=matrix(i,j);
-            size_t vertex2=j+transformIndex2;
-            completeGraph.insertEdge(vertex1,vertex2);
-            completeScore.push_back(score);
+            if(!isinf(score)){
+                size_t vertex2=j+transformIndex2;
+                completeGraph.insertEdge(vertex1,vertex2);
+                completeScore.push_back(score);
+            }
         }
     }
 
@@ -702,15 +814,17 @@ inline void CompleteStructure<T>::addEdgesFromMatrix(size_t time1,size_t time2,c
 
 
 template<class T>
-inline void CompleteStructure<T>::addEdgesFromFile(const std::string& fileName,DisjointParams<>& params){
+template<class PAR>
+inline void CompleteStructure<T>::addEdgesFromFile(const std::string& fileName,PAR& params){
 	char delim=',';
+    VertexGroups<>& vg=*pVertexGroups;
 
 	std::string line;
 	std::ifstream data;
 	try{
-		data.open(params.getGraphFileName());
+        data.open(fileName);
 		if(!data){
-			throw std::system_error(errno, std::system_category(), "failed to open "+params.getGraphFileName());
+            throw std::system_error(errno, std::system_category(), "failed to open "+fileName);
 		}
 
 		std::getline(data, line);
@@ -735,12 +849,16 @@ inline void CompleteStructure<T>::addEdgesFromFile(const std::string& fileName,D
 		size_t maxLabel=0;
 		while (std::getline(data, line) && !line.empty()) {
 
+            //std::cout<<line<<std::endl;
 			strings = split(line, delim);
 
 			unsigned int v = std::stoul(strings[0]);
+            //std::cout<<v<<std::endl;
 			unsigned int w = std::stoul(strings[1]);
+            //std::cout<<w<<std::endl;
 			size_t l0=vg.getGroupIndex(v);
 			size_t l1=vg.getGroupIndex(w);
+            //std::cout<<std::to_string(l0)<<", "<<std::to_string(l1)<<std::endl;
 			if(v>vg.getMaxVertex()||w>vg.getMaxVertex()) continue;
 			//std::cout<<"edge "<<v<<" "<<w<<std::endl;
 

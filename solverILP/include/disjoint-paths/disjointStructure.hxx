@@ -309,13 +309,13 @@ parameters(configParameters)
 	}
 }
 
-
+//includes minTime, excludes maxTime
 template<class T>
 inline void DisjointStructure<T>::readGraphWithTime(size_t minTime,size_t maxTime,CompleteStructure<>* cs){
 
 	andres::graph::Digraph<>& completeGraph=cs->completeGraph;
 	std::vector<double>& completeScore=cs->completeScore;
-	VertexGroups<> vg=cs->vg;
+    const VertexGroups<>& vg=cs->getVertexGroups();
 
 	std::unordered_map<size_t,std::vector<size_t>> groups;
 
@@ -358,6 +358,13 @@ inline void DisjointStructure<T>::readGraphWithTime(size_t minTime,size_t maxTim
 		std::vector<size_t> vToGroup(numberOfVertices);
 		vToGroup[s_]=0;
 		vToGroup[t_]=maxTime-minTime+1;
+        std::vector<size_t> startGroup(1);
+        startGroup[0]=s_;
+        std::vector<size_t> terminalGroup(1);
+        terminalGroup[0]=t_;
+        groups[0]=startGroup;
+        groups[maxTime-minTime+1]=terminalGroup;
+
 
 		for (int gi = minTime; gi < maxTime; ++gi) {
 			//groups[gi-minTime+1]=std::vector<size_t>();
@@ -820,7 +827,7 @@ inline void DisjointStructure<T>::keepFractionOfLifted(){
 			int l0=vertexGroups.getGroupIndex(v0);
 			int l1=vertexGroups.getGroupIndex(v1);
 			double cost=getLiftedEdgeScore(i);
-			bool goodCost=(cost<negMaxValue)||(cost>posMinValue);
+            bool goodCost=(cost<=negMaxValue)||(cost>=posMinValue);
 			//if(isReachable(v0,v1)){
 			if(isReachableNew(v0,v1)){
 

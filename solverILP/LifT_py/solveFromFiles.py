@@ -6,15 +6,38 @@ Created on Fri Jul 10 11:37:09 2020
 @author: fuksova
 """
 
-#import numpy as np
-#import disjointPathsPy as ldpPy
+#This is a script showing how to use LifT ILP solver from python. Its usage is similar to directly calling run-disjoint-paths 
+#from command line. The solver parameters are read from a parameter file.
+# Graph structure together with assignemt of vertices to time frames are initialized from the same two files that are used for
+#direct calling of run-disjoint-paths. 
+#The main difference is that the paths to the two files containing graph structure are not read from the parameter file.
+#They have to be provided as in the script.
 
-params=ldpPy.DisjointParams("/home/fuksova/codes/higher-order-disjoint-paths/params_test.ini")
+import disjointPathsPy as ldpPy
 
+#Initializes structure for holding solver parameters. It expects the path to the solver parameter file.
+params=ldpPy.DisjointParams("../data/exampleSolverILP/params_sequence_py.ini")
+
+#Constructor of structure for holding the mapping between time frames and graph vertices
 timeFrames=ldpPy.TimeFramesToVertices()
-timeFrames.init_from_file("/home/fuksova/codes/higher-order-disjoint-paths/data/error13_5_20/problemDesc_frames",params)
 
+#Initalizing the structure from a file
+timeFrames.init_from_file("../data/exampleSolverILP/problemDesc_frames",params)
+
+#Initializing the graph structure from timeFrames. For now, no edges are present. 
 completeGraphStructure=ldpPy.GraphStructure(timeFrames)
-completeGraphStructure.add_edges_from_file("/home/fuksova/codes/higher-order-disjoint-paths/data/error13_5_20/problemDesc",params)
-ldpPy.solve_ilp(completeGraphStructure)
 
+#Adding edges to graph structure from a file.
+completeGraphStructure.add_edges_from_file("../data/exampleSolverILP/problemDesc",params)
+
+#Calling the solver on the given problem. 
+paths=ldpPy.solve_ilp(params,completeGraphStructure)
+
+#The resulting paths are allways automatically saved into the file with suffix "-all-paths-FINAL" in the output directory. 
+#You can optionally save the resulting paths into another file. 
+ldpPy.write_output_to_file(paths,"../data/exampleSolverILP/my_python_output.txt")
+
+for path in paths:
+  for v in path:
+    print(v, end =" ")
+  print("")
