@@ -276,9 +276,8 @@ std::vector<double> ilp_init_solution(Data<>& data,bool outputs=true)
     ilp0.optimize();
 
     if(outputs){
-        std::cout<<"init solution"<<std::endl;
-        data.parameters.infoFile()<<"init solution"<<std::endl;
-        data.parameters.infoFile().flush();
+        data.parameters.getControlOutput()<<"init solution"<<std::endl;
+        data.parameters.writeControlOutput();
     }
     std::vector<double> solution0(data.getCosts().size(),0);
     for (int i = 0; i < solution0.size(); ++i) {
@@ -290,9 +289,8 @@ std::vector<double> ilp_init_solution(Data<>& data,bool outputs=true)
 
 
     if(outputs){
-        std::cout<<"fix init solution"<<std::endl;
-        data.parameters.infoFile()<<"fix init solution"<<std::endl;
-        data.parameters.infoFile().flush();
+        data.parameters.getControlOutput()<<"fix init solution"<<std::endl;
+        data.parameters.writeControlOutput();
     }
     size_t t=data.getTerminalNode();
     size_t s=data.getSourceNode();
@@ -359,8 +357,9 @@ std::vector<double> ilp_init_solution(Data<>& data,bool outputs=true)
                             //							size_t first=*it;
                             //							size_t second=graph.vertexToVertex(vertex,j);
                             //							it++;
-                            std::cout<<"Init: Two active incoming edges to vertex "<<std::endl;
-                            data.parameters.infoFile()<<"Init: Two active incoming edges to vertex "<<std::endl;
+
+                            data.parameters.getControlOutput()<<"Init: Two active incoming edges to vertex "<<std::endl;
+                            data.parameters.writeControlOutput();
                         }
                         else{
                             newVertex = graph.vertexToVertex(vertex, j);
@@ -387,11 +386,9 @@ std::vector<double> ilp_init_solution(Data<>& data,bool outputs=true)
         }
     }
     if(outputs){
-        std::cout<<"Init solution: inactive on path: "<<inactiveOnPath<<", active outside path: "<<activeOutsidePath<<std::endl;
-        std::cout<<"cost difference "<<costDifference<<std::endl;
-        data.parameters.infoFile()<<"Init solution: inactive on path: "<<inactiveOnPath<<", active outside path: "<<activeOutsidePath<<std::endl;
-        data.parameters.infoFile()<<"cost difference "<<costDifference<<std::endl;
-        data.parameters.infoFile().flush();
+        data.parameters.getControlOutput()<<"Init solution: inactive on path: "<<inactiveOnPath<<", active outside path: "<<activeOutsidePath<<std::endl;
+        data.parameters.getControlOutput()<<"cost difference "<<costDifference<<std::endl;
+        data.parameters.writeControlOutput();
     }
     return solution0;
 
@@ -406,9 +403,8 @@ void ilp_check_solution(Data<>& data,std::vector<double>& solution0,bool outputs
 {
 
     if(outputs){
-        std::cout<<"fix first solution"<<std::endl;
-        data.parameters.infoFile()<<"fix first solution"<<std::endl;
-        data.parameters.infoFile().flush();
+        data.parameters.getControlOutput()<<"fix first solution"<<std::endl;
+        data.parameters.writeControlOutput();
     }
     size_t t=data.getTerminalNode();
     size_t s=data.getSourceNode();
@@ -449,17 +445,15 @@ void ilp_check_solution(Data<>& data,std::vector<double>& solution0,bool outputs
                     size_t leVarIndex=data.getLiftedEdgeVarIndex(le);
                     //size_t vertex2VarIndex=data_.getVertexVarIndex(vertex2);
                     if(isOnPath[vertex2]&&solution0[leVarIndex]<0.5) {
-                        data.parameters.infoFile()<<"check track "<<trackCounter<<std::endl;
-                        data.parameters.infoFile()<<"Error: Inactive lifted edge on an active path"<<std::endl;
-                        data.parameters.infoFile().flush();
-                        std::cout<<"check track "<<trackCounter<<std::endl;
+                        data.parameters.getControlOutput()<<"check track "<<trackCounter<<std::endl;
+                        data.parameters.getControlOutput()<<"Error: Inactive lifted edge on an active path"<<std::endl;
+                        data.parameters.writeControlOutput();
                         throw std::runtime_error(std::string("Inactive lifted edge on an active path"));
                     }
                     else if(!isOnPath[vertex2]&&solution0[leVarIndex]>0.5){
-                        data.parameters.infoFile()<<"check track "<<trackCounter<<std::endl;
-                        data.parameters.infoFile()<<"Active lifted edge outside an active path"<<std::endl;
-                        data.parameters.infoFile().flush();
-                        std::cout<<"check track "<<trackCounter<<std::endl;
+                        data.parameters.getControlOutput()<<"check track "<<trackCounter<<std::endl;
+                        data.parameters.getControlOutput()<<"Active lifted edge outside an active path"<<std::endl;
+                        data.parameters.writeControlOutput();
                         throw std::runtime_error(std::string("Active lifted edge outside an active path"));
                     }
 
@@ -481,11 +475,10 @@ void ilp_check_solution(Data<>& data,std::vector<double>& solution0,bool outputs
                         isOnAnyPath[newVertex]=1;
                         activeEdgeCounter++;
                         if(nextFound){
-                            data.parameters.infoFile()<<"check track "<<trackCounter<<std::endl;
-                            data.parameters.infoFile()<<"Multiple active incoming edges to vertex "<<vertex<<std::endl;
-                            data.parameters.infoFile().flush();
-                            std::cout<<"check track "<<trackCounter<<std::endl;
-                            std::cout<<"Multiple active incoming edges to vertex "<<vertex<<std::endl;
+                            data.parameters.getControlOutput()<<"check track "<<trackCounter<<std::endl;
+                            data.parameters.getControlOutput()<<"Multiple active incoming edges to vertex "<<vertex<<std::endl;
+                            data.parameters.writeControlOutput();
+
                         }
                         nextFound=true;
 
@@ -510,11 +503,10 @@ void ilp_check_solution(Data<>& data,std::vector<double>& solution0,bool outputs
     for (int i = 0; i < graph.numberOfVertices(); ++i) {
         if(i==s||i==t) continue;
         if((solution0[i]>0.5&&!isOnAnyPath[i])||(solution0[i]<0.5&&isOnAnyPath[i])){
-            data.parameters.infoFile()<<"check track "<<trackCounter<<std::endl;
-            data.parameters.infoFile()<<"vertex "<<i<<" labeled "<<solution0[i]<<" is on Path "<<isOnAnyPath[i]<<std::endl;
-            data.parameters.infoFile().flush();
-            std::cout<<"check track "<<trackCounter<<std::endl;
-            std::cout<<"vertex "<<i<<" labeled "<<solution0[i]<<" is on Path "<<isOnAnyPath[i]<<std::endl;
+            data.parameters.getControlOutput()<<"check track "<<trackCounter<<std::endl;
+            data.parameters.getControlOutput()<<"vertex "<<i<<" labeled "<<solution0[i]<<" is on Path "<<isOnAnyPath[i]<<std::endl;
+            data.parameters.writeControlOutput();
+
         }
     }
     size_t activeEdgeCounter2=0;
@@ -528,11 +520,10 @@ void ilp_check_solution(Data<>& data,std::vector<double>& solution0,bool outputs
             activeEdgeCounter2++;
             //if(v==s||w==t) continue;
             if(solution0[v]<0.5||solution0[w]<0.5){
-                data.parameters.infoFile()<<"check track "<<trackCounter<<std::endl;
-                data.parameters.infoFile()<<"edge "<<v<<","<<w<<" has label 1, but "<<solution0[v]<<","<<solution0[w]<<" are its vertices"<<std::endl;
-                data.parameters.infoFile().flush();
-                std::cout<<"check track "<<trackCounter<<std::endl;
-                std::cout<<"edge "<<v<<","<<w<<" has label 1, but "<<solution0[v]<<","<<solution0[w]<<" are its vertices"<<std::endl;
+                data.parameters.getControlOutput()<<"check track "<<trackCounter<<std::endl;
+                data.parameters.getControlOutput()<<"edge "<<v<<","<<w<<" has label 1, but "<<solution0[v]<<","<<solution0[w]<<" are its vertices"<<std::endl;
+                data.parameters.writeControlOutput();
+
             }
         }
         //		if(solution0[index]==0&&(solution0[v]==1||solution0[w]==1)){
@@ -545,11 +536,10 @@ void ilp_check_solution(Data<>& data,std::vector<double>& solution0,bool outputs
         size_t w=data.getVertexVarIndex(liftedGraph.vertexOfEdge(i,1));
         if(v==s||w==t) continue;
         if(solution0[index]>0.5&&(solution0[v]<0.5||solution0[w]<0.5)){
-            data.parameters.infoFile()<<"check track "<<trackCounter<<std::endl;
-            data.parameters.infoFile()<<"lifted edge "<<v<<","<<w<<" has label 1, but "<<solution0[v]<<","<<solution0[w]<<" are its vertices"<<std::endl;
-            data.parameters.infoFile().flush();
-            std::cout<<"check track "<<trackCounter<<std::endl;
-            std::cout<<"lifted edge "<<v<<","<<w<<" has label 1, but "<<solution0[v]<<","<<solution0[w]<<" are its vertices"<<std::endl;
+            data.parameters.getControlOutput()<<"check track "<<trackCounter<<std::endl;
+            data.parameters.getControlOutput()<<"lifted edge "<<v<<","<<w<<" has label 1, but "<<solution0[v]<<","<<solution0[w]<<" are its vertices"<<std::endl;
+            data.parameters.writeControlOutput();
+
         }
         //		if(solution0[index]==0&&(solution0[v]==1||solution0[w]==1)){
         //			std::cout<<"lifted edge "<<v<<","<<w<<" has label 0, but "<<solution0[v]<<","<<solution0[w]<<" are its vertices"<<std::endl;
@@ -558,8 +548,8 @@ void ilp_check_solution(Data<>& data,std::vector<double>& solution0,bool outputs
 
     if(outputs){
         std::cout<<"Solution checked. Tracks: "<<trackCounter<<std::endl;
-        data.parameters.infoFile()<<"Solution checked. Tracks: "<<trackCounter<<std::endl;
-        data.parameters.infoFile().flush();
+        data.parameters.getControlOutput()<<"Solution checked. Tracks: "<<trackCounter<<std::endl;
+        data.parameters.writeControlOutput();
     }
 
 }
@@ -611,22 +601,20 @@ std::vector<double> ilp_solve(Data<>& data,bool outputs=true)
     ilp.setCallback(callback);
 
     if(outputs){
-        std::cout<<"callback set"<<std::endl;
-        data.parameters.infoFile()<<"callback set"<<std::endl;
-        data.parameters.infoFile().flush();
+
+        data.parameters.getControlOutput()<<"callback set"<<std::endl;
+        data.parameters.writeControlOutput();
     }
     ilp_add_constraints<>(ilp,data);
 
     if(outputs){
-        std::cout<<"constraints added"<<std::endl;
-        data.parameters.infoFile()<<"constraints added"<<std::endl;
-        data.parameters.infoFile().flush();
+        data.parameters.getControlOutput()<<"constraints added"<<std::endl;
+        data.parameters.writeControlOutput();
     }
 
     if(data.getInitSolution().size()==data.getCosts().size()){
-        std::cout<<"Init solution from data structure"<<std::endl;
-        data.parameters.infoFile()<<"Init solution from data structure"<<std::endl;
-        data.parameters.infoFile().flush();
+        data.parameters.getControlOutput()<<"Init solution from data structure"<<std::endl;
+        data.parameters.writeControlOutput();
         initSolution=data.getInitSolution();
         ilp_check_solution(data,initSolution,true);
     }
@@ -636,16 +624,16 @@ std::vector<double> ilp_solve(Data<>& data,bool outputs=true)
 
 
     if(outputs){
-        std::cout<<"set start"<<std::endl;
-        data.parameters.infoFile()<<"set start"<<std::endl;
-        data.parameters.infoFile().flush();
+
+        data.parameters.getControlOutput()<<"set start"<<std::endl;
+        data.parameters.writeControlOutput();
     }
     ilp.setStart(initSolution.begin());
 
     if(outputs){
-        std::cout<<"opt start"<<std::endl;
-        data.parameters.infoFile()<<"opt start"<<std::endl;
-        data.parameters.infoFile().flush();
+
+        data.parameters.getControlOutput()<<"opt start"<<std::endl;
+        data.parameters.writeControlOutput();
     }
     ilp.optimize();
     ilp_check_solution(data,ilp,outputs);
@@ -668,8 +656,7 @@ std::unordered_map<size_t,std::vector<size_t>> doPathOptimization(Data<>& data,s
 {
     std::unordered_map<size_t,std::vector<size_t>> breaks;
 
-    std::cout<<"all paths size "<<allPaths.size()<<std::endl;
-    data.parameters.infoFile()<<"all paths size "<<allPaths.size()<<std::endl;
+    data.parameters.getControlOutput()<<"all paths size "<<allPaths.size()<<std::endl;
     for (int i = 0; i < allPaths.size(); ++i) {
         //std::cout<<"path "<<i<<" size :"<<allPaths[i].size()<<std::endl;
         //data.parameters.infoFile()<<"path "<<i<<" size :"<<allPaths[i].size()<<std::endl;
@@ -681,18 +668,17 @@ std::unordered_map<size_t,std::vector<size_t>> doPathOptimization(Data<>& data,s
             std::vector<size_t> breaksInPath=data.cutsInOnePathSolution(labels);
             if(breaksInPath.size()>0){
                 //TODO output path id and number of breaks
-                std::cout<<"path "<<i<<" size :"<<allPaths[i].size()<<std::endl;
-                data.parameters.infoFile()<<"path "<<i<<" size :"<<allPaths[i].size()<<std::endl;
-                std::cout<<"breaks size "<<breaksInPath.size()<<std::endl;
-                data.parameters.infoFile()<<"breaks size "<<breaksInPath.size()<<std::endl;
+                data.parameters.getControlOutput()<<"path "<<i<<" size :"<<allPaths[i].size()<<std::endl;
+                data.parameters.getControlOutput()<<"breaks size "<<breaksInPath.size()<<std::endl;
                 breaks[i]=breaksInPath;
                 //				std::cout<<"full paths size "<<fullPaths.size()<<std::endl;
                 //				data.parameters.infoFile()<<"full paths size "<<fullPaths.size()<<std::endl;
             }
         }
     }
-    std::cout<<"paths optimized, breaks size "<<breaks.size()<<std::endl;
-    data.parameters.infoFile()<<"paths optimized, breaks size "<<breaks.size()<<std::endl;
+
+    data.parameters.getControlOutput()<<"paths optimized, breaks size "<<breaks.size()<<std::endl;
+    data.parameters.writeControlOutput();
     return breaks;
 
 }
@@ -701,13 +687,14 @@ std::unordered_map<size_t,std::vector<size_t>> doPathOptimization(Data<>& data,s
 template<class T=size_t>
 std::vector<std::vector<size_t>> solver_flow_only(DisjointParams<>& parameters)
 {
-    std::cout<<"Using simple flow solver"<<std::endl;
+   parameters.getControlOutput()<<"Using simple flow solver"<<std::endl;
     DisjointStructure<> DS(parameters);
     Data<> data(DS);
     std::vector<double> solution=ilp_init_solution(data,true);
     std::vector<std::vector<size_t>> paths=data.pathsFromSolution(solution,false);
     data.outputSolution(paths,false);
-    std::cout<<"Simple flow solved"<<std::endl;
+    parameters.getControlOutput()<<"Simple flow solved"<<std::endl;
+    parameters.writeControlOutput();
     return paths;
 }
 
@@ -717,21 +704,14 @@ std::vector<std::vector<size_t>> solver_ilp_tracklets(DisjointParams<>& paramete
     levinkov::Timer trackletTimer;
     trackletTimer.start();
 
-    std::cout<<"all paths solved "<<std::endl;
-    parameters.infoFile()<<"all paths solved "<<std::endl;
-    parameters.infoFile().flush();
+    parameters.getControlOutput()<<"all paths solved "<<std::endl;
+    parameters.writeControlOutput();
 
     bool optimizePaths=parameters.isOptimizePaths();
 
     Data<> data(cs,parameters);
     if(!optimizePaths){
-        //			std::cout<<"all paths in solver"<<std::endl;
-        //			for(auto& path:allPaths){
-        //				for(size_t v:path){
-        //					std::cout<<v<<", ";
-        //				}
-        //				std::cout<<std::endl;
-        //			}
+
         data.prepareGraphFromIntervalsDense(allPaths);
         if(!loadIntervals){
             data.outputSolution(allPaths,true);
@@ -747,47 +727,44 @@ std::vector<std::vector<size_t>> solver_ilp_tracklets(DisjointParams<>& paramete
 
 
 
-    std::cout<<"call solver on all paths"<<std::endl;
-    parameters.infoFile()<<"call solver on all paths"<<std::endl;
-    parameters.infoFile().flush();
+    parameters.getControlOutput()<<"call solver on all paths"<<std::endl;
+    parameters.writeControlOutput();
 
     std::vector<double> labels=ilp_solve(data);
 
-    std::cout<<"obtain paths from solution"<<std::endl;
-    parameters.infoFile()<<"obtain paths from solution"<<std::endl;
-    parameters.infoFile().flush();
+    parameters.getControlOutput()<<"obtain paths from solution"<<std::endl;
+    parameters.writeControlOutput();
 
     std::vector<std::vector<size_t>> paths=data.pathsFromSolution(labels,true);
     data.evaluate(paths);
 
     bool isNewGraph;
     if(!optimizePaths){
-        std::cout<<"call graph from interval dense for check"<<std::endl;
-        parameters.infoFile()<<"call graph from interval dense for check"<<std::endl;
-        parameters.infoFile().flush();
+        parameters.getControlOutput()<<"call graph from interval dense for check"<<std::endl;
+        parameters.writeControlOutput();
         isNewGraph=data.prepareGraphFromIntervalsDense(paths,true);
     }
     else{
-        std::cout<<"call optimize paths for check"<<std::endl;
-        parameters.infoFile()<<"call optimize paths for check"<<std::endl;
-        parameters.infoFile().flush();
+
+        parameters.getControlOutput()<<"call optimize paths for check"<<std::endl;
+        parameters.writeControlOutput();
         std::unordered_map<size_t,std::vector<size_t>> breaks=doPathOptimization(data,paths);
         isNewGraph=data.graphFromOptimizedPaths(paths,breaks,true);
     }
     if(isNewGraph){
-        std::cout<<"new graph created"<<std::endl;
-        parameters.infoFile()<<"new graph created"<<std::endl;
-        parameters.infoFile().flush();
+
+        parameters.getControlOutput()<<"new graph created"<<std::endl;
+        parameters.writeControlOutput();
     }
     else{
-        std::cout<<"new graph not created"<<std::endl;
-        parameters.infoFile()<<"new graph not created"<<std::endl;
-        parameters.infoFile().flush();
+
+        parameters.getControlOutput()<<"new graph not created"<<std::endl;
+        parameters.writeControlOutput();
     }
     while(isNewGraph){
-        std::cout<<"final graph not optimal, recomputing..."<<std::endl;
-        parameters.infoFile()<<"final graph not optimal, recomputing..."<<std::endl;
-        parameters.infoFile().flush();
+
+        parameters.getControlOutput()<<"final graph not optimal, recomputing..."<<std::endl;
+        parameters.writeControlOutput();
 
         labels=ilp_solve(data);
         paths=data.pathsFromSolution(labels,true);
@@ -805,13 +782,9 @@ std::vector<std::vector<size_t>> solver_ilp_tracklets(DisjointParams<>& paramete
 
     trackletTimer.stop();
 
-
-    std::cout<<"Solver complete"<<std::endl;
-    std::cout<<"Last phase time "<<trackletTimer.get_elapsed_seconds()<<std::endl;
-
-    parameters.infoFile()<<"Solver complete"<<std::endl;
-    parameters.infoFile()<<"Last phase time "<<trackletTimer.get_elapsed_seconds()<<std::endl;
-    parameters.infoFile().flush();
+    parameters.getControlOutput()<<"Solver complete"<<std::endl;
+    parameters.getControlOutput()<<"Last phase time "<<trackletTimer.get_elapsed_seconds()<<std::endl;
+    parameters.writeControlOutput();
 
     return paths;
 
@@ -830,11 +803,10 @@ std::vector<std::vector<size_t>> solver_ilp_no_intervals(DisjointParams<>& param
 
     Data<> data0(DS);
 
-    std::cout<<"min vertex: "<<DS.minV<<std::endl;
-    parameters.infoFile()<<"min vertex: "<<DS.minV<<std::endl;
-    std::cout<<"max vertex: "<<data0.getGraph().numberOfVertices()-3+DS.minV<<std::endl;
-    parameters.infoFile()<<"max vertex: "<<data0.getGraph().numberOfVertices()-3+DS.minV<<std::endl;
-    parameters.infoFile().flush();
+
+    parameters.getControlOutput()<<"min vertex: "<<DS.minV<<std::endl;
+    parameters.getControlOutput()<<"max vertex: "<<data0.getGraph().numberOfVertices()-3+DS.minV<<std::endl;
+    parameters.writeControlOutput();
 
     std::vector<double> labels=ilp_solve(data0);
 
@@ -843,17 +815,17 @@ std::vector<std::vector<size_t>> solver_ilp_no_intervals(DisjointParams<>& param
     if(parameters.isDenseTracklets()){
         std::vector<std::vector<size_t>> paths=solver_ilp_tracklets(parameters,cs,newPaths,false);
         timer.stop();
-        std::cout<<"Time from start "<<timer.get_elapsed_seconds()<<std::endl;
-        parameters.infoFile()<<"Time from start "<<timer.get_elapsed_seconds()<<std::endl;
-        parameters.infoFile().flush();
+
+        parameters.getControlOutput()<<"Time from start "<<timer.get_elapsed_seconds()<<std::endl;
+        parameters.writeControlOutput();
         return paths;
     }
     else{
         data0.outputSolution(newPaths);
         timer.stop();
-        std::cout<<"Time from start "<<timer.get_elapsed_seconds()<<std::endl;
-        parameters.infoFile()<<"Time from start "<<timer.get_elapsed_seconds()<<std::endl;
-        parameters.infoFile().flush();
+
+        parameters.getControlOutput()<<"Time from start "<<timer.get_elapsed_seconds()<<std::endl;
+        parameters.writeControlOutput();
         return newPaths;
     }
 
@@ -937,26 +909,22 @@ std::vector<std::vector<size_t>> solver_ilp_intervals(DisjointParams<>& paramete
                 maxTOverlap=std::min(maxTOverlap,int(maxTime+1));
                 minTOverlap=std::max(1,minTOverlap);
 
-                std::cout<<"maxT "<<maxT<<std::endl;
-                std::cout<<"maxTOverlap "<<maxTOverlap<<std::endl;
-                std::cout<<"maxTime "<<maxTime<<std::endl;
+                parameters.getControlOutput()<<"maxT "<<maxT<<std::endl;
+                parameters.getControlOutput()<<"maxTOverlap "<<maxTOverlap<<std::endl;
+                parameters.getControlOutput()<<"maxTime "<<maxTime<<std::endl;
+                parameters.writeControlOutput();
 
-                //				std::cout<<"interval "<<minT<<","<<maxT<<std::endl;
-                //				parameters.infoFile()<<"interval "<<minT<<","<<maxT<<std::endl;
-                //				parameters.infoFile().flush();
-                //parameters.output("interval "+minT+","+maxT+"\n");
-                //DisjointStructure<> DS=DisjointStructure<>(parameters,delim,&cs,minT,maxT);
+
                 DisjointStructure<> DS=DisjointStructure<>(parameters,delim,&cs,minTOverlap,maxTOverlap);  //last time used maxTOverlap-1
                 if(DS.getTerminalNode()==1){
                     levinkov::Timer timer;
-                    std::cout<<"Empty interval "<<std::endl;
-                    parameters.infoFile()<<"Empty interval "<<std::endl;
-                    //empty interval
+                    parameters.getControlOutput()<<"Empty interval "<<std::endl;
+                    parameters.writeControlOutput();
                 }
                 else if(DS.getGraph().numberOfEdges()<=(DS.getGraph().numberOfVertices()-2)*2){
                     //s,t edges only
-                    std::cout<<"One layer interval "<<std::endl;
-                    parameters.infoFile()<<"One layer interval "<<std::endl;
+                    parameters.getControlOutput()<<"One layer interval "<<std::endl;
+                    parameters.writeControlOutput();
                     std::vector<std::vector<size_t>> newPaths(DS.maxV-DS.minV+1);
                     for (int j = DS.minV; j <=DS.maxV; ++j) {
                         std::vector<size_t> oneVertexPath(1);
@@ -971,51 +939,39 @@ std::vector<std::vector<size_t>> solver_ilp_intervals(DisjointParams<>& paramete
 
                     Data<> data(DS);
 
-                    std::cout<<"min vertex in interval: "<<DS.minV<<std::endl;
-                    parameters.infoFile()<<"min vertex in interval: "<<DS.minV<<std::endl;
-                    std::cout<<"max vertex in interval: "<<data.getGraph().numberOfVertices()-3+DS.minV<<std::endl;
-                    parameters.infoFile()<<"max vertex in interval: "<<data.getGraph().numberOfVertices()-3+DS.minV<<std::endl;
-                    parameters.infoFile().flush();
+                    parameters.getControlOutput()<<"min vertex in interval: "<<DS.minV<<std::endl;
+                    parameters.getControlOutput()<<"max vertex in interval: "<<data.getGraph().numberOfVertices()-3+DS.minV<<std::endl;
+                    parameters.writeControlOutput();
 
 
 
                     if(i==numberOfIntervals-1){
-                        std::cout<<"max vertex in last interval: "<<data.getGraph().numberOfVertices()-3+DS.minV<<std::endl;
-                        parameters.infoFile()<<"max vertex in last interval: "<<data.getGraph().numberOfVertices()-3+DS.minV<<std::endl;
-                        parameters.infoFile().flush();
+                        parameters.getControlOutput()<<"max vertex in last interval: "<<data.getGraph().numberOfVertices()-3+DS.minV<<std::endl;
+                        parameters.writeControlOutput();
                     }
 
 
                     std::vector<double> labels=ilp_solve(data);
 
                     std::vector<std::vector<size_t>> newPaths=data.pathsFromSolution(labels,false,DS.minV);
-                    //					std::cout<<"new paths in solver"<<std::endl;
-                    //					for(auto& path:newPaths){
-                    //						for(size_t v:path){
-                    //							std::cout<<v<<", ";
-                    //						}
-                    //						std::cout<<std::endl;
-                    //					}
+
                     if(overlap>0){
                         newPaths=extractInnerPaths(cs.getVertexGroups(),newPaths,minT,maxT-1);
                     }
 
 
                     allPaths.insert(allPaths.end(),newPaths.begin(),newPaths.end());
-                    parameters.infoFile().flush();
+                    parameters.writeControlOutput();
                 }
 
                 intervalTimer.stop();
                 timer.stop();
                 double seconds=timer.get_elapsed_seconds();
                 timer.start();
-                std::cout<<"interval complete"<<std::endl;
-                std::cout<<"interval solved in time "<<intervalTimer.get_elapsed_seconds()<<std::endl;
-                std::cout<<"time from start "<<seconds<<std::endl;
-                parameters.infoFile()<<"interval complete"<<std::endl;
-                parameters.infoFile()<<"interval solved in time "<<intervalTimer.get_elapsed_seconds()<<std::endl;
-                parameters.infoFile()<<"time from start "<<seconds<<std::endl;
-                parameters.infoFile().flush();
+                parameters.getControlOutput()<<"interval complete"<<std::endl;
+                parameters.getControlOutput()<<"interval solved in time "<<intervalTimer.get_elapsed_seconds()<<std::endl;
+                parameters.getControlOutput()<<"time from start "<<seconds<<std::endl;
+                parameters.writeControlOutput();
 
 
             }
@@ -1023,9 +979,8 @@ std::vector<std::vector<size_t>> solver_ilp_intervals(DisjointParams<>& paramete
         paths=solver_ilp_tracklets<>(parameters,cs,allPaths,loadIntervals);
 
         timer.stop();
-        std::cout<<"Time from start "<<timer.get_elapsed_seconds()<<std::endl;
-        parameters.infoFile()<<"Time from start "<<timer.get_elapsed_seconds()<<std::endl;
-        parameters.infoFile().flush();
+        parameters.getControlOutput()<<"Time from start "<<timer.get_elapsed_seconds()<<std::endl;
+        parameters.writeControlOutput();
 
     }
     return paths;
