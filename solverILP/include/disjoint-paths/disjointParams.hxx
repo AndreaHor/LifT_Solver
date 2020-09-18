@@ -9,7 +9,7 @@
 #define INCLUDE_DISJOINT_PATHS_INPUTCONFIG_HXX_
 
 #include <string>
-//#include <sstream>
+#include <sstream>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -184,9 +184,13 @@ public:
     //		(*fileForGeneralOutputs)<<toOutput;
     //	}
 
-    std::ofstream& infoFile(){
+    std::ofstream& infoFile(){  //TODO make private
         std::ofstream & infoF=*pInfoFile;
         return infoF;
+    }
+
+    std::stringstream& getControlOutput(){  //TODO make private
+        return controlOutput;
     }
 
     bool isAllBaseTracklet() const {
@@ -228,6 +232,20 @@ public:
     //ConfigDisjoint<>& operator=(const ConfigDisjoint<>&);
 
 
+    bool isControlOutputFilesSet() const{
+        return controlOutputFiles;
+    }
+
+    void writeControlOutput(){
+       std::cout<<controlOutput.str();
+
+        if(controlOutputFiles){
+            infoFile()<<controlOutput.str();
+            infoFile().flush();
+        }
+        controlOutput=std::stringstream();
+    }
+
 private:
     DisjointParams<T>(const DisjointParams<T>&);
     void initParameters(std::map<std::string,std::string>& parameters);
@@ -239,6 +257,9 @@ private:
     std::string timeFileName;
     std::string paramsFileName;
     bool debugOutputFiles;
+    bool controlOutputFiles;
+
+    std::stringstream controlOutput;
 
     double inputCost;
     double outputCost;
@@ -360,7 +381,17 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
     paramsFile<<"params file "<<paramsFileName<<std::endl;
 
     std::string infoFileName=outputFileName+"-info.txt";
-    pInfoFile=new std::ofstream(infoFileName.data(),std::ofstream::out);
+
+    if(parameters.count("CONTROL_OUTPUT_FILES")>0){
+        controlOutputFiles=std::stoi(parameters["CONTROL_OUTPUT_FILES"]);
+    }
+    else{
+        controlOutputFiles=true;
+    }
+    std::cout<<"control output files "<<controlOutputFiles<<std::endl;
+    paramsFile<<"control output files "<<controlOutputFiles<<std::endl;
+
+    pInfoFile=new std::ofstream(infoFileName.data(),std::ofstream::out);  //TODO only if controlOutputFiles  is set
     //fileForGeneralOutputs=&paramsFile;
 
     //TODO use params File name to output all params displayed here with cout
@@ -385,6 +416,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
     }
     std::cout<<"debug output files "<<debugOutputFiles<<std::endl;
     paramsFile<<"debug output files "<<debugOutputFiles<<std::endl;
+
 
 
     if(parameters.count("SPARSIFY")>0){
@@ -728,6 +760,8 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
     parametersSet=true;
 
 }
+
+
 
 
 template<class T>

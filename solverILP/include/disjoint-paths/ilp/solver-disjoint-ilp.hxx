@@ -879,16 +879,28 @@ std::vector<std::vector<size_t>> solver_ilp_intervals(DisjointParams<>& paramete
     else{
 
         //CompleteStructure<> cs=CompleteStructure<>(parameters,delim);
-        std::cout<<"vg max time "<<cs.getVertexGroups().getMaxTime()<<std::endl;
-        std::cout<<"vg max vertex "<<cs.getVertexGroups().getMaxVertex()<<std::endl;
-        std::cout<<"vg last frame size "<<cs.getVertexGroups().getGroupVertices(cs.getVertexGroups().getMaxTime()).size()<<std::endl;
+//        std::cout<<"vg max time "<<cs.getVertexGroups().getMaxTime()<<std::endl;
+//        std::cout<<"vg max vertex "<<cs.getVertexGroups().getMaxVertex()<<std::endl;
+//        std::cout<<"vg last frame size "<<cs.getVertexGroups().getGroupVertices(cs.getVertexGroups().getMaxTime()).size()<<std::endl;
 
+        parameters.getControlOutput()<<"vg max time "<<cs.getVertexGroups().getMaxTime()<<std::endl;
+        parameters.getControlOutput()<<"vg max vertex "<<cs.getVertexGroups().getMaxVertex()<<std::endl;
+        parameters.getControlOutput()<<"vg last frame size "<<cs.getVertexGroups().getGroupVertices(cs.getVertexGroups().getMaxTime()).size()<<std::endl;
+        parameters.writeControlOutput();
 
         size_t maxTime=cs.maxTime;  //maxTime withou t
         size_t intervalSize=parameters.getSmallIntervals();
         size_t numberOfIntervals=maxTime/intervalSize;
-        std::cout<<"cs max vertex: "<<cs.getVertexGroups().getMaxVertex()<<", frame: "<<cs.getVertexGroups().getGroupIndex(cs.getVertexGroups().getMaxVertex())<<std::endl;
-        parameters.infoFile()<<"cs max vertex: "<<cs.getVertexGroups().getMaxVertex()<<", frame: "<<cs.getVertexGroups().getGroupIndex(cs.getVertexGroups().getMaxVertex())<<std::endl;
+
+
+//        std::cout<<"cs max vertex: "<<cs.getVertexGroups().getMaxVertex()<<", frame: "<<cs.getVertexGroups().getGroupIndex(cs.getVertexGroups().getMaxVertex())<<std::endl;
+//        parameters.infoFile()<<"cs max vertex: "<<cs.getVertexGroups().getMaxVertex()<<", frame: "<<cs.getVertexGroups().getGroupIndex(cs.getVertexGroups().getMaxVertex())<<std::endl;
+
+
+        parameters.getControlOutput()<<"cs max vertex: "<<cs.getVertexGroups().getMaxVertex()<<", frame: "<<cs.getVertexGroups().getGroupIndex(cs.getVertexGroups().getMaxVertex())<<std::endl;
+        parameters.writeControlOutput();
+
+
         //parameters.output("cs max vertex: "+cs.vg.getMaxVertex()+", frame: "+cs.vg.getGroupIndex(cs.vg.getMaxVertex())+"\n");
 
         if(maxTime%intervalSize!=0){
@@ -902,8 +914,9 @@ std::vector<std::vector<size_t>> solver_ilp_intervals(DisjointParams<>& paramete
         if(loadIntervals){
             std::string fileName=parameters.getIntervalFile();
             allPaths=readLines<size_t>(fileName,' ');
-            std::cout<<"loaded "<<allPaths.size()<<" paths"<<std::endl;
-            parameters.infoFile()<<"loaded "<<allPaths.size()<<" paths"<<std::endl;
+            parameters.getControlOutput()<<"loaded "<<allPaths.size()<<" paths"<<std::endl;
+
+            parameters.writeControlOutput();
 
             //			std::vector<size_t> path={1328,1350,1362,1383,1478,1519,1529,1535,1547,1555,1566,1592,1600,1617,1631,1638,1737,1750,1801,1831,1842};
             //			allPaths.push_back(path);
