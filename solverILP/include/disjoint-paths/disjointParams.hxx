@@ -45,9 +45,9 @@ class DisjointParams {
 public:
 
     ~DisjointParams(){
-        std::cout<<"config disjoint destructor"<<std::endl;
-        infoFile()<<"config disjoint destructor"<<std::endl;
-        if(pInfoFile!=0){
+        getControlOutput()<<"config disjoint destructor"<<std::endl;
+        writeControlOutput();
+        if(pInfoFile!=nullptr){
             (*pInfoFile).close();
             delete pInfoFile;
         }
@@ -184,10 +184,7 @@ public:
     //		(*fileForGeneralOutputs)<<toOutput;
     //	}
 
-    std::ofstream& infoFile(){  //TODO make private
-        std::ofstream & infoF=*pInfoFile;
-        return infoF;
-    }
+
 
     std::stringstream& getControlOutput(){  //TODO make private
         return controlOutput;
@@ -250,6 +247,11 @@ private:
     DisjointParams<T>(const DisjointParams<T>&);
     void initParameters(std::map<std::string,std::string>& parameters);
     DisjointParams();
+
+    std::ofstream& infoFile(){
+        std::ofstream & infoF=*pInfoFile;
+        return infoF;
+    }
     //std::ofstream * fileForGeneralOutputs;
     std::ofstream* pInfoFile;
     std::string graphFileName;
@@ -320,6 +322,7 @@ private:
 template<class T>
 inline DisjointParams<T>::DisjointParams(const std::string& fileName){
     parametersSet=false;
+    pInfoFile=nullptr;
     std::ifstream data;
     //data.exceptions( std::ifstream::failbit | std::ifstream::badbit );
     try{
@@ -342,6 +345,17 @@ inline DisjointParams<T>::DisjointParams(const std::string& fileName){
 
 template<class T>
 inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>& parameters){
+    if(parameters.count("CONTROL_OUTPUT_FILES")>0){
+        controlOutputFiles=std::stoi(parameters["CONTROL_OUTPUT_FILES"]);
+    }
+    else{
+        controlOutputFiles=true;
+    }
+    std::cout<<"control output files "<<controlOutputFiles<<std::endl;
+
+
+
+
     if(parameters.count("INPUT_GRAPH")>0){
         graphFileName=parameters["INPUT_GRAPH"];
     }
@@ -371,27 +385,25 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
 
     outputFileName=parameters["OUTPUT_PATH"]+parameters["OUTPUT_PREFIX"];
     paramsFileName=outputFileName+"-params.txt";
-    std::ofstream paramsFile(paramsFileName.data(),std::ofstream::out);
+    std::ofstream paramsFile;
+    if(controlOutputFiles){
+         paramsFile.open(paramsFileName.data(),std::ofstream::out);
+    }
 
 
-    std::cout<<"params file "<<paramsFileName<<std::endl;
-
-    paramsFile<<"input graph "<<graphFileName<<std::endl;
-    paramsFile<<"output files "<<outputFileName<<std::endl;
-    paramsFile<<"params file "<<paramsFileName<<std::endl;
-
+    if(controlOutputFiles){
+        std::cout<<"params file "<<paramsFileName<<std::endl;
+        paramsFile<<"control output files "<<controlOutputFiles<<std::endl;
+        paramsFile<<"input graph "<<graphFileName<<std::endl;
+        paramsFile<<"output files "<<outputFileName<<std::endl;
+        paramsFile<<"params file "<<paramsFileName<<std::endl;
+    }
     std::string infoFileName=outputFileName+"-info.txt";
 
-    if(parameters.count("CONTROL_OUTPUT_FILES")>0){
-        controlOutputFiles=std::stoi(parameters["CONTROL_OUTPUT_FILES"]);
-    }
-    else{
-        controlOutputFiles=true;
-    }
-    std::cout<<"control output files "<<controlOutputFiles<<std::endl;
-    paramsFile<<"control output files "<<controlOutputFiles<<std::endl;
 
-    pInfoFile=new std::ofstream(infoFileName.data(),std::ofstream::out);  //TODO only if controlOutputFiles  is set
+    if(controlOutputFiles){
+        pInfoFile=new std::ofstream(infoFileName.data(),std::ofstream::out);  //TODO only if controlOutputFiles  is set
+    }
     //fileForGeneralOutputs=&paramsFile;
 
     //TODO use params File name to output all params displayed here with cout
@@ -405,7 +417,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         timeFileName=graphFileName+"_frames";
     }
     std::cout<<"input frames "<<timeFileName<<std::endl;
-    paramsFile<<"input frames "<<timeFileName<<std::endl;
+     if(controlOutputFiles) paramsFile<<"input frames "<<timeFileName<<std::endl;
 
 
     if(parameters.count("DEBUG_OUTPUT_FILES")>0){
@@ -415,7 +427,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         debugOutputFiles=0;
     }
     std::cout<<"debug output files "<<debugOutputFiles<<std::endl;
-    paramsFile<<"debug output files "<<debugOutputFiles<<std::endl;
+    if(controlOutputFiles) paramsFile<<"debug output files "<<debugOutputFiles<<std::endl;
 
 
 
@@ -426,7 +438,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         sparsify=1;
     }
     std::cout<<"sparsify "<<sparsify<<std::endl;
-    paramsFile<<"sparsify "<<sparsify<<std::endl;
+    if(controlOutputFiles) paramsFile<<"sparsify "<<sparsify<<std::endl;
 
     //TODO Put some of the following parameters under if(sparsify){...
     //TODO check for wrong input?
@@ -439,7 +451,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         restrictFrames=1;
     }
     std::cout<<"restrict frames "<<restrictFrames<<std::endl;
-    paramsFile<<"restrict frames "<<restrictFrames<<std::endl;
+    if(controlOutputFiles) paramsFile<<"restrict frames "<<restrictFrames<<std::endl;
 
     if(parameters.count("MAX_TIMEGAP")>0){
         maxTimeFrame=std::stoul(parameters["MAX_TIMEGAP"]);
@@ -449,7 +461,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         maxTimeFrame=std::numeric_limits<size_t>::max();
     }
     std::cout<<"max time gap "<<maxTimeFrame<<std::endl;
-    paramsFile<<"max time gap "<<maxTimeFrame<<std::endl;
+    if(controlOutputFiles) paramsFile<<"max time gap "<<maxTimeFrame<<std::endl;
 
     if(parameters.count("INPUT_COST")>0){
         inputCost=std::stod(parameters["INPUT_COST"]);
@@ -458,7 +470,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         inputCost=0;
     }
     std::cout<<"input cost "<<inputCost<<std::endl;
-    paramsFile<<"input cost "<<inputCost<<std::endl;
+    if(controlOutputFiles) paramsFile<<"input cost "<<inputCost<<std::endl;
 
     if(parameters.count("OUTPUT_COST")>0){
         outputCost=std::stod(parameters["OUTPUT_COST"]);
@@ -467,7 +479,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         outputCost=0;
     }
     std::cout<<"output cost "<<outputCost<<std::endl;
-    paramsFile<<"output cost "<<outputCost<<std::endl;
+    if(controlOutputFiles) paramsFile<<"output cost "<<outputCost<<std::endl;
 
     if(parameters.count("MAX_TIMEGAP_BASE")>0){
         maxTimeBase=std::stoul(parameters["MAX_TIMEGAP_BASE"]);
@@ -476,7 +488,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         maxTimeBase=60;
     }
     std::cout<<"max time gap base "<<maxTimeBase<<std::endl;
-    paramsFile<<"max time gap base "<<maxTimeBase<<std::endl;
+    if(controlOutputFiles) paramsFile<<"max time gap base "<<maxTimeBase<<std::endl;
 
     if(parameters.count("KNN_GAP")>0){
         knnTimeGap=std::stoul(parameters["KNN_GAP"]);
@@ -485,7 +497,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         knnTimeGap=3;
     }
     std::cout<<"KNN time gap "<<knnTimeGap<<std::endl;
-    paramsFile<<"KNN time gap "<<knnTimeGap<<std::endl;
+    if(controlOutputFiles) paramsFile<<"KNN time gap "<<knnTimeGap<<std::endl;
 
     if(parameters.count("KNN_K")>0){
         knnK=std::stoul(parameters["KNN_K"]);
@@ -494,7 +506,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         knnK=3;
     }
     std::cout<<"KNN k "<<knnK<<std::endl;
-    paramsFile<<"KNN k "<<knnK<<std::endl;
+    if(controlOutputFiles) paramsFile<<"KNN k "<<knnK<<std::endl;
 
     if(parameters.count("BASE_THRESHOLD")>0){
         baseUpperThreshold=std::stod(parameters["BASE_THRESHOLD"]);
@@ -503,7 +515,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         baseUpperThreshold=0;
     }
     std::cout<<"base upper threshold "<<baseUpperThreshold<<std::endl;
-    paramsFile<<"base upper threshold "<<baseUpperThreshold<<std::endl;
+    if(controlOutputFiles) paramsFile<<"base upper threshold "<<baseUpperThreshold<<std::endl;
 
     //	if(parameters.count("REQUIRE_IMPROVING")>0){
     //		requireImproving=std::stoi(parameters["REQUIRE_IMPROVING"]);
@@ -512,7 +524,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
     requireImproving=0;
     //}
     std::cout<<"require improving "<<requireImproving<<std::endl;
-    paramsFile<<"require improving "<<requireImproving<<std::endl;
+    if(controlOutputFiles) paramsFile<<"require improving "<<requireImproving<<std::endl;
 
     //	if(parameters.count("AUTOMATIC_LIFTED")>0){
     //		automaticLifted=std::stoi(parameters["AUTOMATIC_LIFTED"]);
@@ -521,7 +533,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
     automaticLifted=true;
     //}
     std::cout<<"automatic lifted "<<automaticLifted<<std::endl;
-    paramsFile<<"automatic lifted "<<automaticLifted<<std::endl;
+    if(controlOutputFiles) paramsFile<<"automatic lifted "<<automaticLifted<<std::endl;
 
     if(parameters.count("MAX_TIMEGAP_LIFTED")>0){
         maxTimeLifted=std::stoul(parameters["MAX_TIMEGAP_LIFTED"]);
@@ -530,7 +542,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         maxTimeLifted=60;
     }
     std::cout<<"max time gap lifted "<<maxTimeLifted<<std::endl;
-    paramsFile<<"max time gap lifted "<<maxTimeLifted<<std::endl;
+    if(controlOutputFiles) paramsFile<<"max time gap lifted "<<maxTimeLifted<<std::endl;
 
     if(parameters.count("DENSE_TIMEGAP_LIFTED")>0){
         denseTimeLifted=std::stoul(parameters["DENSE_TIMEGAP_LIFTED"]);
@@ -539,7 +551,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         denseTimeLifted=12;
     }
     std::cout<<"dense time gap lifted "<<denseTimeLifted<<std::endl;
-    paramsFile<<"dense time gap lifted "<<denseTimeLifted<<std::endl;
+    if(controlOutputFiles) paramsFile<<"dense time gap lifted "<<denseTimeLifted<<std::endl;
 
     if(parameters.count("NEGATIVE_THRESHOLD_LIFTED")>0){
         negativeThresholdLifted=std::stod(parameters["NEGATIVE_THRESHOLD_LIFTED"]);
@@ -548,7 +560,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         negativeThresholdLifted=-1;
     }
     std::cout<<"negative threshold lifted "<<negativeThresholdLifted<<std::endl;
-    paramsFile<<"negative threshold lifted "<<negativeThresholdLifted<<std::endl;
+    if(controlOutputFiles) paramsFile<<"negative threshold lifted "<<negativeThresholdLifted<<std::endl;
 
     if(parameters.count("POSITIVE_THRESHOLD_LIFTED")>0){
         positiveThresholdLifted=std::stod(parameters["POSITIVE_THRESHOLD_LIFTED"]);
@@ -557,7 +569,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         positiveThresholdLifted=1;
     }
     std::cout<<"positive threshold lifted "<<positiveThresholdLifted<<std::endl;
-    paramsFile<<"positive threshold lifted "<<positiveThresholdLifted<<std::endl;
+    if(controlOutputFiles) paramsFile<<"positive threshold lifted "<<positiveThresholdLifted<<std::endl;
 
     if(parameters.count("LONGER_LIFTED_INTERVAL")>0){
         longerIntervalLifted=std::stoul(parameters["LONGER_LIFTED_INTERVAL"]);
@@ -566,7 +578,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         longerIntervalLifted=4;
     }
     std::cout<<"longer interval lifted "<<longerIntervalLifted<<std::endl;
-    paramsFile<<"longer interval lifted "<<longerIntervalLifted<<std::endl;
+    if(controlOutputFiles) paramsFile<<"longer interval lifted "<<longerIntervalLifted<<std::endl;
 
 
     //	if(parameters.count("REPULSIVE_TIMEGAP")>0){
@@ -598,7 +610,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         smallIntervals=40;
     }
     std::cout<<"small intervals "<<smallIntervals<<std::endl;
-    paramsFile<<"small intervals "<<smallIntervals<<std::endl;
+    if(controlOutputFiles) paramsFile<<"small intervals "<<smallIntervals<<std::endl;
 
 
 
@@ -614,7 +626,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         trackletSize=std::min(trackletSize,smallIntervals);
     }
     std::cout<<"tracklet size "<<trackletSize<<std::endl;
-    paramsFile<<"tracklet size "<<trackletSize<<std::endl;
+    if(controlOutputFiles) paramsFile<<"tracklet size "<<trackletSize<<std::endl;
 
     if(parameters.count("ALL_BASE_TRACKLET")>0){
         allBaseTracklet=std::stoi(parameters["ALL_BASE_TRACKLET"]);
@@ -624,7 +636,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         allBaseTracklet=true;
     }
     std::cout<<"all base edges in tracklet graph "<<allBaseTracklet<<std::endl;
-    paramsFile<<"all base edges in tracklet graph "<<allBaseTracklet<<std::endl;
+    if(controlOutputFiles) paramsFile<<"all base edges in tracklet graph "<<allBaseTracklet<<std::endl;
 
 
 
@@ -635,7 +647,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         denseTracklets=true;
     }
     std::cout<<"dense tracklets "<<denseTracklets<<std::endl;
-    paramsFile<<"dense tracklets "<<denseTracklets<<std::endl;
+    if(controlOutputFiles) paramsFile<<"dense tracklets "<<denseTracklets<<std::endl;
 
 
     if(parameters.count("OPTIMIZE_PATHS")>0){
@@ -645,7 +657,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         optimizePaths=false;
     }
     std::cout<<"optimize paths "<<optimizePaths<<std::endl;
-    paramsFile<<"optimize paths "<<optimizePaths<<std::endl;
+    if(controlOutputFiles) paramsFile<<"optimize paths "<<optimizePaths<<std::endl;
 
     if(parameters.count("MAX_TIMEGAP_COMPLETE")>0){
         maxTimeGapComplete=std::stoul(parameters["MAX_TIMEGAP_COMPLETE"]);
@@ -656,7 +668,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         maxTimeGapComplete=std::max(maxTimeLifted,maxTimeBase);
     }
     std::cout<<"max time gap complete "<<maxTimeGapComplete<<std::endl;
-    paramsFile<<"max time gap complete "<<maxTimeGapComplete<<std::endl;
+    if(controlOutputFiles) paramsFile<<"max time gap complete "<<maxTimeGapComplete<<std::endl;
 
 
 
@@ -667,7 +679,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         completeGapForTracklet=false;
     }
     std::cout<<"use complete time gap in tracklet graph "<<completeGapForTracklet<<std::endl;
-    paramsFile<<"use complete time gap in tracklet graph "<<completeGapForTracklet<<std::endl;
+    if(controlOutputFiles) paramsFile<<"use complete time gap in tracklet graph "<<completeGapForTracklet<<std::endl;
 
 
 
@@ -689,7 +701,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
     repulsive=0;
     //	}
     std::cout<<"use repulsive "<<repulsive<<std::endl;
-    paramsFile<<"use repulsive "<<repulsive<<std::endl;
+    if(controlOutputFiles) paramsFile<<"use repulsive "<<repulsive<<std::endl;
 
     if(parameters.count("GUROBI_REL_GAP")>0){
         gurobiRelativeGap=std::stod(parameters["GUROBI_REL_GAP"]);
@@ -698,7 +710,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         gurobiRelativeGap=0;
     }
     std::cout<<"gurobi relative gap "<<gurobiRelativeGap<<std::endl;
-    paramsFile<<"gurobi relative gap "<<gurobiRelativeGap<<std::endl;
+    if(controlOutputFiles) paramsFile<<"gurobi relative gap "<<gurobiRelativeGap<<std::endl;
 
 
     if(parameters.count("GUROBI_REL_GAP_TRACKLET")>0){
@@ -708,7 +720,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         gurobiRelGapTrackletG=0;
     }
     std::cout<<"gurobi relative gap for tracklet graph "<<gurobiRelGapTrackletG<<std::endl;
-    paramsFile<<"gurobi relative gap for tracklet graph "<<gurobiRelGapTrackletG<<std::endl;
+    if(controlOutputFiles) paramsFile<<"gurobi relative gap for tracklet graph "<<gurobiRelGapTrackletG<<std::endl;
 
 
     if(parameters.count("TASK")>0){
@@ -723,7 +735,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
         taskType='C';
     }
     std::cout<<"task type "<<taskType<<std::endl;
-    paramsFile<<"task type "<<taskType<<std::endl;
+    if(controlOutputFiles) paramsFile<<"task type "<<taskType<<std::endl;
 
     if(taskType=='T'){
         if(parameters.count("INTERVAL_FILE")>0){
@@ -733,7 +745,7 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
             intervalFile=parameters["OUTPUT_PATH"]+parameters["OUTPUT_PREFIX"]+"-all-paths-INTERVALS.txt";
         }
         std::cout<<"Interval solution from "<<intervalFile<<std::endl;
-        paramsFile<<"Interval solution from "<<intervalFile<<std::endl;
+        if(controlOutputFiles) paramsFile<<"Interval solution from "<<intervalFile<<std::endl;
     }
     else{
         intervalFile="";
@@ -749,14 +761,14 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
     }
 
     std::cout<<"max time gap base for tracklet graph "<<trTimeGapBase<<std::endl;
-    paramsFile<<"max time gap base for tracklet graph "<<trTimeGapBase<<std::endl;
+    if(controlOutputFiles) paramsFile<<"max time gap base for tracklet graph "<<trTimeGapBase<<std::endl;
 
 
     std::cout<<"max time gap lifted for tracklet graph "<<trTimeGapLifted<<std::endl;
-    paramsFile<<"max time gap lifted for tracklet graph "<<trTimeGapLifted<<std::endl;
+    if(controlOutputFiles) paramsFile<<"max time gap lifted for tracklet graph "<<trTimeGapLifted<<std::endl;
 
 
-    paramsFile.close();
+    if(controlOutputFiles) paramsFile.close();
     parametersSet=true;
 
 }

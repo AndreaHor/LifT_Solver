@@ -106,12 +106,15 @@ try
 	disjointPaths::DisjointParams<size_t> configDisjoint(parameters.configFile);
 	if(configDisjoint.isParametersSet()){
 		if(configDisjoint.getMaxTimeLifted()==0){
-			disjointPaths::solver_flow_only(configDisjoint);
+            std::vector<std::vector<size_t>> paths=disjointPaths::solver_flow_only(configDisjoint);
+            disjointPaths::writeOutputToFile(paths,configDisjoint.getOutputFileName() + "-all-paths-FINAL.txt");
+
 		}
 		else{
 
             disjointPaths::CompleteStructure<> cs(configDisjoint);
-            disjointPaths::solver_ilp<size_t>(configDisjoint,cs);
+            std::vector<std::vector<size_t>> paths=disjointPaths::solver_ilp<size_t>(configDisjoint,cs);
+            disjointPaths::writeOutputToFile(paths,configDisjoint.getOutputFileName() + "-all-paths-FINAL.txt");
 
 //			if(configDisjoint.getSmallIntervals()==0){
 //				disjointPaths::DisjointStructure<> disjointP(configDisjoint);

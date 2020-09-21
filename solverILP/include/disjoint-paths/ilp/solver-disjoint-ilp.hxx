@@ -547,7 +547,6 @@ void ilp_check_solution(Data<>& data,std::vector<double>& solution0,bool outputs
     }
 
     if(outputs){
-        std::cout<<"Solution checked. Tracks: "<<trackCounter<<std::endl;
         data.parameters.getControlOutput()<<"Solution checked. Tracks: "<<trackCounter<<std::endl;
         data.parameters.writeControlOutput();
     }
@@ -692,7 +691,7 @@ std::vector<std::vector<size_t>> solver_flow_only(DisjointParams<>& parameters)
     Data<> data(DS);
     std::vector<double> solution=ilp_init_solution(data,true);
     std::vector<std::vector<size_t>> paths=data.pathsFromSolution(solution,false);
-    data.outputSolution(paths,false);
+    //data.outputSolution(paths,false);
     parameters.getControlOutput()<<"Simple flow solved"<<std::endl;
     parameters.writeControlOutput();
     return paths;
@@ -713,7 +712,7 @@ std::vector<std::vector<size_t>> solver_ilp_tracklets(DisjointParams<>& paramete
     if(!optimizePaths){
 
         data.prepareGraphFromIntervalsDense(allPaths);
-        if(!loadIntervals){
+        if(!loadIntervals&&parameters.isControlOutputFilesSet()){
             data.outputSolution(allPaths,true);
         }
 
@@ -730,7 +729,7 @@ std::vector<std::vector<size_t>> solver_ilp_tracklets(DisjointParams<>& paramete
     parameters.getControlOutput()<<"call solver on all paths"<<std::endl;
     parameters.writeControlOutput();
 
-    std::vector<double> labels=ilp_solve(data);
+    std::vector<double> labels=ilp_solve(data,parameters.isControlOutputFilesSet());
 
     parameters.getControlOutput()<<"obtain paths from solution"<<std::endl;
     parameters.writeControlOutput();
@@ -766,7 +765,7 @@ std::vector<std::vector<size_t>> solver_ilp_tracklets(DisjointParams<>& paramete
         parameters.getControlOutput()<<"final graph not optimal, recomputing..."<<std::endl;
         parameters.writeControlOutput();
 
-        labels=ilp_solve(data);
+        labels=ilp_solve(data,parameters.isControlOutputFilesSet());
         paths=data.pathsFromSolution(labels,true);
         data.evaluate(paths);
         if(!optimizePaths){
@@ -778,7 +777,7 @@ std::vector<std::vector<size_t>> solver_ilp_tracklets(DisjointParams<>& paramete
         }
     }
 
-    data.outputSolution(paths);
+   // data.outputSolution(paths);
 
     trackletTimer.stop();
 
@@ -808,7 +807,7 @@ std::vector<std::vector<size_t>> solver_ilp_no_intervals(DisjointParams<>& param
     parameters.getControlOutput()<<"max vertex: "<<data0.getGraph().numberOfVertices()-3+DS.minV<<std::endl;
     parameters.writeControlOutput();
 
-    std::vector<double> labels=ilp_solve(data0);
+    std::vector<double> labels=ilp_solve(data0,parameters.isControlOutputFilesSet());
 
     std::vector<std::vector<size_t>> newPaths=data0.pathsFromSolution(labels,false);
 
@@ -821,7 +820,7 @@ std::vector<std::vector<size_t>> solver_ilp_no_intervals(DisjointParams<>& param
         return paths;
     }
     else{
-        data0.outputSolution(newPaths);
+     //   data0.outputSolution(newPaths);
         timer.stop();
 
         parameters.getControlOutput()<<"Time from start "<<timer.get_elapsed_seconds()<<std::endl;
@@ -951,7 +950,7 @@ std::vector<std::vector<size_t>> solver_ilp_intervals(DisjointParams<>& paramete
                     }
 
 
-                    std::vector<double> labels=ilp_solve(data);
+                    std::vector<double> labels=ilp_solve(data,parameters.isControlOutputFilesSet());
 
                     std::vector<std::vector<size_t>> newPaths=data.pathsFromSolution(labels,false,DS.minV);
 

@@ -975,21 +975,21 @@ inline void Data<T>::graphFromIntervalsDense(){
 	    initSolution=std::vector<double>();
         parameters.getControlOutput()<<"all small paths"<<std::endl;
         parameters.writeControlOutput();
-	    std::ofstream pathsFile;
-	    pathsFile.open(parameters.getOutputFileName()+"paths.txt",std::ofstream::out | std::ofstream::app);
+       // std::ofstream pathsFile;
+       // pathsFile.open(parameters.getOutputFileName()+"paths.txt",std::ofstream::out | std::ofstream::app);
 
-	    for (int i = 0; i < vertexToPath.size(); ++i) {
-			size_t p=vertexToPath[i];
-			if(smallPaths[p][0]==i){
-				for (int j = 0; j < smallPaths[p].size(); ++j) {
-					pathsFile<<smallPaths[p][j]<<",";
-				}
-				pathsFile<<std::endl;
-			}
-		}
-	    pathsFile<<std::endl<<std::endl;
+//	    for (int i = 0; i < vertexToPath.size(); ++i) {
+//			size_t p=vertexToPath[i];
+//			if(smallPaths[p][0]==i){
+//				for (int j = 0; j < smallPaths[p].size(); ++j) {
+//					pathsFile<<smallPaths[p][j]<<",";
+//				}
+//				pathsFile<<std::endl;
+//			}
+//		}
+//	    pathsFile<<std::endl<<std::endl;
 
-	    pathsFile.close();
+//	    pathsFile.close();
 
 
 		andres::graph::Digraph<> trGraphBase(smallPaths.size()+2);//Maybe without +2
