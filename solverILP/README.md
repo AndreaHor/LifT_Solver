@@ -61,6 +61,9 @@ parameter file. You find an example parameter file in directory `data/exampleSol
     
   - `DEBUG_OUTPUT_FILES = 0`  
     Expects 0/1 values. If set to 1, the solver outputs preliminary feasible solutions obtained during its run. Default value is 0.
+  
+  - `CONTROL_OUTPUT_FILES = 0`  
+    Expects 0/1 values. If set to 0, the solver does not produce any files except the file with final results. Default value is 1.
     
   - `SPARSIFY = 1`  
     Expects value 0/1. If set to 0, no sparsification is done, so parameters related to sparsificatioin are not needed. If set to 1, sparsification is done. Default and recommended value is 1.
@@ -187,7 +190,7 @@ All output files have the same prefix specified in `OUTPUT_PREFIX`.
     Tracklets obtained from intermediate feasible solutions. `-tr` stores tracklets produces from solver run on tracklet graphs. These files are produced only if `DEBUG_OUTPUT_FILES = 1`.
 
 # Use from Python
-There are two possibilities of using the solver from Python. They are demonstrated in two example scripts in directory `/home/fuksova/codes/LifT_Solver/solverILP/LifT_py`. These two scripts are copied during solver compilation into the build directory and can be directly run from there.  
+There are two possibilities of using the solver from Python. They are demonstrated in two example scripts in directory `/home/fuksova/codes/LifT_Solver/solverILP/LifT_py`. These two scripts are copied during solver compilation into the build directory and can be directly run from there. Parameter file is slightly different because it does not specify input and output paths for the files except the output path for control output files. An example parameter file can be found in `data/exampleSolverILP/params_sequence_py.ini`. The two possibilities of using the solver from python are as follows:
 
-1. The problem graph is initialized from input files. See script `solveFromFiles.py`. Its usage is similar to directly running the solver from the command line. The difference is that the path to the graph file `problemDesc` and to the time frame file `problemDesc_frames` have to be specified directly in the script. They are not read from `params_sequence.ini`.
-2. The problem graph is initialized from python arrays. See script `solveFromMatrix.py`. In this case, the only file needed is the parameter file  `params_sequence.ini`. The graph structure and the mapping between time frames and graph vertices are given defined by python arrays.
+1. The problem graph is initialized from input files. See script `solveFromFiles.py`. Its usage is similar to directly running the solver from the command line. The difference is that the paths to the input files and the path to the file with the final results have to be specified in the python script. They are not read from `params_sequence_py.ini`.
+2. The problem graph is initialized from python arrays. See script `solveFromMatrix.py`. In this case, the only input file needed is the parameter file  `params_sequence_py.ini`. The path to it has to be specified in the python script as well as the path to the file where final results should be stored. The graph structure and the mapping between time frames and graph vertices are given by python arrays.
