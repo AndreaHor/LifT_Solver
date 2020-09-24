@@ -15,6 +15,7 @@
 #include <vector>
 #include <map>
 #include <limits>
+//#include <disjoint-paths/parametersConstructor.hxx>
 
 
 namespace disjointPaths {
@@ -54,7 +55,11 @@ public:
     }
 
 
-    DisjointParams(const std::string& fileName);
+     DisjointParams(std::map<std::string,std::string>& parameters);
+    // DisjointParams(ParametersParser& parametersParser);
+
+
+   // DisjointParams(std::map<std::string, std::string> &parameters);
     //DisjointParamsDisjointParamsDisjointParams(const std::stringstream& stream);
 
     template<class STR>
@@ -230,7 +235,7 @@ public:
 
 private:
     DisjointParams<T>(const DisjointParams<T>&);
-    void initParameters(std::map<std::string,std::string>& parameters);
+    //void initParameters(std::map<std::string,std::string>& parameters);
     DisjointParams();
     //std::ofstream * fileForGeneralOutputs;
     std::ofstream* pInfoFile;
@@ -296,31 +301,35 @@ private:
 // }
 
 
+//template<class T>
+//inline DisjointParams<T>::DisjointParams(const std::string& fileName){
+//    parametersSet=false;
+//    std::ifstream data;
+//    //data.exceptions( std::ifstream::failbit | std::ifstream::badbit );
+//    try{
+//        data.open(fileName);
+//        if (!data){
+//            throw std::system_error(errno, std::system_category(), "failed to open "+fileName);
+//        }
+//        std::map<std::string,std::string> params=parseStream(data);
+//        initParameters(params);
+
+//    }
+
+//    catch (std::system_error& er) {
+//        std::clog << er.what() << " (" << er.code() << ")" << std::endl;
+//    }
+
+//}
+
+//template<class T>
+//inline DisjointParams<T>::DisjointParams(ParametersParser &parametersParser){
+//    DisjointParams(parametersParser.getParsedParameters());
+//}
+
 template<class T>
-inline DisjointParams<T>::DisjointParams(const std::string& fileName){
-    parametersSet=false;
-    std::ifstream data;
-    //data.exceptions( std::ifstream::failbit | std::ifstream::badbit );
-    try{
-        data.open(fileName);
-        if (!data){
-            throw std::system_error(errno, std::system_category(), "failed to open "+fileName);
-        }
-        std::map<std::string,std::string> params=parseStream(data);
-        initParameters(params);
-
-    }
-
-    catch (std::system_error& er) {
-        std::clog << er.what() << " (" << er.code() << ")" << std::endl;
-    }
-
-}
-
-
-
-template<class T>
-inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>& parameters){
+inline DisjointParams<T>::DisjointParams(std::map<std::string, std::string> &parameters){
+  //  std::map<std::string,std::string>& parameters=parameters.getParsedParameters();
     if(parameters.count("INPUT_GRAPH")>0){
         graphFileName=parameters["INPUT_GRAPH"];
     }
@@ -730,63 +739,63 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
 }
 
 
-template<class T>
-template<class STR>
-inline std::map<std::string,std::string> DisjointParams<T>::parseStream(STR& data){
-    char delim='=';
-    std::string line;
-    std::vector<std::string> strings;
-    std::map<std::string,std::string> parameters;
+//template<class T>
+//template<class STR>
+//inline std::map<std::string,std::string> DisjointParams<T>::parseStream(STR& data){
+//    char delim='=';
+//    std::string line;
+//    std::vector<std::string> strings;
+//    std::map<std::string,std::string> parameters;
 
 
 
-    size_t lineCounter=0;
-    std::vector<size_t> currentGroup;
-    bool solverPart=false;
-    while (!solverPart&&std::getline(data, line) ) {
-        size_t commentPos=line.find_first_of('#');
-        if(commentPos<line.length()){
-            line.erase(commentPos);
-        }
-        if(!line.empty()&&line.find("[SOLVER]")!=line.npos){
-            solverPart=true;
-        }
-    }
-    if(!solverPart){
-        throw std::runtime_error("Config file does not contain \"[SOLVER]\".  ");
-    }
-    bool newSection=false;
-    while(!newSection&&std::getline(data, line)){
-        size_t commentPos=line.find_first_of('#');
-        if(commentPos<line.length()){
-            line.erase(commentPos);
-        }
-        if(line.find("[")==line.npos){
-            if(!line.empty()){ //TODO not split all delims, just the first occurence
-                strings=split<>(line,delim);
-                std::string whitespaces (" ");
+//    size_t lineCounter=0;
+//    std::vector<size_t> currentGroup;
+//    bool solverPart=false;
+//    while (!solverPart&&std::getline(data, line) ) {
+//        size_t commentPos=line.find_first_of('#');
+//        if(commentPos<line.length()){
+//            line.erase(commentPos);
+//        }
+//        if(!line.empty()&&line.find("[SOLVER]")!=line.npos){
+//            solverPart=true;
+//        }
+//    }
+//    if(!solverPart){
+//        throw std::runtime_error("Config file does not contain \"[SOLVER]\".  ");
+//    }
+//    bool newSection=false;
+//    while(!newSection&&std::getline(data, line)){
+//        size_t commentPos=line.find_first_of('#');
+//        if(commentPos<line.length()){
+//            line.erase(commentPos);
+//        }
+//        if(line.find("[")==line.npos){
+//            if(!line.empty()){ //TODO not split all delims, just the first occurence
+//                strings=split<>(line,delim);
+//                std::string whitespaces (" ");
 
-                size_t foundLast = strings[0].find_last_not_of(whitespaces);
-                size_t foundFirst=strings[0].find_first_not_of(whitespaces);
-                std::string key=strings[0].substr(foundFirst,foundLast-foundFirst+1);
+//                size_t foundLast = strings[0].find_last_not_of(whitespaces);
+//                size_t foundFirst=strings[0].find_first_not_of(whitespaces);
+//                std::string key=strings[0].substr(foundFirst,foundLast-foundFirst+1);
 
-                foundLast = strings[1].find_last_not_of(whitespaces);
-                foundFirst=strings[1].find_first_not_of(whitespaces);
-                std::string value=strings[1].substr(foundFirst,foundLast-foundFirst+1);
+//                foundLast = strings[1].find_last_not_of(whitespaces);
+//                foundFirst=strings[1].find_first_not_of(whitespaces);
+//                std::string value=strings[1].substr(foundFirst,foundLast-foundFirst+1);
 
-                parameters[key]=value;
-            }
-        }
-        else{
-            newSection=true;
-        }
-    }
+//                parameters[key]=value;
+//            }
+//        }
+//        else{
+//            newSection=true;
+//        }
+//    }
 
-    for(auto itMap=parameters.begin();itMap!=parameters.end();itMap++){
-        std::cout<<itMap->first<<"-"<<itMap->second<<"-"<<std::endl;
-    }
-    return parameters;
-}
+//    for(auto itMap=parameters.begin();itMap!=parameters.end();itMap++){
+//        std::cout<<itMap->first<<"-"<<itMap->second<<"-"<<std::endl;
+//    }
+//    return parameters;
+//}
 
 
 

@@ -18,7 +18,7 @@
 //#include "disjoint-paths/ilp/MyCallback.hxx"
 #include "disjoint-paths/disjointParams.hxx"
 #include "disjoint-paths/disjointPathsMethods.hxx"
-
+#include "disjoint-paths/parametersConstructor.hxx"
 
 struct Parameters {
 	std::string configFile;
@@ -103,15 +103,19 @@ try
 
 
 	auto parameters = parseCommandLine(argc, argv);
-	disjointPaths::DisjointParams<size_t> configDisjoint(parameters.configFile);
-	if(configDisjoint.isParametersSet()){
-		if(configDisjoint.getMaxTimeLifted()==0){
-			disjointPaths::solver_flow_only(configDisjoint);
+    disjointPaths::ParametersParser parameterParser;
+    parameterParser.parseFile(parameters.configFile);
+
+    //std::map<std::string,std::string> parsedParams=disjointPaths::parseParametersFromFile(parameters.configFile);
+    disjointPaths::DisjointParams<size_t> solverParameters(parameterParser.getParsedParameters());
+    if(solverParameters.isParametersSet()){
+        if(solverParameters.getMaxTimeLifted()==0){
+            disjointPaths::solver_flow_only(solverParameters);
 		}
 		else{
 
-            disjointPaths::CompleteStructure<> cs(configDisjoint);
-            disjointPaths::solver_ilp<size_t>(configDisjoint,cs);
+            disjointPaths::CompleteStructure<> cs(solverParameters);
+            disjointPaths::solver_ilp<size_t>(solverParameters,cs);
 
 //			if(configDisjoint.getSmallIntervals()==0){
 //				disjointPaths::DisjointStructure<> disjointP(configDisjoint);
