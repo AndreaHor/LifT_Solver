@@ -19,6 +19,7 @@ PYBIND11_MODULE(disjointPathsPy, m) {
 
     py::class_<disjointPaths::ParametersParser>(m,"ParametersParser")
             .def(py::init<>())
+            .def("get_parsed_params",&disjointPaths::ParametersParser::getParsedStrings,"getting the parsed strings from parser")
             .def("init_from_file",&disjointPaths::ParametersParser::initFromFile,"Parses parameters from a file");
            // .def("init_from_stream",&disjointPaths::ParametersParser::initFromStream<std::stringstream>,"Parses parameters from a stream");
 
