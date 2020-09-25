@@ -71,7 +71,7 @@ std::vector<std::vector<T>> readLines(std::string inputFileName, char delim) {
 
 		inputFile.open(inputFileName);
 		if (!inputFile){
-			throw std::system_error(errno, std::system_category(), "failed to open "+inputFileName);
+            throw std::system_error(errno, std::system_category(), "failed to open file with interval solution "+inputFileName);
 		}
 
 		std::string line;
@@ -167,6 +167,7 @@ public:
     template<class PAR> VertexGroups(PAR& parameters){
 		//std::vector<std::vector<size_t>> groups;
 
+        std::cout<<"time file name check 2 "<<parameters.getTimeFileName()<<std::endl;
         initFromFile(parameters.getTimeFileName(),parameters);
 //		std::string line;
 //		std::vector<std::string> strings;
@@ -309,11 +310,12 @@ inline void VertexGroups<T>::initFromFile(const std::string& fileName, const PAR
     size_t maxTimeToRead=parameters.getMaxTimeFrame();
 
 
+    std::cout<<"time file name check 3 "<<fileName<<std::endl;
     std::ifstream timeData;
     try{
         timeData.open(fileName);
         if(!timeData){
-            throw std::system_error(errno, std::system_category(), "failed to open "+fileName);
+            throw std::system_error(errno, std::system_category(), "failed to open file with vertices in time layers "+fileName);
         }
 
     unsigned int previousTime=1;
@@ -689,6 +691,7 @@ public:
     template<class PAR>
     CompleteStructure(PAR & configParameters)
 {
+        std::cout<<"time file name check 1 "<<configParameters.getTimeFileName()<<std::endl;
         pVertexGroups=new VertexGroups<>(configParameters);
         VertexGroups<>& vg=*pVertexGroups;
 		maxTime=vg.getMaxTime();
@@ -725,6 +728,8 @@ public:
     template<class PAR>
     void addEdgesFromFile(const std::string& fileName,PAR& params);
     void addEdgesFromMatrix(size_t time1,size_t time2,const py::array_t<double> inputMatrix);
+    template<class PAR>
+    void addEdgesFromVectors(const py::array_t<size_t>edges,const py::array_t<double> costs,PAR& params);
     const VertexGroups<>& getVertexGroups(){
         return *pVertexGroups;
     }
@@ -741,6 +746,49 @@ private:
     VertexGroups<>* pVertexGroups;
 
 };
+
+template<class T>
+template<class PAR>
+inline void CompleteStructure<T>::addEdgesFromVectors(const py::array_t<size_t> edges,const py::array_t<double> costs,PAR& params){
+    char delim=',';
+    VertexGroups<>& vg=*pVertexGroups;
+
+    const auto edgeVector=edges.unchecked<2>();
+    const std::size_t dim1=edgeVector.shape(0);
+    const std::size_t dim2=edgeVector.shape(1);
+    const auto costVector=costs.unchecked<1>();
+    const size_t dimOfCosts=costVector.shape(0);
+
+
+    if(dim2!=2){
+        std::string message="Wrong dimension of edge array, second dimension 2 expected";
+        throw std::invalid_argument(message);
+    }
+    if(dim1!=dimOfCosts){
+        std::string message="Dimension of edge array and edge costs do not match.";
+        throw std::invalid_argument(message);
+    }
+
+    params.getControlOutput()<<"Reading base edges from vector. "<<std::endl;
+    params.writeControlOutput();
+    for (size_t i=0;i<dim1;i++) {
+        size_t v=edgeVector(i,0);
+        size_t w=edgeVector(i,1);
+        double edgeCost=costVector(i);
+
+        size_t l0=vg.getGroupIndex(v);
+        size_t l1=vg.getGroupIndex(w);
+        //std::cout<<std::to_string(l0)<<", "<<std::to_string(l1)<<std::endl;
+        if(v>vg.getMaxVertex()||w>vg.getMaxVertex()) continue;
+        //std::cout<<"edge "<<v<<" "<<w<<std::endl;
+
+        if(l1-l0<=params.getMaxTimeGapComplete()){
+            completeGraph.insertEdge(v,w);
+            completeScore.push_back(edgeCost);
+        }
+    }
+}
+
 
 template<class T>
 inline void CompleteStructure<T>::addEdgesFromMatrix(size_t time1,size_t time2,const py::array_t<double> inputMatrix){
@@ -823,7 +871,7 @@ inline void CompleteStructure<T>::addEdgesFromFile(const std::string& fileName,P
 	try{
         data.open(fileName);
 		if(!data){
-            throw std::system_error(errno, std::system_category(), "failed to open "+fileName);
+            throw std::system_error(errno, std::system_category(), "failed to open graph file "+fileName);
 		}
 
 		std::getline(data, line);

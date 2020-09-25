@@ -207,7 +207,7 @@ parameters(configParameters)
 		try{
 			graphFile.open(parameters.getGraphFileName());
 			if(!graphFile){
-				throw std::system_error(errno, std::system_category(), "failed to open "+parameters.getGraphFileName());
+                throw std::system_error(errno, std::system_category(), "failed to open graph file "+parameters.getGraphFileName());
 			}
 			readGraph(graphFile,maxVertex,delim);
 			if(!parameters.isAutomaticLifted()){

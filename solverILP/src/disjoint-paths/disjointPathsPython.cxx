@@ -19,12 +19,11 @@ PYBIND11_MODULE(disjointPathsPy, m) {
 
     py::class_<disjointPaths::ParametersParser>(m,"ParametersParser")
             .def(py::init<>())
-            .def("init_from_file",&disjointPaths::ParametersParser::initFromFile,"Parses parameters from a file")
-            .def("init_from_stream",&disjointPaths::ParametersParser::initFromStream<std::stringstream>,"Parses parameters from a stream");
+            .def("init_from_file",&disjointPaths::ParametersParser::initFromFile,"Parses parameters from a file");
+           // .def("init_from_stream",&disjointPaths::ParametersParser::initFromStream<std::stringstream>,"Parses parameters from a stream");
 
 
      py::class_<disjointPaths::DisjointParams<>>(m, "DisjointParams")
-        .def(py::init<disjointPaths::ParametersParser&>())
         .def(py::init<std::map<std::string,std::string>&>());
         
      py::class_<disjointPaths::VertexGroups<>>(m, "TimeFramesToVertices")
@@ -35,6 +34,7 @@ PYBIND11_MODULE(disjointPathsPy, m) {
      py::class_<disjointPaths::CompleteStructure<>>(m, "GraphStructure")
         .def(py::init<disjointPaths::VertexGroups<> &>())
         .def("add_edges_from_array", &disjointPaths::CompleteStructure<>::addEdgesFromMatrix, "Initializes edges of the graph between two time frames from a matrix.")
+        .def("add_edges_from_vectors", &disjointPaths::CompleteStructure<>::addEdgesFromVectors<disjointPaths::DisjointParams<>>, "Initializes edges of the graph from an Nx2 array of size_t with edge vertices and an Nx1 array of doubles with costs.")
         .def("add_edges_from_file", &disjointPaths::CompleteStructure<>::addEdgesFromFile<disjointPaths::DisjointParams<>>, "Initializes all edges of the graph from a file.");
 
     // m.def("solve_ilp", py::overload_cast<disjointPaths::DisjointParams<>&, disjointPaths::CompleteStructure<>&>(&disjointPaths::solver_ilp_intervals<>), "Solve lifted disjoint paths");

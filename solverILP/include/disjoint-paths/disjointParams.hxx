@@ -55,7 +55,7 @@ public:
 
 
    // DisjointParams(const std::string& fileName);
-     DisjointParams(ParametersParser& paramsConstructor);
+    // DisjointParams(ParametersParser& paramsConstructor);
      DisjointParams(std::map<std::string,std::string>& parsedParams);
     //DisjointParamsDisjointParamsDisjointParams(const std::stringstream& stream);
 
@@ -247,7 +247,7 @@ public:
 
 private:
     DisjointParams<T>(const DisjointParams<T>&);
-    void initParameters(std::map<std::string,std::string>& parameters);
+   // void initParameters(std::map<std::string,std::string>& parameters);
     DisjointParams();
 
     std::ofstream& infoFile(){
@@ -343,10 +343,10 @@ private:
 
 //}
 
-template<class T>
-inline DisjointParams<T>::DisjointParams(ParametersParser& paramsConstructor){
-    DisjointParams(paramsConstructor.getParsedStrings());
-}
+//template<class T>
+//inline DisjointParams<T>::DisjointParams(ParametersParser& paramsConstructor){
+//    DisjointParams(paramsConstructor.getParsedStrings());
+//}
 
 template<class T>
 inline DisjointParams<T>::DisjointParams(std::map<std::string,std::string>& parameters){

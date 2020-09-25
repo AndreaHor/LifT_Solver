@@ -555,7 +555,7 @@ inline void Data<T>::readCompleteGraph(){
             data.open(parameters.getGraphFileName());
             if(!data){
 
-                throw std::system_error(errno, std::system_category(), "failed to open "+parameters.getGraphFileName());
+                throw std::system_error(errno, std::system_category(), "failed to open graph file "+parameters.getGraphFileName());
 
             }
             char delim=',';

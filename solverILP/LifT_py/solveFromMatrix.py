@@ -46,7 +46,7 @@ paramsMap["MAX_TIMEGAP_LIFTED"]="60"
 paramsMap["OUTPUT_PATH"]="../data/exampleSolverILP/"
 
 
-#Initializes structure for holding solver parameters. It expects the path to the solver parameter file.
+#Initializes structure for holding solver parameters. It expects either a ParameterParser or a string to string dictionary as an input
 params=ldpPy.DisjointParams(paramsMap)
 
 #Constructor of structure for holding the mapping between time frames and graph vertices

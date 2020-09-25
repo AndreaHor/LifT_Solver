@@ -107,7 +107,7 @@ try
     disjointPaths::ParametersParser parametersParser;
     parametersParser.initFromFile(parameters.configFile);
 
-    disjointPaths::DisjointParams<size_t> disjointParameters(parametersParser);
+    disjointPaths::DisjointParams<size_t> disjointParameters(parametersParser.getParsedStrings());
     if(disjointParameters.isParametersSet()){
         if(disjointParameters.getMaxTimeLifted()==0){
             std::vector<std::vector<size_t>> paths=disjointPaths::solver_flow_only(disjointParameters);
@@ -115,6 +115,7 @@ try
 
 		}
 		else{
+            std::cout<<"time file name check 0 "<<disjointParameters.getTimeFileName()<<std::endl;
 
             disjointPaths::CompleteStructure<> cs(disjointParameters);
             std::vector<std::vector<size_t>> paths=disjointPaths::solver_ilp<size_t>(disjointParameters,cs);

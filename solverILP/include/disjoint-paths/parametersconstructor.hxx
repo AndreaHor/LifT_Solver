@@ -21,7 +21,7 @@ class ParametersParser{
         try{
             data.open(fileName);
             if (!data){
-                throw std::system_error(errno, std::system_category(), "failed to open "+fileName);
+                throw std::system_error(errno, std::system_category(), "failed to open parameter file "+fileName);
             }
             bool solverPart=false;
             std::string line;
@@ -38,6 +38,7 @@ class ParametersParser{
                 throw std::runtime_error("Config file does not contain \"[SOLVER]\".  ");
             }
             initFromStream(data);
+            data.close();
 
         }
 

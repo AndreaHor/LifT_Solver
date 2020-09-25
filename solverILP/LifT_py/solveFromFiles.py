@@ -15,11 +15,13 @@ Created on Fri Jul 10 11:37:09 2020
 
 import disjointPathsPy as ldpPy
 
+#Create a parser for parameters
 paramsParser=ldpPy.ParametersParser()
 
+#Initializes parameters from file
 paramsParser.init_from_file("../data/exampleSolverILP/params_sequence_py.ini")
 
-#Initializes structure for holding solver parameters. It expects the path to the solver parameter file.
+#Initializes structure for holding solver parameters. It expects either a ParameterParser or a string to string dictionary as an input
 params=ldpPy.DisjointParams(paramsParser)
 
 #Constructor of structure for holding the mapping between time frames and graph vertices
