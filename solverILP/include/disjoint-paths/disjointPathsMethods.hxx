@@ -32,7 +32,7 @@
 #include <set>
 #include <map>
 #include <list>
-#include "disjoint-paths/disjointParams.hxx"
+//#include "disjoint-paths/disjointParams.hxx"
 #include <utility>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>

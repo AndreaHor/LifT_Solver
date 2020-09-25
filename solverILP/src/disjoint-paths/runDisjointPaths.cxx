@@ -18,6 +18,7 @@
 //#include "disjoint-paths/ilp/MyCallback.hxx"
 #include "disjoint-paths/disjointParams.hxx"
 #include "disjoint-paths/disjointPathsMethods.hxx"
+#include "disjoint-paths/parametersconstructor.hxx"
 
 
 struct Parameters {
@@ -103,18 +104,21 @@ try
 
 
 	auto parameters = parseCommandLine(argc, argv);
-	disjointPaths::DisjointParams<size_t> configDisjoint(parameters.configFile);
-	if(configDisjoint.isParametersSet()){
-		if(configDisjoint.getMaxTimeLifted()==0){
-            std::vector<std::vector<size_t>> paths=disjointPaths::solver_flow_only(configDisjoint);
-            disjointPaths::writeOutputToFile(paths,configDisjoint.getOutputFileName() + "-all-paths-FINAL.txt");
+    disjointPaths::ParametersParser parametersParser;
+    parametersParser.initFromFile(parameters.configFile);
+
+    disjointPaths::DisjointParams<size_t> disjointParameters(parametersParser);
+    if(disjointParameters.isParametersSet()){
+        if(disjointParameters.getMaxTimeLifted()==0){
+            std::vector<std::vector<size_t>> paths=disjointPaths::solver_flow_only(disjointParameters);
+            disjointPaths::writeOutputToFile(paths,disjointParameters.getOutputFileName() + "-all-paths-FINAL.txt");
 
 		}
 		else{
 
-            disjointPaths::CompleteStructure<> cs(configDisjoint);
-            std::vector<std::vector<size_t>> paths=disjointPaths::solver_ilp<size_t>(configDisjoint,cs);
-            disjointPaths::writeOutputToFile(paths,configDisjoint.getOutputFileName() + "-all-paths-FINAL.txt");
+            disjointPaths::CompleteStructure<> cs(disjointParameters);
+            std::vector<std::vector<size_t>> paths=disjointPaths::solver_ilp<size_t>(disjointParameters,cs);
+            disjointPaths::writeOutputToFile(paths,disjointParameters.getOutputFileName() + "-all-paths-FINAL.txt");
 
 //			if(configDisjoint.getSmallIntervals()==0){
 //				disjointPaths::DisjointStructure<> disjointP(configDisjoint);

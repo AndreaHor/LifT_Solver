@@ -17,8 +17,15 @@ namespace py = pybind11;
 PYBIND11_MODULE(disjointPathsPy, m) {
     m.doc() = "python binding for lifted disjoint paths";
 
+    py::class_<disjointPaths::ParametersParser>(m,"ParametersParser")
+            .def(py::init<>())
+            .def("init_from_file",&disjointPaths::ParametersParser::initFromFile,"Parses parameters from a file")
+            .def("init_from_stream",&disjointPaths::ParametersParser::initFromStream<std::stringstream>,"Parses parameters from a stream");
+
+
      py::class_<disjointPaths::DisjointParams<>>(m, "DisjointParams")
-        .def(py::init<const std::string &>());
+        .def(py::init<disjointPaths::ParametersParser&>())
+        .def(py::init<std::map<std::string,std::string>&>());
         
      py::class_<disjointPaths::VertexGroups<>>(m, "TimeFramesToVertices")
         .def(py::init<>())

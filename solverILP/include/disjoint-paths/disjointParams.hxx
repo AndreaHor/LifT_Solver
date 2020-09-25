@@ -15,29 +15,29 @@
 #include <vector>
 #include <map>
 #include <limits>
-
+#include"disjoint-paths/parametersconstructor.hxx"
 
 namespace disjointPaths {
 
 
-template<class T=size_t>
-std::vector<std::string> split(const
-                               std::string& inputString, char delim) {
-    size_t occurence = 0;
-    size_t newOccurence = 0;
-    std::vector<std::string> strings;
-    while (newOccurence < inputString.size()) {
-        newOccurence = std::min(inputString.find_first_of(delim, occurence),
-                                inputString.size());
+//template<class T=size_t>
+//std::vector<std::string> split(const
+//                               std::string& inputString, char delim) {
+//    size_t occurence = 0;
+//    size_t newOccurence = 0;
+//    std::vector<std::string> strings;
+//    while (newOccurence < inputString.size()) {
+//        newOccurence = std::min(inputString.find_first_of(delim, occurence),
+//                                inputString.size());
 
-        std::string newString(inputString, occurence, newOccurence - occurence);
-        strings.push_back(newString);
-        newOccurence = newOccurence + 1;
-        occurence = newOccurence;
-    }
+//        std::string newString(inputString, occurence, newOccurence - occurence);
+//        strings.push_back(newString);
+//        newOccurence = newOccurence + 1;
+//        occurence = newOccurence;
+//    }
 
-    return strings;
-}
+//    return strings;
+//}
 
 
 template<class T = size_t>
@@ -54,7 +54,9 @@ public:
     }
 
 
-    DisjointParams(const std::string& fileName);
+   // DisjointParams(const std::string& fileName);
+     DisjointParams(ParametersParser& paramsConstructor);
+     DisjointParams(std::map<std::string,std::string>& parsedParams);
     //DisjointParamsDisjointParamsDisjointParams(const std::stringstream& stream);
 
     template<class STR>
@@ -319,32 +321,37 @@ private:
 // }
 
 
+//template<class T>
+//inline DisjointParams<T>::DisjointParams(const std::string& fileName){
+//    parametersSet=false;
+//    pInfoFile=nullptr;
+//    std::ifstream data;
+//    //data.exceptions( std::ifstream::failbit | std::ifstream::badbit );
+//    try{
+//        data.open(fileName);
+//        if (!data){
+//            throw std::system_error(errno, std::system_category(), "failed to open "+fileName);
+//        }
+//        std::map<std::string,std::string> params=parseStream(data);
+//        initParameters(params);
+
+//    }
+
+//    catch (std::system_error& er) {
+//        std::clog << er.what() << " (" << er.code() << ")" << std::endl;
+//    }
+
+//}
+
 template<class T>
-inline DisjointParams<T>::DisjointParams(const std::string& fileName){
-    parametersSet=false;
-    pInfoFile=nullptr;
-    std::ifstream data;
-    //data.exceptions( std::ifstream::failbit | std::ifstream::badbit );
-    try{
-        data.open(fileName);
-        if (!data){
-            throw std::system_error(errno, std::system_category(), "failed to open "+fileName);
-        }
-        std::map<std::string,std::string> params=parseStream(data);
-        initParameters(params);
-
-    }
-
-    catch (std::system_error& er) {
-        std::clog << er.what() << " (" << er.code() << ")" << std::endl;
-    }
-
+inline DisjointParams<T>::DisjointParams(ParametersParser& paramsConstructor){
+    DisjointParams(paramsConstructor.getParsedStrings());
 }
 
-
-
 template<class T>
-inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>& parameters){
+inline DisjointParams<T>::DisjointParams(std::map<std::string,std::string>& parameters){
+    pInfoFile=nullptr;
+    //std::map<std::string,std::string>& parameters=paramsConstructor.getParsedStrings();
     if(parameters.count("CONTROL_OUTPUT_FILES")>0){
         controlOutputFiles=std::stoi(parameters["CONTROL_OUTPUT_FILES"]);
     }
@@ -776,63 +783,63 @@ inline void DisjointParams<T>::initParameters(std::map<std::string,std::string>&
 
 
 
-template<class T>
-template<class STR>
-inline std::map<std::string,std::string> DisjointParams<T>::parseStream(STR& data){
-    char delim='=';
-    std::string line;
-    std::vector<std::string> strings;
-    std::map<std::string,std::string> parameters;
+//template<class T>
+//template<class STR>
+//inline std::map<std::string,std::string> DisjointParams<T>::parseStream(STR& data){
+//    char delim='=';
+//    std::string line;
+//    std::vector<std::string> strings;
+//    std::map<std::string,std::string> parameters;
 
 
 
-    size_t lineCounter=0;
-    std::vector<size_t> currentGroup;
-    bool solverPart=false;
-    while (!solverPart&&std::getline(data, line) ) {
-        size_t commentPos=line.find_first_of('#');
-        if(commentPos<line.length()){
-            line.erase(commentPos);
-        }
-        if(!line.empty()&&line.find("[SOLVER]")!=line.npos){
-            solverPart=true;
-        }
-    }
-    if(!solverPart){
-        throw std::runtime_error("Config file does not contain \"[SOLVER]\".  ");
-    }
-    bool newSection=false;
-    while(!newSection&&std::getline(data, line)){
-        size_t commentPos=line.find_first_of('#');
-        if(commentPos<line.length()){
-            line.erase(commentPos);
-        }
-        if(line.find("[")==line.npos){
-            if(!line.empty()){ //TODO not split all delims, just the first occurence
-                strings=split<>(line,delim);
-                std::string whitespaces (" ");
+//    size_t lineCounter=0;
+//    std::vector<size_t> currentGroup;
+//    bool solverPart=false;
+//    while (!solverPart&&std::getline(data, line) ) {
+//        size_t commentPos=line.find_first_of('#');
+//        if(commentPos<line.length()){
+//            line.erase(commentPos);
+//        }
+//        if(!line.empty()&&line.find("[SOLVER]")!=line.npos){
+//            solverPart=true;
+//        }
+//    }
+//    if(!solverPart){
+//        throw std::runtime_error("Config file does not contain \"[SOLVER]\".  ");
+//    }
+//    bool newSection=false;
+//    while(!newSection&&std::getline(data, line)){
+//        size_t commentPos=line.find_first_of('#');
+//        if(commentPos<line.length()){
+//            line.erase(commentPos);
+//        }
+//        if(line.find("[")==line.npos){
+//            if(!line.empty()){ //TODO not split all delims, just the first occurence
+//                strings=split<>(line,delim);
+//                std::string whitespaces (" ");
 
-                size_t foundLast = strings[0].find_last_not_of(whitespaces);
-                size_t foundFirst=strings[0].find_first_not_of(whitespaces);
-                std::string key=strings[0].substr(foundFirst,foundLast-foundFirst+1);
+//                size_t foundLast = strings[0].find_last_not_of(whitespaces);
+//                size_t foundFirst=strings[0].find_first_not_of(whitespaces);
+//                std::string key=strings[0].substr(foundFirst,foundLast-foundFirst+1);
 
-                foundLast = strings[1].find_last_not_of(whitespaces);
-                foundFirst=strings[1].find_first_not_of(whitespaces);
-                std::string value=strings[1].substr(foundFirst,foundLast-foundFirst+1);
+//                foundLast = strings[1].find_last_not_of(whitespaces);
+//                foundFirst=strings[1].find_first_not_of(whitespaces);
+//                std::string value=strings[1].substr(foundFirst,foundLast-foundFirst+1);
 
-                parameters[key]=value;
-            }
-        }
-        else{
-            newSection=true;
-        }
-    }
+//                parameters[key]=value;
+//            }
+//        }
+//        else{
+//            newSection=true;
+//        }
+//    }
 
-    for(auto itMap=parameters.begin();itMap!=parameters.end();itMap++){
-        std::cout<<itMap->first<<"-"<<itMap->second<<"-"<<std::endl;
-    }
-    return parameters;
-}
+//    for(auto itMap=parameters.begin();itMap!=parameters.end();itMap++){
+//        std::cout<<itMap->first<<"-"<<itMap->second<<"-"<<std::endl;
+//    }
+//    return parameters;
+//}
 
 
 
