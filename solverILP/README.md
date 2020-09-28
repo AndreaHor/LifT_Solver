@@ -194,4 +194,5 @@ There are two possibilities of using the solver from Python. They are demonstrat
 
 1. The problem graph is initialized from input files. See script `solveFromFiles.py`. Its usage is similar to directly running the solver from the command line. The difference is that the paths to the input files and the path to the file with the final results have to be specified in the python script. They are not read from `params_sequence_py.ini`.
 2. The problem graph is initialized from python arrays. See script `solveFromMatrix.py`. In this case, there are no input files needed. The graph structure and the mapping between time frames and graph vertices are given by python arrays directly in python. Solver parameters are provided as a string to string dictionary in python. 
+
 The two above mentioned approaches can be combined. So that e.g. input parameters will be read from a file and graph structures will be given as python arrays.
