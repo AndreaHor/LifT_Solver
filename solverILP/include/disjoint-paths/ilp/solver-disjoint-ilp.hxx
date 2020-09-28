@@ -955,7 +955,7 @@ std::vector<std::vector<size_t>> solver_ilp_intervals(DisjointParams<>& paramete
                     std::vector<std::vector<size_t>> newPaths=data.pathsFromSolution(labels,false,DS.minV);
 
                     if(overlap>0){
-                        newPaths=extractInnerPaths(cs.getVertexGroups(),newPaths,minT,maxT-1);
+                        newPaths=cs.getVertexGroups().extractInnerPaths(newPaths,minT,maxT-1);
                     }
 
 

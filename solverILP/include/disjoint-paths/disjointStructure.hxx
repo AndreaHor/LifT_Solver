@@ -33,7 +33,7 @@
 #include <list>
 #include "disjoint-paths/disjointParams.hxx"
 #include "disjoint-paths/disjointPathsMethods.hxx"
-#include "disjoint-paths/completestructure.hxx"
+#include "disjoint-paths/completeStructure.hxx"
 #include <utility>
 
 namespace disjointPaths {
