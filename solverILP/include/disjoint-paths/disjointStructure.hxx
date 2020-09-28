@@ -33,6 +33,7 @@
 #include <list>
 #include "disjoint-paths/disjointParams.hxx"
 #include "disjoint-paths/disjointPathsMethods.hxx"
+#include "disjoint-paths/completestructure.hxx"
 #include <utility>
 
 namespace disjointPaths {
@@ -163,7 +164,7 @@ private:
 	std::vector<double> vertexScore;
 	std::vector<double> edgeScore;
 	std::vector<double> liftedEdgeScore;
-	std::vector<std::vector<bool>> desc;
+    std::vector<std::vector<bool>> desc;  //TODO remove
 	std::vector<std::unordered_set<size_t>> reachable;
 
 
