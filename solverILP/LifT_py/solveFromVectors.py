@@ -61,26 +61,18 @@ timeFrames.init_from_vector(vect)
 #Initializing the graph structure from timeFrames. For now, no edges are present. 
 completeGraphStructure=ldpPy.GraphStructure(timeFrames)
 
+#Edge vector. Each edge is represented by a pair of vertices. Vertices ar numbered from zero
+edgeVector=np.array([[0,3],[0,4],[1,3],[1,4],[2,3],[2,4],[3,5],[3,6],[3,7],[4,5],[4,6],[4,7],[0,5],[0,6],[0,7],[1,5],[1,6],[1,7],[2,6],[2,7]])
+costVector=np.array([-2.2,-1,-1,-2.2,-1,-1,-2.2,-1,-1,-1,-2.2,-1,  -2.2,-1,-1, -1,-2.2,-1, -1,-2.2])
 
-#This ininity variable will be used as an edge weight indicating that an edge is missing.
-noEdge=float("inf")
-
-#Three adjacency matrices that specify costs of edges between pairs of time frames. The number of rows of each matrix must correspond to the number of detections in the lower time frame. The number of matrix columns must correspond to the number of detections in the higher time frame.
-matrix12=np.array([[-2.2,-1.0],[-1.0,-2.2],[-1.0,-1.0]])
-matrix23=np.array([[-2.2,-1.0,-1.0],[-1.0,-2.2,-1.0]])
-matrix13=np.array([[-2.2,-1.0,2.3],[-1.0,-2.2,-1.0],[noEdge,-1.0,-2.2]])
-
-#Adding edges to graph structure from adjacency matrices.
-#Arguments: index of the lower frame, index of the higher frame, adjacency matrix
-completeGraphStructure.add_edges_from_array(1,2,matrix12)
-completeGraphStructure.add_edges_from_array(2,3,matrix23)
-completeGraphStructure.add_edges_from_array(1,3,matrix13)
+#Adding edges to graph structure from vectors
+completeGraphStructure.add_edges_from_vectors(edgeVector,costVector,params)
 
 #Calling the solver on the given problem and get the resulting paths. 
 paths=ldpPy.solve_ilp(params,completeGraphStructure)
 
 #Saving the resulting paths into an output file. 
-ldpPy.write_output_to_file(paths,"../data/exampleSolverILP/my_python_output.txt")
+ldpPy.write_output_to_file(paths,"../data/exampleSolverILP/my_python_output_vect.txt")
 
 for path in paths:
   for v in path:

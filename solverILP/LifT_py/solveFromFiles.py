@@ -21,7 +21,7 @@ paramsParser=ldpPy.ParametersParser()
 #Parses parameters from file
 paramsParser.init_from_file("../data/exampleSolverILP/params_sequence_py.ini")
 
-#Initializes structure for holding solver parameters. It expects a string to string map as an input. ParametersParser.get_parsed_params() can be used for providing such map.
+#Initializes structure for holding solver parameters. It expects a string to string map (dictionary) as an input. ParametersParser.get_parsed_params() can be used for providing such map.
 params=ldpPy.DisjointParams(paramsParser.get_parsed_params())
 
 #Constructor of structure for holding the mapping between time frames and graph vertices

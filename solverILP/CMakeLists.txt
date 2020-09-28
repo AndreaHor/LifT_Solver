@@ -44,6 +44,7 @@ if(GUROBI_FOUND)
     target_link_libraries(disjointPathsPy PRIVATE ${GUROBI_LIBRARIES} MyCallback)
     configure_file(LifT_py/solveFromFiles.py ${CMAKE_CURRENT_BINARY_DIR}/solveFromFiles.py)
     configure_file(LifT_py/solveFromMatrix.py ${CMAKE_CURRENT_BINARY_DIR}/solveFromMatrix.py)
+    configure_file(LifT_py/solveFromVectors.py ${CMAKE_CURRENT_BINARY_DIR}/solveFromVectors.py)
   
 endif()
 
