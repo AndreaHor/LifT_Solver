@@ -803,8 +803,8 @@ std::vector<std::vector<size_t>> solver_ilp_no_intervals(DisjointParams<>& param
     Data<> data0(DS);
 
 
-    parameters.getControlOutput()<<"min vertex: "<<DS.minV<<std::endl;
-    parameters.getControlOutput()<<"max vertex: "<<data0.getGraph().numberOfVertices()-3+DS.minV<<std::endl;
+    parameters.getControlOutput()<<"min vertex: "<<DS.getMinV()<<std::endl;
+    parameters.getControlOutput()<<"max vertex: "<<data0.getGraph().numberOfVertices()-3+DS.getMinV()<<std::endl;
     parameters.writeControlOutput();
 
     std::vector<double> labels=ilp_solve(data0,parameters.isControlOutputFilesSet());
@@ -924,11 +924,11 @@ std::vector<std::vector<size_t>> solver_ilp_intervals(DisjointParams<>& paramete
                     //s,t edges only
                     parameters.getControlOutput()<<"One layer interval "<<std::endl;
                     parameters.writeControlOutput();
-                    std::vector<std::vector<size_t>> newPaths(DS.maxV-DS.minV+1);
-                    for (int j = DS.minV; j <=DS.maxV; ++j) {
+                    std::vector<std::vector<size_t>> newPaths(DS.getMaxV()-DS.getMinV()+1);
+                    for (int j = DS.getMinV(); j <=DS.getMaxV(); ++j) {
                         std::vector<size_t> oneVertexPath(1);
                         oneVertexPath[0]=j;
-                        newPaths[j-DS.minV]=oneVertexPath;
+                        newPaths[j-DS.getMinV()]=oneVertexPath;
                     }
                     allPaths.insert(allPaths.end(),newPaths.begin(),newPaths.end());
 
@@ -938,21 +938,21 @@ std::vector<std::vector<size_t>> solver_ilp_intervals(DisjointParams<>& paramete
 
                     Data<> data(DS);
 
-                    parameters.getControlOutput()<<"min vertex in interval: "<<DS.minV<<std::endl;
-                    parameters.getControlOutput()<<"max vertex in interval: "<<data.getGraph().numberOfVertices()-3+DS.minV<<std::endl;
+                    parameters.getControlOutput()<<"min vertex in interval: "<<DS.getMinV()<<std::endl;
+                    parameters.getControlOutput()<<"max vertex in interval: "<<data.getGraph().numberOfVertices()-3+DS.getMinV()<<std::endl;
                     parameters.writeControlOutput();
 
 
 
                     if(i==numberOfIntervals-1){
-                        parameters.getControlOutput()<<"max vertex in last interval: "<<data.getGraph().numberOfVertices()-3+DS.minV<<std::endl;
+                        parameters.getControlOutput()<<"max vertex in last interval: "<<data.getGraph().numberOfVertices()-3+DS.getMinV()<<std::endl;
                         parameters.writeControlOutput();
                     }
 
 
                     std::vector<double> labels=ilp_solve(data,parameters.isControlOutputFilesSet());
 
-                    std::vector<std::vector<size_t>> newPaths=data.pathsFromSolution(labels,false,DS.minV);
+                    std::vector<std::vector<size_t>> newPaths=data.pathsFromSolution(labels,false,DS.getMinV());
 
                     if(overlap>0){
                         newPaths=cs.getVertexGroups().extractInnerPaths(newPaths,minT,maxT-1);
@@ -987,45 +987,6 @@ std::vector<std::vector<size_t>> solver_ilp_intervals(DisjointParams<>& paramete
 
 
 
-////template<class ILP, class CALLBACK = ilp::Callback<ILP>>
-//template<class T=size_t>
-//void solver_ilp(DisjointStructure<>& ds)
-//{
-
-
-//    levinkov::Timer timer;
-//    timer.start();
-
-//    Data<> data(ds);
-
-//    std::vector<double> labels=ilp_solve(data);
-
-//    std::vector<std::vector<size_t>> paths=data.pathsFromSolution(labels,false);
-
-//    //If one more iteration would be done with cut into tracklets even if time breaks are empty, solution can be improved
-//    if(data.parameters.isDenseTracklets()){
-//        bool isNewGraph=data.prepareGraphFromIntervalsDense(paths,false);
-//        while(isNewGraph){
-//            std::cout<<"final graph not optimal, recomputing..."<<std::endl;
-//            ds.parameters.infoFile()<<"final graph not optimal, recomputing..."<<std::endl;
-//            ds.parameters.infoFile().flush();
-
-//            labels=ilp_solve(data);
-//            paths=data.pathsFromSolution(labels,true);
-//            isNewGraph=data.prepareGraphFromIntervalsDense(paths,true);
-//        }
-//    }
-
-//    data.outputSolution(paths);
-
-//    timer.stop();
-
-//    std::cout<<"solver complete"<<std::endl;
-//    std::cout<<"time "<<timer.get_elapsed_seconds()<<std::endl;
-//    ds.parameters.infoFile()<<"solver complete"<<std::endl<<"time "<<timer.get_elapsed_seconds()<<std::endl;
-//    ds.parameters.infoFile().flush();
-
-//}
 
 template<class T=size_t>
 std::vector<std::vector<size_t>> solver_ilp(DisjointParams<>& parameters,CompleteStructure<>& cs)
@@ -1042,48 +1003,6 @@ std::vector<std::vector<size_t>> solver_ilp(DisjointParams<>& parameters,Complet
 }
 
 
-
-//TODO export this as a debug procedure
-//if(i==0){
-//				std::vector<size_t> veticesToCheck={292,381};
-//				for (int j = 0; j < veticesToCheck.size(); ++j) {
-//					size_t vToCheck=veticesToCheck[j];
-//					if(vToCheck>=DS.minV&&vToCheck<DS.minV+DS.getGraph().numberOfVertices()){
-//						size_t v=vToCheck;
-//						vToCheck-=DS.minV;
-//						std::cout<<"base graph: "<<std::endl;
-//						for (int k = 0; k < data.getGraph().numberOfEdgesFromVertex(vToCheck); ++k) {
-//							size_t wToCheck=data.getGraph().vertexFromVertex(vToCheck,k);
-//							size_t edgeToCheck=data.getGraph().edgeFromVertex(vToCheck,k);
-//							double score=data.getCosts()[data.getEdgeVarIndex(edgeToCheck)];
-//							size_t w=wToCheck+DS.minV;
-//							std::cout<<v<<","<<w<<": "<<score<<std::endl;
-//						}
-//						for (int k = 0; k < data.getGraph().numberOfEdgesToVertex(vToCheck); ++k) {
-//							size_t wToCheck=data.getGraph().vertexToVertex(vToCheck,k);
-//							size_t edgeToCheck=data.getGraph().edgeToVertex(vToCheck,k);
-//							double score=data.getCosts()[data.getEdgeVarIndex(edgeToCheck)];
-//							size_t w=wToCheck+DS.minV;
-//							std::cout<<w<<","<<v<<": "<<score<<std::endl;
-//						}
-//						std::cout<<"lifted graph: "<<std::endl;
-//						for (int k = 0; k < data.getGraphLifted().numberOfEdgesFromVertex(vToCheck); ++k) {
-//							size_t wToCheck=data.getGraphLifted().vertexFromVertex(vToCheck,k);
-//							size_t edgeToCheck=data.getGraphLifted().edgeFromVertex(vToCheck,k);
-//							double score=data.getCosts()[data.getLiftedEdgeVarIndex(edgeToCheck)];
-//							size_t w=wToCheck+DS.minV;
-//							std::cout<<v<<","<<w<<": "<<score<<std::endl;
-//						}
-//						for (int k = 0; k < data.getGraphLifted().numberOfEdgesToVertex(vToCheck); ++k) {
-//							size_t wToCheck=data.getGraphLifted().vertexToVertex(vToCheck,k);
-//							size_t edgeToCheck=data.getGraphLifted().edgeToVertex(vToCheck,k);
-//							double score=data.getCosts()[data.getLiftedEdgeVarIndex(edgeToCheck)];
-//							size_t w=wToCheck+DS.minV;
-//							std::cout<<w<<","<<v<<": "<<score<<std::endl;
-//						}
-//					}
-//				}
-//}
 
 
 

@@ -77,7 +77,7 @@ public:
 
 private:
         //std::vector<std::vector<size_t>> groups;
-    std::vector<std::vector<size_t>> groups;
+        std::vector<std::vector<size_t>> groups;
         std::vector<size_t> vToGroup;
         size_t maxVertex;
         size_t maxTime;
