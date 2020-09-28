@@ -31,7 +31,7 @@ public:
     template<class PAR>
     CompleteStructure(PAR & configParameters)
 {
-    //    std::cout<<"time file name check 1 "<<configParameters.getTimeFileName()<<std::endl;
+
         pVertexGroups=new VertexGroups<>(configParameters);
         VertexGroups<>& vg=*pVertexGroups;
                 maxTime=vg.getMaxTime();
@@ -73,13 +73,13 @@ public:
     const VertexGroups<>& getVertexGroups(){
         return *pVertexGroups;
     }
-    //void addEdges(size_t time1,size_t time2,std::stringstream& data);
+
 
         andres::graph::Digraph<> completeGraph;
         std::vector<double> completeScore;
 
         size_t maxTime;
-    //DisjointParams<T>& params;
+
 
 private:
     bool deleteVG;
@@ -118,9 +118,9 @@ inline void CompleteStructure<T>::addEdgesFromVectors(const py::array_t<size_t> 
 
         size_t l0=vg.getGroupIndex(v);
         size_t l1=vg.getGroupIndex(w);
-        //std::cout<<std::to_string(l0)<<", "<<std::to_string(l1)<<std::endl;
+
         if(v>vg.getMaxVertex()||w>vg.getMaxVertex()) continue;
-        //std::cout<<"edge "<<v<<" "<<w<<std::endl;
+
 
         if(l1-l0<=params.getMaxTimeGapComplete()){
             completeGraph.insertEdge(v,w);
@@ -162,107 +162,70 @@ inline void CompleteStructure<T>::addEdgesFromMatrix(size_t time1,size_t time2,c
 }
 
 
-//template<class T>
-//inline void CompleteStructure<T>::addEdges(size_t time1,size_t time2,std::stringstream& data){
-//	std::string line;
-//	std::vector<std::string> strings;
-//	char delim=',';
-
-//	size_t lineCounter=0;
-//	size_t transformIndex1=vg.getGroupVertices(time1)[0];
-//	size_t numberOfVertices1=vg.getGroupVertices(time1).size();
-//	size_t transformIndex2=vg.getGroupVertices(time2)[0];
-//	size_t numberOfVertices2=vg.getGroupVertices(time2).size();
-
-//	while (std::getline(data, line) && !line.empty()) {
-//		if(lineCounter>=numberOfVertices1){
-//			throw std::invalid_argument("Attempt to add edges to non-existing vertices in time frame "+time1);
-//		}
-//		size_t vertex1=lineCounter+transformIndex1;
-//		strings = split(line, delim);
-//		if(strings.size()!=numberOfVertices2){
-//			throw std::invalid_argument("Number of matrix columns does not match the number of vertices in time frame "+time2);
-//		}
-
-//		for (int i = 0; i < numberOfVertices2; ++i) {
-//			double score=std::stoul(strings[i]);
-//			if(score<std::numeric_limits<double>::infinity()){
-//				size_t vertex2=i+transformIndex2;
-//				completeGraph.insertEdge(vertex1,vertex2);
-//				completeScore.push_back(score);
-//			}
-//		}
-//    	lineCounter++;
-//	}
-//	if(lineCounter<numberOfVertices1){
-//		throw std::invalid_argument("Number of lines in matrix is lower than number of vertices in time "+time1);
-//	}
-//}
 
 
 template<class T>
 template<class PAR>
 inline void CompleteStructure<T>::addEdgesFromFile(const std::string& fileName,PAR& params){
-        char delim=',';
+    char delim=',';
     VertexGroups<>& vg=*pVertexGroups;
 
-        std::string line;
-        std::ifstream data;
-        try{
+    std::string line;
+    std::ifstream data;
+    try{
         data.open(fileName);
-                if(!data){
+        if(!data){
             throw std::system_error(errno, std::system_category(), "failed to open graph file "+fileName);
-                }
+        }
 
-                std::getline(data, line);
-                double objValue=0;
+        std::getline(data, line);
+        double objValue=0;
 
 
         params.getControlOutput()<<"Read big graph" << std::endl;
-                std::vector<std::string> strings;
+        std::vector<std::string> strings;
 
         params.getControlOutput()<<"Reading vertices from file. "<<std::endl;
         params.writeControlOutput();
-                //Vertices that are not found have score=0. Appearance and disappearance cost are read here.
-                while (std::getline(data, line) && !line.empty()) {
+        //Vertices that are not found have score=0. Appearance and disappearance cost are read here.
+        while (std::getline(data, line) && !line.empty()) {
 
-                }
+        }
 
         params.getControlOutput()<<"Reading base edges from file. "<<std::endl;
         params.writeControlOutput();
-                size_t maxLabel=0;
-                while (std::getline(data, line) && !line.empty()) {
-
-            //std::cout<<line<<std::endl;
-                        strings = split(line, delim);
-
-                        unsigned int v = std::stoul(strings[0]);
-            //std::cout<<v<<std::endl;
-                        unsigned int w = std::stoul(strings[1]);
-            //std::cout<<w<<std::endl;
-                        size_t l0=vg.getGroupIndex(v);
-                        size_t l1=vg.getGroupIndex(w);
-            //std::cout<<std::to_string(l0)<<", "<<std::to_string(l1)<<std::endl;
-                        if(v>vg.getMaxVertex()||w>vg.getMaxVertex()) continue;
-                        //std::cout<<"edge "<<v<<" "<<w<<std::endl;
-
-                        if(l1-l0<=params.getMaxTimeGapComplete()){
-                                double score = std::stod(strings[2]);
-                                completeGraph.insertEdge(v,w);
-                                completeScore.push_back(score);
-                        }
-
-                }
+        size_t maxLabel=0;
+        while (std::getline(data, line) && !line.empty()) {
 
 
-                //objValue+=maxLabel*parameters.getInputCost()+maxLabel*parameters.getOutputCost();
+            strings = split(line, delim);
 
-                data.close();
-        }
-        catch (std::system_error& er) {
-                std::clog << er.what() << " (" << er.code() << ")" << std::endl;
+            unsigned int v = std::stoul(strings[0]);
+
+            unsigned int w = std::stoul(strings[1]);
+
+            size_t l0=vg.getGroupIndex(v);
+            size_t l1=vg.getGroupIndex(w);
+
+            if(v>vg.getMaxVertex()||w>vg.getMaxVertex()) continue;
+
+            if(l1-l0<=params.getMaxTimeGapComplete()){
+                double score = std::stod(strings[2]);
+                completeGraph.insertEdge(v,w);
+                completeScore.push_back(score);
+            }
 
         }
+
+
+        //objValue+=maxLabel*parameters.getInputCost()+maxLabel*parameters.getOutputCost();
+
+        data.close();
+    }
+    catch (std::system_error& er) {
+        std::clog << er.what() << " (" << er.code() << ")" << std::endl;
+
+    }
 }
 
 }//End of namespace
