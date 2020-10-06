@@ -684,11 +684,20 @@ std::unordered_map<size_t,std::vector<size_t>> doPathOptimization(Data<>& data,s
 
 
 template<class T=size_t>
-std::vector<std::vector<size_t>> solver_flow_only(DisjointParams<>& parameters)
+std::vector<std::vector<size_t>> solver_flow_only(DisjointParams<>& parameters,disjointPaths::CompleteStructure<>& cs)
 {
    parameters.getControlOutput()<<"Using simple flow solver"<<std::endl;
-    DisjointStructure<> DS(parameters);
-    Data<> data(DS);
+
+   size_t minT=1;
+   size_t maxT=cs.maxTime+1;  //plus one because DS solver excludes maxT
+   char delim=',';
+   DisjointStructure<> DS=DisjointStructure<>(parameters,delim,&cs,minT,maxT);
+
+   Data<> data(DS);
+
+
+    //DisjointStructure<> DS(parameters);
+    //Data<> data(DS);
     std::vector<double> solution=ilp_init_solution(data,true);
     std::vector<std::vector<size_t>> paths=data.pathsFromSolution(solution,false);
     //data.outputSolution(paths,false);
@@ -845,7 +854,7 @@ std::vector<std::vector<size_t>> solver_ilp_intervals(DisjointParams<>& paramete
     std::vector<std::vector<size_t>> paths;
 
     if(parameters.getMaxTimeLifted()==0){
-        paths=solver_flow_only(parameters);
+        paths=solver_flow_only(parameters,cs);
     }
     else{
 
@@ -991,13 +1000,19 @@ std::vector<std::vector<size_t>> solver_ilp_intervals(DisjointParams<>& paramete
 template<class T=size_t>
 std::vector<std::vector<size_t>> solver_ilp(DisjointParams<>& parameters,CompleteStructure<>& cs)
 {
-    if(parameters.getSmallIntervals()>0){
-        std::vector<std::vector<size_t>> paths=solver_ilp_intervals(parameters,cs);
+    if(parameters.getMaxTimeLifted()==0){
+        std::vector<std::vector<size_t>> paths=solver_flow_only(parameters,cs);
         return paths;
     }
     else{
-        std::vector<std::vector<size_t>> paths=solver_ilp_no_intervals(parameters,cs);
-        return paths;
+        if(parameters.getSmallIntervals()>0){
+            std::vector<std::vector<size_t>> paths=solver_ilp_intervals(parameters,cs);
+            return paths;
+        }
+        else{
+            std::vector<std::vector<size_t>> paths=solver_ilp_no_intervals(parameters,cs);
+            return paths;
+        }
     }
 
 }

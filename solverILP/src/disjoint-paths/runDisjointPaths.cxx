@@ -109,13 +109,13 @@ try
 
     disjointPaths::DisjointParams<size_t> disjointParameters(parametersParser.getParsedStrings());
     if(disjointParameters.isParametersSet()){
-        if(disjointParameters.getMaxTimeLifted()==0){
-            std::vector<std::vector<size_t>> paths=disjointPaths::solver_flow_only(disjointParameters);
-            disjointPaths::writeOutputToFile(paths,disjointParameters.getOutputFileName() + "-all-paths-FINAL.txt");
+//        if(disjointParameters.getMaxTimeLifted()==0){
+//            disjointPaths::CompleteStructure<> cs(disjointParameters);
+//            std::vector<std::vector<size_t>> paths=disjointPaths::solver_flow_only(disjointParameters,cs);
+//            disjointPaths::writeOutputToFile(paths,disjointParameters.getOutputFileName() + "-all-paths-FINAL.txt");
 
-		}
-		else{
-            std::cout<<"time file name check 0 "<<disjointParameters.getTimeFileName()<<std::endl;
+//		}
+//		else{
 
             disjointPaths::CompleteStructure<> cs(disjointParameters);
             std::vector<std::vector<size_t>> paths=disjointPaths::solver_ilp<size_t>(disjointParameters,cs);
@@ -129,7 +129,7 @@ try
 //				disjointPaths::CompleteStructure<> cs(configDisjoint);
 //                disjointPaths::solver_ilp_intervals<size_t>(configDisjoint,cs);
 //			}
-		}
+        //}
 	}
 	else{
 		std::cout<<"Problem with parameter settings. No computation done."<<std::endl;
