@@ -75,6 +75,14 @@ public:
 	}
 
 
+    void setGraph(const andres::graph::Digraph<>& newGraph)  {
+        graph_=newGraph;
+    }
+
+    void setGraphLifted(const andres::graph::Digraph<>& newGraphLifted)  {
+        graphLifted_=newGraphLifted;
+    }
+
 	std::vector<std::vector<bool>>* getPReachable(){
 		return &desc;
 	}
@@ -116,10 +124,18 @@ public:
 		return edgeScore;
 	}
 
+    void setEdgesScore(const std::vector<double>& beScore){
+        edgeScore=beScore;
+    }
+
+
 	const std::vector<double>& getLiftedEdgesScore() {
 			return liftedEdgeScore;
 	}
 
+    void setLiftedEdgesScore(const std::vector<double>& leScore){
+        liftedEdgeScore=leScore;
+    }
 
 
 	const std::vector<double>& getVerticesScore() {
@@ -129,6 +145,8 @@ public:
 	double getLiftedEdgeScore(size_t e) const {
 		return liftedEdgeScore[e];
 	}
+
+
 
 	double getLiftedEdgeScore(size_t v0,size_t v1) const {
 		auto findEdge=graphLifted_.findEdge(v0,v1);
@@ -193,7 +211,7 @@ private:
 	//void persistentEdges();
 	void createKnnBaseGraph();
 
-	void keepFractionOfLifted();
+    //void keepFractionOfLifted();
 
 	bool useTimeFrames;
 
@@ -309,9 +327,7 @@ parameters(configParameters)
 			createKnnBaseGraph();
 
 			if(parameters.getMaxTimeLifted()>0){
-
-					keepFractionOfLifted();
-
+                 keepFractionOfLifted(*this,parameters);
 			}
 		}
 		else{
@@ -726,159 +742,159 @@ inline void DisjointStructure<T>::createKnnBaseGraph(){
 }
 
 
-template<class T>
-inline void DisjointStructure<T>::keepFractionOfLifted(){
+//template<class T>
+//inline void DisjointStructure<T>::keepFractionOfLifted(){
 
 
-    parameters.getControlOutput()<<"Sparsify lifted graph"<<std::endl;
-    parameters.writeControlOutput();
-    //TODO run automaticLifted to find candidates first
+//    parameters.getControlOutput()<<"Sparsify lifted graph"<<std::endl;
+//    parameters.writeControlOutput();
+//    //TODO run automaticLifted to find candidates first
 
-    double negMaxValue=0;
-    double posMinValue=0;
-    bool useAdaptive=false;
-    //TODO adaptive lifted threshold in config file
-    std::vector<double> newLiftedCosts;
+//    double negMaxValue=0;
+//    double posMinValue=0;
+//    bool useAdaptive=false;
+//    //TODO adaptive lifted threshold in config file
+//    std::vector<double> newLiftedCosts;
 
-    andres::graph::Digraph<> tempGraphLifted=(graph_.numberOfVertices());
-
-
-    if(useAdaptive){
-
-        double fPositive=parameters.getPositiveThresholdLifted();
-        double fNegative=parameters.getNegativeThresholdLifted();
-
-        assert(fNegative>=0&&fNegative<=1);
-        assert(fPositive>=0&&fPositive<=1);
-
-        std::priority_queue<double> allPositive;
-        std::priority_queue<double> allNegative;
-        for (int i = 0; i < graphLifted_.numberOfEdges(); ++i) {
-            double cost=getLiftedEdgeScore(i);
-            if(cost<0){
-                allNegative.push(-cost);
-            }
-            else{
-                allPositive.push(cost);
-            }
-        }
-
-        double negativeToKeep=fNegative*allNegative.size();
-        double positiveToKeep=fPositive*allPositive.size();
-        int negNumber=int(round(negativeToKeep));
-        int posNumber=int(round(positiveToKeep));
-
-        for (int i = 0; i < negNumber; ++i) {
-            allNegative.pop();
-        }
-        for (int i = 0; i < posNumber; ++i) {
-            allPositive.pop();
-        }
+//    andres::graph::Digraph<> tempGraphLifted=(graph_.numberOfVertices());
 
 
+//    if(useAdaptive){
 
-        if(!allNegative.empty()){
-            negMaxValue=-allNegative.top();
-        }
+//        double fPositive=parameters.getPositiveThresholdLifted();
+//        double fNegative=parameters.getNegativeThresholdLifted();
 
-        parameters.getControlOutput()<<"max negative lifted "<<negMaxValue<<std::endl;
+//        assert(fNegative>=0&&fNegative<=1);
+//        assert(fPositive>=0&&fPositive<=1);
 
-        if(!allPositive.empty()){
-            posMinValue=allPositive.top();
-        }
+//        std::priority_queue<double> allPositive;
+//        std::priority_queue<double> allNegative;
+//        for (int i = 0; i < graphLifted_.numberOfEdges(); ++i) {
+//            double cost=getLiftedEdgeScore(i);
+//            if(cost<0){
+//                allNegative.push(-cost);
+//            }
+//            else{
+//                allPositive.push(cost);
+//            }
+//        }
 
-        parameters.getControlOutput()<<"min positive lifted "<<posMinValue<<std::endl;
-        parameters.writeControlOutput();
+//        double negativeToKeep=fNegative*allNegative.size();
+//        double positiveToKeep=fPositive*allPositive.size();
+//        int negNumber=int(round(negativeToKeep));
+//        int posNumber=int(round(positiveToKeep));
 
-    }
-    else{
-        negMaxValue=parameters.getNegativeThresholdLifted();
-        posMinValue=parameters.getPositiveThresholdLifted();
-    }
-
-
-    std::unordered_map<size_t,std::set<size_t>> liftedEdges;
-    for (int v = 0; v < graphLifted_.numberOfVertices()-2; ++v) {
-        std::unordered_set<size_t> alternativePath;
-        for (int i = 0; i < graph_.numberOfEdgesFromVertex(v); ++i) {
-            size_t w=graph_.vertexFromVertex(v,i);
-            for(size_t u:reachable[w]){
-                if(u!=w) alternativePath.insert(u);
-            }
-        }
-        for (int i = 0; i < graphLifted_.numberOfEdgesFromVertex(v); ++i) {
-            size_t w=graphLifted_.vertexFromVertex(v,i);
-            if(w!=t_){
-                if(alternativePath.count(w)>0) liftedEdges[v].insert(w);
-
-            }
-
-        }
-    }
-
-
-    parameters.getControlOutput()<<"done"<<std::endl;
-    parameters.writeControlOutput();
-
-
-    for (int i = 0; i < graphLifted_.numberOfEdges(); ++i) {
-        size_t v0=graphLifted_.vertexOfEdge(i,0);
-        size_t v1=graphLifted_.vertexOfEdge(i,1);
-        int l0=vertexGroups.getGroupIndex(v0);
-        int l1=vertexGroups.getGroupIndex(v1);
-        double cost=getLiftedEdgeScore(i);
-        bool goodCost=(cost<=negMaxValue)||(cost>=posMinValue);
-        //if(isReachable(v0,v1)){
-        if(isReachableNew(v0,v1)){
-
-            int timeGapDiff=l1-l0-parameters.getDenseTimeLifted();
-            bool timeConstraint=l1-l0<=parameters.getDenseTimeLifted()||((l1-l0)<=parameters.getMaxTimeLifted()&&(timeGapDiff%parameters.getLongerIntervalLifted())==0);
-            //int modulo=timeGapDiff%parameters.getLongerIntervalLifted();
-            //if(l1-l0<=parameters.getDenseTimeLifted()||((l1-l0)<=parameters.getMaxTimeLifted()&&(timeGapDiff%parameters.getLongerIntervalLifted())==0)){
-            if(timeConstraint&&goodCost){
-                if(liftedEdges[v0].count(v1)>0){
-                    tempGraphLifted.insertEdge(v0,v1);
-                    newLiftedCosts.push_back(cost);
-                }
-                else{
-                    auto edgeTest=graph_.findEdge(v0,v1);
-                    if(edgeTest.first){
-                        edgeScore[edgeTest.second]+=cost;  //Compensate that the lifted edge has been removed
-                    }
-                    //						else{
-                    //							throw std::runtime_error("Error in lifted graph sparsification.");
-                    //						}
-                }
-
-            }
-        }
-
-    }
+//        for (int i = 0; i < negNumber; ++i) {
+//            allNegative.pop();
+//        }
+//        for (int i = 0; i < posNumber; ++i) {
+//            allPositive.pop();
+//        }
 
 
 
+//        if(!allNegative.empty()){
+//            negMaxValue=-allNegative.top();
+//        }
+
+//        parameters.getControlOutput()<<"max negative lifted "<<negMaxValue<<std::endl;
+
+//        if(!allPositive.empty()){
+//            posMinValue=allPositive.top();
+//        }
+
+//        parameters.getControlOutput()<<"min positive lifted "<<posMinValue<<std::endl;
+//        parameters.writeControlOutput();
+
+//    }
+//    else{
+//        negMaxValue=parameters.getNegativeThresholdLifted();
+//        posMinValue=parameters.getPositiveThresholdLifted();
+//    }
+
+
+//    std::unordered_map<size_t,std::set<size_t>> liftedEdges;
+//    for (int v = 0; v < graphLifted_.numberOfVertices()-2; ++v) {
+//        std::unordered_set<size_t> alternativePath;
+//        for (int i = 0; i < graph_.numberOfEdgesFromVertex(v); ++i) {
+//            size_t w=graph_.vertexFromVertex(v,i);
+//            for(size_t u:reachable[w]){
+//                if(u!=w) alternativePath.insert(u);
+//            }
+//        }
+//        for (int i = 0; i < graphLifted_.numberOfEdgesFromVertex(v); ++i) {
+//            size_t w=graphLifted_.vertexFromVertex(v,i);
+//            if(w!=t_){
+//                if(alternativePath.count(w)>0) liftedEdges[v].insert(w);
+
+//            }
+
+//        }
+//    }
+
+
+//    parameters.getControlOutput()<<"done"<<std::endl;
+//    parameters.writeControlOutput();
+
+
+//    for (int i = 0; i < graphLifted_.numberOfEdges(); ++i) {
+//        size_t v0=graphLifted_.vertexOfEdge(i,0);
+//        size_t v1=graphLifted_.vertexOfEdge(i,1);
+//        int l0=vertexGroups.getGroupIndex(v0);
+//        int l1=vertexGroups.getGroupIndex(v1);
+//        double cost=getLiftedEdgeScore(i);
+//        bool goodCost=(cost<=negMaxValue)||(cost>=posMinValue);
+//        //if(isReachable(v0,v1)){
+//        if(isReachableNew(v0,v1)){
+
+//            int timeGapDiff=l1-l0-parameters.getDenseTimeLifted();
+//            bool timeConstraint=l1-l0<=parameters.getDenseTimeLifted()||((l1-l0)<=parameters.getMaxTimeLifted()&&(timeGapDiff%parameters.getLongerIntervalLifted())==0);
+//            //int modulo=timeGapDiff%parameters.getLongerIntervalLifted();
+//            //if(l1-l0<=parameters.getDenseTimeLifted()||((l1-l0)<=parameters.getMaxTimeLifted()&&(timeGapDiff%parameters.getLongerIntervalLifted())==0)){
+//            if(timeConstraint&&goodCost){
+//                if(liftedEdges[v0].count(v1)>0){
+//                    tempGraphLifted.insertEdge(v0,v1);
+//                    newLiftedCosts.push_back(cost);
+//                }
+//                else{
+//                    auto edgeTest=graph_.findEdge(v0,v1);
+//                    if(edgeTest.first){
+//                        edgeScore[edgeTest.second]+=cost;  //Compensate that the lifted edge has been removed
+//                    }
+//                    //						else{
+//                    //							throw std::runtime_error("Error in lifted graph sparsification.");
+//                    //						}
+//                }
+
+//            }
+//        }
+
+//    }
 
 
 
-    liftedEdgeScore=newLiftedCosts;
 
-    graphLifted_=tempGraphLifted;
 
-    parameters.getControlOutput()<<"Left "<<newLiftedCosts.size()<<" lifted edges."<<std::endl;
-    parameters.writeControlOutput();
 
-    if(graphLifted_.numberOfEdges()!=newLiftedCosts.size()){
+//    liftedEdgeScore=newLiftedCosts;
 
-        parameters.getControlOutput()<<"lifted edge number mismatch, lifted graph: "<<graphLifted_.numberOfEdges()<<", cost vector "<<newLiftedCosts.size()<<std::endl;
-    }
-    else{
+//    graphLifted_=tempGraphLifted;
 
-        parameters.getControlOutput()<<"lifted edge number and lifted graph size match "<<std::endl;
+//    parameters.getControlOutput()<<"Left "<<newLiftedCosts.size()<<" lifted edges."<<std::endl;
+//    parameters.writeControlOutput();
 
-    }
-    parameters.writeControlOutput();
+//    if(graphLifted_.numberOfEdges()!=newLiftedCosts.size()){
 
-}
+//        parameters.getControlOutput()<<"lifted edge number mismatch, lifted graph: "<<graphLifted_.numberOfEdges()<<", cost vector "<<newLiftedCosts.size()<<std::endl;
+//    }
+//    else{
+
+//        parameters.getControlOutput()<<"lifted edge number and lifted graph size match "<<std::endl;
+
+//    }
+//    parameters.writeControlOutput();
+
+//}
 
 
 
