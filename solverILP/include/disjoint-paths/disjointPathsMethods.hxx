@@ -250,8 +250,171 @@ template<class T,class PAR>
 
 
 
+
+
+
+ template<class INSTANCE, class PAR>
+   void createKnnBaseGraph(INSTANCE& instance,  PAR& parameters){
+        parameters.getControlOutput()<<"Sparsify base graph"<<std::endl;
+        parameters.writeControlOutput();
+
+        std::vector<double> newBaseCosts;
+        //std::vector<size_t> inOutEdges;
+        size_t k=parameters.getKnnK();
+        //std::vector<size_t> goodLongEdges;
+
+
+        const andres::graph::Digraph<>& graph_=instance.getGraph();
+        const size_t t_=instance.getTerminalNode();
+        const size_t s_=instance.getSourceNode();
+        const VertexGroups<size_t>& vg=instance.getVertexGroups();
+        const std::vector<double>& edgeScore=instance.getEdgesScore();
+        andres::graph::Digraph<> tempGraph(graph_.numberOfVertices());
+
+
+
+        std::vector<bool> finalEdges(graph_.numberOfEdges(),false);
+        for (int v0 = 0; v0 < graph_.numberOfVertices(); ++v0) {
+            std::unordered_map<int,std::list<size_t>> edgesToKeep;
+            size_t l0=vg.getGroupIndex(v0);
+            for (size_t ne = 0; ne < graph_.numberOfEdgesFromVertex(v0); ++ne) {
+                size_t e=graph_.edgeFromVertex(v0,ne);
+                size_t v1=graph_.vertexFromVertex(v0,ne);
+    //			std::cout<<"edge "<<e<<": "<<v0<<","<<v1<<": "<<problemGraph.getEdgeScore(e)<<std::endl;
+                if(v0==s_||v1==t_){
+                    //tempGraph.insertEdge(v0,v1);
+                    //newBaseCosts.push_back(edgeScore[e]);
+                    finalEdges[e]=true;
+                }
+                else{
+                    size_t l1=vg.getGroupIndex(v1);
+                    size_t gap=l1-l0;
+                    if(gap<=parameters.getMaxTimeBase()){
+                    //if(gap<=parameters.getKnnTimeGap()){
+                        //gap=std::min(parameters.getKnnTimeGap()+1,gap);
+                        double cost=edgeScore[e];
+                        if(edgesToKeep.count(gap)>0){
+                            std::list<size_t>& smallList=edgesToKeep[gap];
+                            auto it=smallList.begin();
+                            double bsf=edgeScore[*it];
+                            //std::cout<<"edge "<<e<<": "<<v0<<","<<v1<<": "<<bsf<<std::endl;
+                            while(bsf>cost&&it!=smallList.end()){
+                                it++;
+                                size_t index=*it;
+                                if(it!=smallList.end()){
+                                    bsf=edgeScore[index];
+                                    //	std::cout<<"edge "<<e<<": "<<v0<<","<<v1<<": "<<bsf<<std::endl;
+                                }
+                            }
+                            if(it!=smallList.begin()){
+                                smallList.insert(it,e);
+                                if(smallList.size()>k) smallList.pop_front();
+                            }
+                            else if(smallList.size()<k){
+                                smallList.push_front(e);
+                            }
+                        }
+                        else{
+                            edgesToKeep[gap].push_front(e);
+                        }
+                    }
+    //				else if(gap<=parameters.getMaxTimeBase()){
+    //					if(getEdgeScore(e)<=parameters.getBaseUpperThreshold()){
+    //						//tempGraph.insertEdge(v0,v1);
+    //						//newBaseCosts.push_back(getEdgeScore(e));
+    //						finalEdges[e]=true;
+    //					}
+    //
+    //				}
+                }
+            }
+            //std::cout.precision(4);
+            double bsf=0;
+            for (int gap = 0; gap <= parameters.getKnnTimeGap(); ++gap) {
+                if(edgesToKeep.count(gap)>0){
+                    auto& smallList=edgesToKeep[gap];
+                    for(size_t e:smallList){
+                        finalEdges[e]=true;
+                        if(edgeScore[e]<bsf){
+                            bsf=edgeScore[e];
+                        }
+                    }
+                }
+            }
+
+            bool onlyImproving=parameters.isRequireImproving();
+            for (int gap =  parameters.getKnnTimeGap()+1;gap<=parameters.getMaxTimeBase(); ++gap) {
+                if(edgesToKeep.count(gap)>0){
+                    if(onlyImproving){
+                        double currentBsf=0;
+                        auto& smallList=edgesToKeep[gap];
+                        for(size_t e:smallList){
+                            double score=edgeScore[e];
+                            if(score<bsf&&score<=parameters.getBaseUpperThreshold()){
+                                finalEdges[e]=true;
+                                if(score<currentBsf){
+                                    currentBsf=score;
+                                }
+                            }
+                        }
+                        bsf=std::min(bsf,currentBsf);
+                    }
+                    else{
+                        auto& smallList=edgesToKeep[gap];
+                        for(size_t e:smallList){
+                            double score=edgeScore[e];
+                            if(score<=parameters.getBaseUpperThreshold()){
+                                finalEdges[e]=true;
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+
+        for (int e = 0; e < graph_.numberOfEdges(); ++e) {
+            if(finalEdges[e]){
+                size_t v0=graph_.vertexOfEdge(e,0);
+                size_t v1=graph_.vertexOfEdge(e,1);
+                tempGraph.insertEdge(v0,v1);
+                newBaseCosts.push_back(edgeScore[e]);
+            }
+        }
+
+        if(newBaseCosts.size()!=tempGraph.numberOfEdges()){
+            throw std::runtime_error("Error in base graph sparsification.");
+        }
+
+
+
+        instance.setGraph(tempGraph);
+        instance.setEdgesScore(newBaseCosts);
+
+
+        if(graph_.numberOfEdges()!=newBaseCosts.size()){
+            parameters.getControlOutput()<<"edge number mismatch, graph: "<<graph_.numberOfEdges()<<", cost vector "<<newBaseCosts.size()<<std::endl;
+            parameters.writeControlOutput();
+
+        }
+        else{
+
+            parameters.getControlOutput()<<"edge number and graph size match "<<std::endl;
+            parameters.writeControlOutput();
+        }
+
+        parameters.getControlOutput()<<"Left "<<newBaseCosts.size()<<" base edges"<<std::endl;
+        parameters.writeControlOutput();
+
+    }
+
+
+
+
+
+
     template<class INSTANCE, class PAR>
-    inline void keepFractionOfLifted(INSTANCE& instance,  PAR& parameters){
+    void keepFractionOfLifted(INSTANCE& instance,  PAR& parameters){
 
 
         parameters.getControlOutput()<<"Sparsify lifted graph"<<std::endl;
