@@ -45,15 +45,15 @@ public:
 
 
 	DisjointStructure(disjointPaths::DisjointParams<>& configParameters,char delim=',',CompleteStructure<>* cs=0,size_t minTime=0,size_t maxTime=0);
-	bool isReachable(size_t i,size_t j) const{
-		if(i==t_) return false;  //Assume no path from the terminal node
-		if(desc.size()==0) return true;
-		return desc[i][j];
+//	bool isReachable(size_t i,size_t j) const{
+//		if(i==t_) return false;  //Assume no path from the terminal node
+//		if(desc.size()==0) return true;
+//		return desc[i][j];
 
 
-	}
+//	}
 
-	bool isReachableNew(size_t i,size_t j) const{
+    bool isReachable(size_t i,size_t j) const{
 		if(i==t_) return false;  //Assume no path from the terminal node
 		if(reachable.size()==0) return true;
 		return reachable[i].count(j)>0;
@@ -83,11 +83,11 @@ public:
         graphLifted_=newGraphLifted;
     }
 
-	std::vector<std::vector<bool>>* getPReachable(){
-		return &desc;
-	}
+//	std::vector<std::vector<bool>>* getPReachable(){
+//		return &desc;
+//	}
 
-	std::vector<std::unordered_set<size_t>>* getPReachableNew(){
+    std::vector<std::unordered_set<size_t>>* getPReachable(){
 		return &reachable;
 	}
 
@@ -197,7 +197,7 @@ private:
 	std::vector<double> vertexScore;
 	std::vector<double> edgeScore;
 	std::vector<double> liftedEdgeScore;
-    std::vector<std::vector<bool>> desc;  //TODO remove
+    //std::vector<std::vector<bool>> desc;  //TODO remove
 	std::vector<std::unordered_set<size_t>> reachable;
 
 

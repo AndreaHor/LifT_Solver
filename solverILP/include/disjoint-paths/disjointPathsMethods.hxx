@@ -342,32 +342,16 @@ template<class T,class PAR>
                 }
             }
 
-            bool onlyImproving=parameters.isRequireImproving();
             for (int gap =  parameters.getKnnTimeGap()+1;gap<=parameters.getMaxTimeBase(); ++gap) {
                 if(edgesToKeep.count(gap)>0){
-                    if(onlyImproving){
-                        double currentBsf=0;
-                        auto& smallList=edgesToKeep[gap];
-                        for(size_t e:smallList){
-                            double score=edgeScore[e];
-                            if(score<bsf&&score<=parameters.getBaseUpperThreshold()){
-                                finalEdges[e]=true;
-                                if(score<currentBsf){
-                                    currentBsf=score;
-                                }
-                            }
-                        }
-                        bsf=std::min(bsf,currentBsf);
-                    }
-                    else{
-                        auto& smallList=edgesToKeep[gap];
-                        for(size_t e:smallList){
-                            double score=edgeScore[e];
-                            if(score<=parameters.getBaseUpperThreshold()){
-                                finalEdges[e]=true;
-                            }
+                    auto& smallList=edgesToKeep[gap];
+                    for(size_t e:smallList){
+                        double score=edgeScore[e];
+                        if(score<=parameters.getBaseUpperThreshold()){
+                            finalEdges[e]=true;
                         }
                     }
+
                 }
             }
 
@@ -429,7 +413,7 @@ template<class T,class PAR>
         const andres::graph::Digraph<>& graph_=instance.getGraph();
         const andres::graph::Digraph<>& graphLifted_=instance.getGraphLifted();
         const std::vector<double>& liftedCosts=instance.getLiftedEdgesScore();
-        const std::vector<std::unordered_set<size_t>>* pReachable =instance.getPReachableNew();
+        const std::vector<std::unordered_set<size_t>>* pReachable =instance.getPReachable();
         const std::vector<std::unordered_set<size_t>>& reachable=*pReachable;
         const size_t t_=instance.getTerminalNode();
         const VertexGroups<size_t>& vg=instance.getVertexGroups();
@@ -477,7 +461,7 @@ template<class T,class PAR>
             double cost=liftedCosts.at(i);
             bool goodCost=(cost<=negMaxValue)||(cost>=posMinValue);
             //if(isReachable(v0,v1)){
-            if(instance.isReachableNew(v0,v1)&&goodCost){
+            if(instance.isReachable(v0,v1)&&goodCost){
 
                 int timeGapDiff=l1-l0-parameters.getDenseTimeLifted();
                 bool timeConstraint=l1-l0<=parameters.getDenseTimeLifted()||((l1-l0)<=parameters.getMaxTimeLifted()&&(timeGapDiff%parameters.getLongerIntervalLifted())==0);

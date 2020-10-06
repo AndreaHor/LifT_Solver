@@ -62,7 +62,7 @@ public:
 		costs.insert(costs.end(),disjointStructure.getLiftedEdgesScore().begin(),disjointStructure.getLiftedEdgesScore().end());
 
 
-        pReachable=disjointStructure.getPReachableNew();
+        pReachable=disjointStructure.getPReachable();
 
 
 
