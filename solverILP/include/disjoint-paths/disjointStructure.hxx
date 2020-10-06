@@ -206,12 +206,7 @@ private:
 	andres::graph::Digraph<> graphLifted_;
 
 
-	void readGraph(std::ifstream& data,size_t maxVertex,char delim);
 	void readGraphWithTime(size_t minTime,size_t maxTime,CompleteStructure<>* cs);
-	//void persistentEdges();
-//	void createKnnBaseGraph();
-
-    //void keepFractionOfLifted();
 
 	bool useTimeFrames;
 
@@ -229,71 +224,11 @@ parameters(configParameters)
 
 	useTimeFrames=parameters.isRestrictFrames()||parameters.isSparsify();
 	size_t maxVertex;
-	if(cs==0){
-	//	if(useTimeFrames){
-            vertexGroups=VertexGroups<size_t>(configParameters);
-			maxVertex=vertexGroups.getMaxVertex();
-//		}
-//		else{
-//			maxVertex=std::numeric_limits<size_t>::max();
-//		}
-		std::ifstream graphFile;
-		try{
-			graphFile.open(parameters.getGraphFileName());
-			if(!graphFile){
-                throw std::system_error(errno, std::system_category(), "failed to open graph file "+parameters.getGraphFileName());
-			}
-			readGraph(graphFile,maxVertex,delim);
-			if(!parameters.isAutomaticLifted()){
-				//std::vector<std::vector<bool>> secOrderDesc=automaticLifted(graph_);
-                parameters.getControlOutput()<<"Reading lifted edges from file."<<std::endl;
-                parameters.writeControlOutput();
-				std::string line;
-				std::vector<std::string> strings;
-				while (std::getline(graphFile, line) && !line.empty()) {
-					strings = split(line, delim);
-					if (strings.size() < 3) {
-						throw std::runtime_error(
-								std::string("Edge vertices and score expected on every edge line "));
-					}
-
-					unsigned int v = std::stoul(strings[0]);
-					unsigned int w = std::stoul(strings[1]);
-					if(v>=graph_.numberOfVertices()-2||w>=graph_.numberOfVertices()-2) continue;
-					//if(isReachable(v,w)&&v!=s_&&w!=t_&&v!=t_&&w!=s_){
-					if(isReachableNew(v,w)&&v!=s_&&w!=t_&&v!=t_&&w!=s_){
-						double score = std::stod(strings[2]);
-						//if(secOrderDesc[v][w]){
-						auto edgeTest=graphLifted_.findEdge(v,w);
-						if(!edgeTest.first){
-							graphLifted_.insertEdge(v, w);
-							liftedEdgeScore.push_back(score);
-						}
-						else{
-							liftedEdgeScore[edgeTest.second]=score;
-						}
-					}
-				}
-
-			}
-			graphFile.close();
-		}
-		catch (std::system_error& er) {
-			std::clog << er.what() << " (" << er.code() << ")" << std::endl;
-
-		}
-	}
-	else{
-		readGraphWithTime(minTime,maxTime,cs);
-
-	}
 
 
-	//desc=disjointPaths::initReachable(graph_);
+    readGraphWithTime(minTime,maxTime,cs);
 
-	//std::vector<std::vector<bool>> secOrderDesc=automaticLifted(graph_);
 
-	//TODO ensure that the lifted edges are added only if the reachability and non uniqueness is satisfied!
 
 	if(graph_.numberOfVertices()>2){
 
@@ -347,6 +282,7 @@ parameters(configParameters)
 		else{
 			//desc=initReachable(graph_,parameters);
 			reachable=initReachableSet(graph_,parameters);
+            //TODO remove redundant edges from lifted graph
 		}
 	}
 }
@@ -452,134 +388,6 @@ inline void DisjointStructure<T>::readGraphWithTime(size_t minTime,size_t maxTim
 	}
 
 }
-
-
-
-
-
-
-
-template<class T>
-inline void DisjointStructure<T>::readGraph(std::ifstream& data,size_t maxVertex,char delim){
-	std::string line;
-	//	char delim = ' ';
-	size_t lineCounter=0;
-	std::getline(data, line);
-	lineCounter++;
-
-    parameters.getControlOutput()<<"called read graph" << std::endl;
-    parameters.writeControlOutput();
-	std::vector<std::string> strings = split(line, delim);
-	size_t numberOfVertices;
-
-	if (strings.size() == 1) {
-		if(parameters.isRestrictFrames()){
-			numberOfVertices=maxVertex+3;
-		}
-		else{
-			numberOfVertices = stoul(strings[0]);
-			numberOfVertices += 2;  //to include s and t in the end of the list
-		}
-		s_ = numberOfVertices - 2;
-		t_ = numberOfVertices - 1;
-
-	} else {
-		std::string str="first row must contain 1 number, detected ";
-		str+=std::to_string(strings.size());
-		str+="numbers";
-		throw std::runtime_error(str);
-	}
-
-
-
-	graphLifted_ = andres::graph::Digraph<>(numberOfVertices);
-	graph_ = andres::graph::Digraph<>(numberOfVertices);
-	std::vector<double> inputCosts(numberOfVertices-2,parameters.getInputCost());
-	std::vector<double> outputCosts(numberOfVertices-2,parameters.getOutputCost());
-
-
-	// std::vector<std::pair<size_t,siz  Data<>e_t> > liftedEdges;
-	vertexScore = std::vector<double>(numberOfVertices, 0);
-
-
-    parameters.getControlOutput()<<"Reading vertices from file. "<<std::endl;
-    parameters.writeControlOutput();
-	//Vertices that are not found have score=0. Appearance and disappearance cost are read here.
-	bool vertexAndInOutScore=false;
-	while (std::getline(data, line) && !line.empty()) {
-		if(vertexAndInOutScore){ //By default disabled in the final version
-			lineCounter++;
-			strings = split(line, delim);
-			if (strings.size() < 2) {
-				throw std::runtime_error(
-						std::string("Vertex and its score expected"));
-			}
-
-
-			unsigned int v = std::stoul(strings[0]);
-			if(v>graph_.numberOfVertices()-3) continue;
-			double score = std::stod(strings[1]);
-			vertexScore[v] = score;
-
-			if(strings.size()==4){
-				inputCosts[v]=std::stod(strings[2]);
-				outputCosts[v]=std::stod(strings[3]);
-			}
-		}
-
-	}
-
-	for (int v = 0; v < numberOfVertices-2; ++v) {
-		graph_.insertEdge(s_,v);
-		edgeScore.push_back(inputCosts[v]);
-		graph_.insertEdge(v,t_);
-		edgeScore.push_back(outputCosts[v]);
-	}
-
-	size_t maxGap=parameters.getMaxTimeGapComplete();
-
-
-    parameters.getControlOutput()<<"Reading base edges from file. "<<std::endl;
-    parameters.writeControlOutput();
-	while (std::getline(data, line) && !line.empty()) {
-		lineCounter++;
-		strings = split(line, delim);
-		if (strings.size() < 3) {
-			throw std::runtime_error(
-					std::string("Edge vertices and score expected, line "+std::to_string(lineCounter)));
-		}
-
-		unsigned int v = std::stoul(strings[0]);
-		unsigned int w = std::stoul(strings[1]);
-
-		if(v>numberOfVertices-3||w>numberOfVertices-3) continue;
-
-		size_t gv=vertexGroups.getGroupIndex(v);
-		size_t gw=vertexGroups.getGroupIndex(w);
-		if(gw-gv>maxGap) continue;
-
-		//if(v>=graph_.numberOfVertices()-2||w>=graph_.numberOfVertices()-2) continue;
-		double score = std::stod(strings[2]);
-		auto edgeTest=graph_.findEdge(v,w);
-
-		if(!edgeTest.first){  //if the edge does not exist
-			graph_.insertEdge(v, w);
-			edgeScore.push_back(score);
-
-		}
-		else{  //if the edge already exists, only update the score
-			edgeScore[edgeTest.second]=score;
-
-		}
-
-
-	}
-
-}
-
-
-
-
 
 
 
