@@ -9,7 +9,7 @@
 #include "disjoint-paths/disjointParams.hxx"
 #include "disjoint-paths/disjointPathsMethods.hxx"
 #include "disjoint-paths/ilp/solver-disjoint-ilp.hxx"
-
+#include <string>
 namespace py = pybind11;
 
 
@@ -20,7 +20,7 @@ PYBIND11_MODULE(disjointPathsPy, m) {
     py::class_<disjointPaths::ParametersParser>(m,"ParametersParser")
             .def(py::init<>())
             .def("get_parsed_params",&disjointPaths::ParametersParser::getParsedStrings,"getting the parsed strings from parser")
-            .def("init_from_file",&disjointPaths::ParametersParser::initFromFile,"Parses parameters from a file");
+            .def("init_from_file", py::overload_cast<std::string&>(&disjointPaths::ParametersParser::initFromFile),"Parses parameters from a file");
            // .def("init_from_stream",&disjointPaths::ParametersParser::initFromStream<std::stringstream>,"Parses parameters from a stream");
 
 

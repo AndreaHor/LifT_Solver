@@ -15,7 +15,7 @@
 #include <vector>
 #include <map>
 #include <limits>
-#include"disjoint-paths/parametersconstructor.hxx"
+#include"disjoint-paths/parametersParser.hxx"
 
 namespace disjointPaths {
 
