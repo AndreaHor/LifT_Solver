@@ -38,6 +38,7 @@ paramsMap["GUROBI_REL_GAP"]="0"
 paramsMap["GUROBI_REL_GAP_TRACKLET"]="0"
 paramsMap["DEBUG_OUTPUT_FILES"]="0"
 paramsMap["CONTROL_OUTPUT_FILES"]="0"
+paramsMap["CONTROL_STD_OUTPUT"]="0"
 paramsMap["ALL_BASE_TRACKLET"]="1"
 paramsMap["OPTIMIZE_PATHS"]="0"
 paramsMap["MAX_TIMEGAP_BASE"]="60"
@@ -82,7 +83,7 @@ paths=ldpPy.solve_ilp(params,completeGraphStructure)
 #Saving the resulting paths into an output file. 
 ldpPy.write_output_to_file(paths,"../data/exampleSolverILP/my_python_output.txt")
 
-for path in paths:
-  for v in path:
-    print(v, end =" ")
-  print("")
+#for path in paths:
+#  for v in path:
+#    print(v, end =" ")
+#  print("")

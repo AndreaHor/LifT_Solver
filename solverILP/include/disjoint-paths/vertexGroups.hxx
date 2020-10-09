@@ -129,8 +129,8 @@ inline void VertexGroups<T>::initFromVector(const std::vector<size_t>& verticesI
          assert(vToGroup[groups[i][j]]==i);
         }
     }
-    std::cout<<"max vertex "<<maxVertex<<std::endl;
-    std::cout<<"max time "<<maxTime<<std::endl;
+//    std::cout<<"max vertex "<<maxVertex<<std::endl;
+//    std::cout<<"max time "<<maxTime<<std::endl;
 
 
 
@@ -155,7 +155,7 @@ inline void VertexGroups<T>::initFromFile(const std::string& fileName, const PAR
     size_t maxTimeToRead=parameters.getMaxTimeFrame();
 
 
-    std::cout<<"time file name check 3 "<<fileName<<std::endl;
+
     std::ifstream timeData;
     try{
         timeData.open(fileName);

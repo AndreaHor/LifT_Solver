@@ -479,7 +479,7 @@ inline DisjointParams<T>::DisjointParams(std::map<std::string,std::string>& para
     else{
         maxTimeFrame=std::numeric_limits<size_t>::max();
     }
-    std::cout<<"max time gap "<<maxTimeFrame<<std::endl;
+    controlOutput<<"max time gap "<<maxTimeFrame<<std::endl;
     if(controlOutputFiles) paramsFile<<"max time gap "<<maxTimeFrame<<std::endl;
 
     if(parameters.count("INPUT_COST")>0){

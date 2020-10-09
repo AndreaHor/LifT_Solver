@@ -51,9 +51,9 @@ public:
 {
         VertexGroups<>& vg=*pVertexGroups;
         maxTime=vg.getMaxTime();
-        std::cout<<"max time "<<maxTime<<std::endl;
+       // std::cout<<"max time "<<maxTime<<std::endl;
         completeGraph=andres::graph::Digraph<>(vg.getMaxVertex()+1);
-        std::cout<<"cg vertices "<<completeGraph.numberOfVertices()<<std::endl;
+       // std::cout<<"cg vertices "<<completeGraph.numberOfVertices()<<std::endl;
         deleteVG=false;
 
 

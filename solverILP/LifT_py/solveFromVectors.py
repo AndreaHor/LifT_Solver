@@ -75,7 +75,7 @@ paths=ldpPy.solve_ilp(params,completeGraphStructure)
 #Saving the resulting paths into an output file. 
 ldpPy.write_output_to_file(paths,"../data/exampleSolverILP/my_python_output_vect.txt")
 
-for path in paths:
-  for v in path:
-    print(v, end =" ")
-  print("")
+#for path in paths:
+#  for v in path:
+#    print(v, end =" ")
+#  print("")
