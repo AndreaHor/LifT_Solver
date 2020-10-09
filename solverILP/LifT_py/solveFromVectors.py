@@ -42,6 +42,7 @@ paramsMap["ALL_BASE_TRACKLET"]="1"
 paramsMap["OPTIMIZE_PATHS"]="0"
 paramsMap["MAX_TIMEGAP_BASE"]="60"
 paramsMap["MAX_TIMEGAP_LIFTED"]="60"
+paramsMap["CONTROL_STD_OUTPUT"]="0"
 paramsMap["OUTPUT_PATH"]="../data/exampleSolverILP/"
 
 
