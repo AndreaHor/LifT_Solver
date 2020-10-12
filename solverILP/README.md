@@ -65,6 +65,9 @@ parameter file. You find an example parameter file in directory `data/exampleSol
   - `CONTROL_OUTPUT_FILES = 0`  
     Expects 0/1 values. If set to 0, the solver does not produce any files except the file with final results. Default value is 1.
     
+  - `CONTROL_STD_OUTPUT = 0`  
+    Expects 0/1 values. If set to 0, the solver does not produce any std output except information about gurobi licence. Default value is 1.
+    
   - `SPARSIFY = 1`  
     Expects value 0/1. If set to 0, no sparsification is done, so parameters related to sparsificatioin are not needed. If set to 1, sparsification is done. Default and recommended value is 1.
     
