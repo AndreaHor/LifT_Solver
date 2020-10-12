@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <fstream>
 #include <utility>
+#include <unordered_map>
 #include "disjoint-paths/fileProcessingMethods.hxx"
 
 namespace disjointPaths {

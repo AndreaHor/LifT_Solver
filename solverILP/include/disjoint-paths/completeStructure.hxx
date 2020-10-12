@@ -20,6 +20,7 @@
 #include <pybind11/numpy.h>
 #include "disjoint-paths/vertexGroups.hxx"
 #include "disjoint-paths/fileProcessingMethods.hxx"
+#include <array>
 
 namespace disjointPaths {
 
@@ -69,7 +70,10 @@ public:
     void addEdgesFromFile(const std::string& fileName,PAR& params);
     void addEdgesFromMatrix(size_t time1,size_t time2,const py::array_t<double> inputMatrix);
     template<class PAR>
-    void addEdgesFromVectors(const py::array_t<size_t>edges,const py::array_t<double> costs,PAR& params);
+    void addEdgesFromVectors(const py::array_t<size_t>& edges,const py::array_t<double>& costs,PAR& params);
+    void addEdgesFromVectorsAll(const py::array_t<size_t>& edges,const py::array_t<double>& costs);
+    std::vector<bool> getGraphEdgeLabels(const std::vector<std::vector<size_t>>& paths) const;
+    std::vector<std::array<size_t,2>> getEdgeList() const;
     const VertexGroups<>& getVertexGroups(){
         return *pVertexGroups;
     }
@@ -87,9 +91,49 @@ private:
 
 };
 
+
+template<class T>
+inline void CompleteStructure<T>::addEdgesFromVectorsAll(const py::array_t<size_t>& edges,const py::array_t<double>& costs){
+    char delim=',';
+    VertexGroups<>& vg=*pVertexGroups;
+
+    const auto edgeVector=edges.unchecked<2>();
+    const std::size_t dim1=edgeVector.shape(0);
+    const std::size_t dim2=edgeVector.shape(1);
+    const auto costVector=costs.unchecked<1>();
+    const size_t dimOfCosts=costVector.shape(0);
+
+
+    if(dim2!=2){
+        std::string message="Wrong dimension of edge array, second dimension 2 expected";
+        throw std::invalid_argument(message);
+    }
+    if(dim1!=dimOfCosts){
+        std::string message="Dimension of edge array and edge costs do not match.";
+        throw std::invalid_argument(message);
+    }
+
+
+    for (size_t i=0;i<dim1;i++) {
+        size_t v=edgeVector(i,0);
+        size_t w=edgeVector(i,1);
+        double edgeCost=costVector(i);
+
+        if(v>vg.getMaxVertex()||w>vg.getMaxVertex()){
+            throw std::invalid_argument("Input edges contain vertices out of the range.");
+        }
+
+        completeGraph.insertEdge(v,w);
+        completeScore.push_back(edgeCost);
+
+    }
+}
+
+
+
 template<class T>
 template<class PAR>
-inline void CompleteStructure<T>::addEdgesFromVectors(const py::array_t<size_t> edges,const py::array_t<double> costs,PAR& params){
+inline void CompleteStructure<T>::addEdgesFromVectors(const py::array_t<size_t>& edges,const py::array_t<double>& costs,PAR& params){
     char delim=',';
     VertexGroups<>& vg=*pVertexGroups;
 
@@ -128,6 +172,8 @@ inline void CompleteStructure<T>::addEdgesFromVectors(const py::array_t<size_t> 
         }
     }
 }
+
+
 
 
 template<class T>
@@ -227,6 +273,29 @@ inline void CompleteStructure<T>::addEdgesFromFile(const std::string& fileName,P
 
     }
 }
+
+
+
+
+template<class T>
+inline std::vector<bool> CompleteStructure<T>::getGraphEdgeLabels(const std::vector<std::vector<size_t>>& paths) const{
+    std::vector<bool> labels=getEdgeLabels(completeGraph,paths);
+    //std::vector<bool> labels;
+    return labels;
+}
+
+template<class T>
+inline std::vector<std::array<size_t,2>> CompleteStructure<T>::getEdgeList() const{
+    std::vector<std::array<size_t,2>> edges(completeGraph.numberOfEdges());
+    for (size_t e = 0; e < completeGraph.numberOfEdges(); ++e) {
+        size_t v=completeGraph.vertexOfEdge(e,0);
+        size_t w=completeGraph.vertexOfEdge(e,1);
+        edges[e]={v,w};
+    }
+    return edges;
+}
+
+
 
 }//End of namespace
 #endif // COMPLETESTRUCTURE_HXX

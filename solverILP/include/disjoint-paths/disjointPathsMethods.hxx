@@ -248,7 +248,32 @@ template<class T,class PAR>
 
 }
 
+   template<class T>
+   std::vector<bool> getEdgeLabels(const T& graph,const std::vector<std::vector<size_t>>& paths){
+        char delim=',';
+        std::vector<bool> activeEdges(graph.numberOfEdges());
 
+
+        for (size_t i=0;i<paths.size();i++) {
+            std::vector<bool> activeVertices(graph.numberOfVertices());
+            for (size_t j = 0; j < paths.at(i).size(); ++j) {
+                activeVertices[paths.at(i).at(j)]=1;
+            }
+            for (size_t j = 0; j < paths.at(i).size(); ++j) {
+                size_t v=paths.at(i).at(j);
+                size_t n=graph.numberOfEdgesFromVertex(v);
+                for (int k = 0; k < n; ++k) {
+                    size_t w=graph.vertexFromVertex(v,k);
+                    if(activeVertices[w]){
+                        size_t e=graph.edgeFromVertex(v,k);
+                        activeEdges[e]=1;
+                    }
+
+                }
+            }
+        }
+        return activeEdges;
+    }
 
 
 

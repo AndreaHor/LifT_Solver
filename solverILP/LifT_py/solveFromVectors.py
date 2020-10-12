@@ -42,6 +42,7 @@ paramsMap["ALL_BASE_TRACKLET"]="1"
 paramsMap["OPTIMIZE_PATHS"]="0"
 paramsMap["MAX_TIMEGAP_BASE"]="60"
 paramsMap["MAX_TIMEGAP_LIFTED"]="60"
+paramsMap["MAX_TIMEGAP_COMPLETE"]="60"
 paramsMap["CONTROL_STD_OUTPUT"]="0"
 paramsMap["OUTPUT_PATH"]="../data/exampleSolverILP/"
 
@@ -66,14 +67,33 @@ completeGraphStructure=ldpPy.GraphStructure(timeFrames)
 edgeVector=np.array([[0,3],[0,4],[1,3],[1,4],[2,3],[2,4],[3,5],[3,6],[3,7],[4,5],[4,6],[4,7],[0,5],[0,6],[0,7],[1,5],[1,6],[1,7],[2,6],[2,7]])
 costVector=np.array([-2.2,-1,-1,-2.2,-1,-1,-2.2,-1,-1,-1,-2.2,-1,  -2.2,-1,-1, -1,-2.2,-1, -1,-2.2])
 
-#Adding edges to graph structure from vectors
-completeGraphStructure.add_edges_from_vectors(edgeVector,costVector,params)
+#Adding edges to graph structure from vectors. This method adds all edges regardles restrictions given in params.
+completeGraphStructure.add_edges_from_vectors_all(edgeVector,costVector)
 
-#Calling the solver on the given problem and get the resulting paths. 
+#Alternative method where either MAX_TIMEGAP_COMPLETE or the maximum from MAX_TIMEGAP_BASE and MAX_TIMEGAP_LIFTED applies for selection of edges. 
+#completeGraphStructure.add_edges_from_vectors(edgeVector,costVector,params)
+
+#Calling the solver on the given problem and get the resulting paths. Lifted graph and base graph are extracted from completeGraphStructure according to sparsification variables set in params.
 paths=ldpPy.solve_ilp(params,completeGraphStructure)
+
+#Obtaining edge labels for completeGraphStructure based on resulting paths. If method add_edges_from_vectors_all was used, indices of labels are guaranteed to agree with indices of edges in edgeVector.
+#Label 1 (True) is given iff endpoints of the respective edge belong to the same path.
+edgeLabels=completeGraphStructure.get_edge_labels(paths)
+
+#In case that method add_edges_from_vectors was used instead of add_edges_from_vectors_all, you can obtain list of edges as follows:
+#usedEdgesVector=completeGraphStructure.get_edge_list()
 
 #Saving the resulting paths into an output file. 
 ldpPy.write_output_to_file(paths,"../data/exampleSolverILP/my_python_output_vect.txt")
+
+
+#for edge in edgeLabels:
+#  print(edge)
+  
+#for edge in usedEdgesVector:
+#   for v in edge:
+#      print(v,end =" ")
+#   print("")
 
 #for path in paths:
 #  for v in path:
