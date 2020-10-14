@@ -13,7 +13,7 @@ namespace disjointPaths {
 class TwoGraphsInputStructure
 {
 public:
-    TwoGraphsInputStructure(const py::array_t<size_t>& baseEdges,const py::array_t<size_t>& liftedEdges,const  py::array_t<double>& baseCosts,const  py::array_t<double>& liftedCosts,const VertexGroups<>* pvg) {
+    TwoGraphsInputStructure(const py::array_t<size_t>& baseEdges,const py::array_t<size_t>& liftedEdges,const  py::array_t<double>& baseCosts,const  py::array_t<double>& liftedCosts,VertexGroups<>* pvg) {
         pBaseEdges=&baseEdges;
         pLiftedEdges=&liftedEdges;
         pBaseCosts=&baseCosts;
@@ -24,11 +24,11 @@ public:
     const py::array_t<size_t>* pLiftedEdges;
     const py::array_t<double>* pBaseCosts;
     const py::array_t<double>* pLiftedCosts;
-    const VertexGroups<>* myPvg;
+    VertexGroups<>* myPvg;
 
 
 };
 
 }
 
-#endif // TWOGRAPHSINPUTSTRUCTURE_HXX_
+#endif // TWO_GRAPHS_INPUT_STRUCTURE_HXX_
