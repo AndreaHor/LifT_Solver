@@ -50,6 +50,10 @@ PYBIND11_MODULE(disjointPathsPy, m) {
 
      m.def("solve_standard_disjoit_paths", &disjointPaths::solver_flow_only<>, "Solve standard disjoint paths problem");
 
+     m.def("get_base_edge_labels",&disjointPaths::getBaseEdgeLabels<std::vector<std::array<size_t,2>>>,"Given a vector of base edge vertices, vector of solution paths and the number of graph vertices, it returns labels to base edges.");
+
+     m.def("get_lifted_edge_labels",&disjointPaths::getLiftedEdgeLabels<std::vector<std::array<size_t,2>>>,"Given a vector of lifted edge vertices, vector of solution paths and the number of graph vertices, it returns labels to base edges.");
+
 
 
 

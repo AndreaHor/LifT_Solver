@@ -278,6 +278,68 @@ template<class T,class PAR>
 
 
 
+   template<class T>
+   std::vector<bool> getLiftedEdgeLabels(const T& edges,const std::vector<std::vector<size_t>>& paths,size_t numberOfVertices){
+        char delim=',';
+        std::vector<bool> activeEdges(edges.size());
+        std::vector<size_t> vertexLabels(numberOfVertices);
+
+
+
+        for (size_t i=0;i<paths.size();i++) {
+            for (size_t j = 0; j < paths.at(i).size(); ++j) {
+                vertexLabels[paths.at(i).at(j)]=i+1;
+            }
+       }
+        for(size_t i=0;i<activeEdges.size();i++){
+            size_t label1=vertexLabels[edges.at(i).at(0)];
+            size_t label2=vertexLabels[edges.at(i).at(1)];
+            if(label1==label2) activeEdges[i]=1;
+        }
+        return activeEdges;
+    }
+
+
+   template<class T>
+   std::vector<bool> getBaseEdgeLabels(const T& edges,const std::vector<std::vector<size_t>>& paths,size_t numberOfVertices){
+        char delim=',';
+        std::vector<bool> activeEdges(edges.size());
+        std::vector<size_t> vertexDescendants(numberOfVertices);
+        std::vector<bool> needCheck(numberOfVertices);
+
+        //TODO: make check if all inner base edges stored in vertexDescendants, were present in edges contrainer
+        size_t t=numberOfVertices+1;
+
+
+        for (size_t i=0;i<paths.size()-1;i++) {
+            for (size_t j = 0; j < paths.at(i).size(); ++j) {
+                size_t vertex=paths.at(i).at(j);
+                vertexDescendants[vertex]=paths.at(i).at(j+1);
+                needCheck[vertex]=1;
+            }
+            size_t lastVertex=*(paths.at(i).rbegin());
+            vertexDescendants[lastVertex]=t;
+       }
+        for(size_t i=0;i<activeEdges.size();i++){
+            size_t firstVertex=edges.at(i).at(0);
+            size_t secondVertex=edges.at(i).at(1);
+            size_t descendant=vertexDescendants[firstVertex];
+            if(descendant==secondVertex){
+                activeEdges[i]=1;
+                needCheck[firstVertex]=0;
+            }
+        }
+//        if(debug()){
+//            for(size_t i=0;i<needCheck.size();i++){
+//                if(needCheck[i]) //TODO exception
+//            }
+
+//        }
+
+        return activeEdges;
+    }
+
+
  template<class INSTANCE, class PAR>
    void createKnnBaseGraph(INSTANCE& instance,  PAR& parameters){
         parameters.getControlOutput()<<"Sparsify base graph"<<std::endl;
