@@ -77,6 +77,15 @@ completeGraphStructure.add_edges_from_vectors_all(edgeVector,costVector)
 #Calling the solver on the given problem and get the resulting paths. Lifted graph and base graph are extracted from completeGraphStructure according to sparsification variables set in params.
 paths=ldpPy.solve_ilp(params,completeGraphStructure)
 
+#Obtaining edge labels w.r.t. resulting paths. Label 1 (True) is given iff endpoints of the respective edge belong to the same path.
+edgeLabels=ldpPy.get_lifted_edge_labels(edgeVector,paths,numberOfVertices)
+
+#Saving the resulting paths into an output file. 
+ldpPy.write_output_to_file(paths,"../data/exampleSolverILP/my_python_output_vect.txt")
+
+
+
+#Alternative methods
 #Obtaining edge labels for completeGraphStructure based on resulting paths. If method add_edges_from_vectors_all was used, indices of labels are guaranteed to agree with indices of edges in edgeVector.
 #Label 1 (True) is given iff endpoints of the respective edge belong to the same path.
 #edgeLabels=completeGraphStructure.get_edge_labels(paths)
@@ -84,10 +93,6 @@ paths=ldpPy.solve_ilp(params,completeGraphStructure)
 #In case that method add_edges_from_vectors was used instead of add_edges_from_vectors_all, you can obtain list of edges as follows:
 #usedEdgesVector=completeGraphStructure.get_edge_list()
 
-edgeLabels=ldpPy.get_lifted_edge_labels(edgeVector,paths,numberOfVertices)
-
-#Saving the resulting paths into an output file. 
-ldpPy.write_output_to_file(paths,"../data/exampleSolverILP/my_python_output_vect.txt")
 
 
 #for edge in edgeLabels:

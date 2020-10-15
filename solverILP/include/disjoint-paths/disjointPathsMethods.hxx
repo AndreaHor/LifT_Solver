@@ -305,17 +305,17 @@ template<class T,class PAR>
         char delim=',';
         std::vector<bool> activeEdges(edges.size());
         std::vector<size_t> vertexDescendants(numberOfVertices);
-        std::vector<bool> needCheck(numberOfVertices);
+       // std::vector<bool> needCheck(numberOfVertices);
 
         //TODO: make check if all inner base edges stored in vertexDescendants, were present in edges contrainer
         size_t t=numberOfVertices+1;
 
 
-        for (size_t i=0;i<paths.size()-1;i++) {
-            for (size_t j = 0; j < paths.at(i).size(); ++j) {
+        for (size_t i=0;i<paths.size();i++) {
+            for (size_t j = 0; j < paths.at(i).size()-1; ++j) {
                 size_t vertex=paths.at(i).at(j);
                 vertexDescendants[vertex]=paths.at(i).at(j+1);
-                needCheck[vertex]=1;
+              //  needCheck[vertex]=1;
             }
             size_t lastVertex=*(paths.at(i).rbegin());
             vertexDescendants[lastVertex]=t;
@@ -326,7 +326,7 @@ template<class T,class PAR>
             size_t descendant=vertexDescendants[firstVertex];
             if(descendant==secondVertex){
                 activeEdges[i]=1;
-                needCheck[firstVertex]=0;
+              //  needCheck[firstVertex]=0;
             }
         }
 //        if(debug()){
