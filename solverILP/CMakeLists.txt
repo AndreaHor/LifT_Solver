@@ -10,7 +10,7 @@ add_definitions(-march=native)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 
-#set(PYBIND11_CPP_STANDARD -std=c++17)
+set(PYBIND11_CPP_STANDARD -std=c++14)
 set(PYBIND11_INSTALL ON CACHE BOOL "enable pybind11 bindings.")
 
 include_directories(include)
