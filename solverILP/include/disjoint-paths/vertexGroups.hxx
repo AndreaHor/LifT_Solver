@@ -97,8 +97,8 @@ inline void VertexGroups<T>::initFromVector(const std::vector<size_t>& verticesI
     std::vector<size_t> verticesInGroup;
     vToGroup=std::vector<size_t>();
     while(frameCounter<=maxTime){
-        while(inFrameCounter==verticesInFrames[frameCounter-1]){
-            groups[frameCounter]=verticesInGroup;
+        while(frameCounter<=maxTime&&inFrameCounter==verticesInFrames.at(frameCounter-1)){
+            groups.at(frameCounter)=verticesInGroup;
             inFrameCounter=0;
             frameCounter++;
             verticesInGroup=std::vector<size_t>();
@@ -118,16 +118,16 @@ inline void VertexGroups<T>::initFromVector(const std::vector<size_t>& verticesI
     verticesInGroup=std::vector<size_t>();
     verticesInGroup.push_back(s);
     vToGroup.push_back(0);
-    groups[0]=verticesInGroup;
+    groups.at(0)=verticesInGroup;
 
     verticesInGroup=std::vector<size_t>();
     verticesInGroup.push_back(t);
     vToGroup.push_back(frameCounter);
-    groups[frameCounter]=verticesInGroup;
+    groups.at(frameCounter)=verticesInGroup;
 
     for (int i = 0; i < groups.size(); ++i) {
         for (int j = 0; j < groups[i].size(); ++j) {
-         assert(vToGroup[groups[i][j]]==i);
+         assert(vToGroup.at(groups[i][j])==i);
         }
     }
 //    std::cout<<"max vertex "<<maxVertex<<std::endl;
