@@ -56,6 +56,7 @@ timeFrames=ldpPy.TimeFramesToVertices()
 #This array contains information about how many detections are in each time frame. The array must contain non-negative integer values. 
 #Numbering of graph vertices in time frames: Frame 1: 0,1,2; Frame 2: 3,4; Frame 3: 4,5,6
 vect= np.array([3, 2, 3])
+numberOfVertices=8;
 
 #Initalizing the structure from the given array.
 timeFrames.init_from_vector(vect)
@@ -76,15 +77,22 @@ completeGraphStructure.add_edges_from_vectors_all(edgeVector,costVector)
 #Calling the solver on the given problem and get the resulting paths. Lifted graph and base graph are extracted from completeGraphStructure according to sparsification variables set in params.
 paths=ldpPy.solve_ilp(params,completeGraphStructure)
 
+#Obtaining edge labels w.r.t. resulting paths. Label 1 (True) is given iff endpoints of the respective edge belong to the same path.
+edgeLabels=ldpPy.get_lifted_edge_labels(edgeVector,paths,numberOfVertices)
+
+#Saving the resulting paths into an output file. 
+ldpPy.write_output_to_file(paths,"../data/exampleSolverILP/my_python_output_vect.txt")
+
+
+
+#Alternative methods
 #Obtaining edge labels for completeGraphStructure based on resulting paths. If method add_edges_from_vectors_all was used, indices of labels are guaranteed to agree with indices of edges in edgeVector.
 #Label 1 (True) is given iff endpoints of the respective edge belong to the same path.
-edgeLabels=completeGraphStructure.get_edge_labels(paths)
+#edgeLabels=completeGraphStructure.get_edge_labels(paths)
 
 #In case that method add_edges_from_vectors was used instead of add_edges_from_vectors_all, you can obtain list of edges as follows:
 #usedEdgesVector=completeGraphStructure.get_edge_list()
 
-#Saving the resulting paths into an output file. 
-ldpPy.write_output_to_file(paths,"../data/exampleSolverILP/my_python_output_vect.txt")
 
 
 #for edge in edgeLabels:
