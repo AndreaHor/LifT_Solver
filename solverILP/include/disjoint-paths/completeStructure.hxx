@@ -31,14 +31,15 @@ struct CompleteStructure {
 public:
     template<class PAR>
     CompleteStructure(PAR & configParameters)
-{
+    {
 
         pVertexGroups=new VertexGroups<>(configParameters);
         VertexGroups<>& vg=*pVertexGroups;
-                maxTime=vg.getMaxTime();
+        maxTime=vg.getMaxTime();
 
         configParameters.getControlOutput()<<"max time "<<maxTime<<std::endl;
-                completeGraph=andres::graph::Digraph<>(vg.getMaxVertex()+1);
+        completeGraph=andres::graph::Digraph<>(vg.getMaxVertex()+1);
+        verticesScore=std::vector<double>(vg.getMaxVertex()+1);
 
         configParameters.getControlOutput()<<"cg vertices "<<completeGraph.numberOfVertices()<<std::endl;
         addEdgesFromFile(configParameters.getGraphFileName(),configParameters);
@@ -51,7 +52,9 @@ public:
         pVertexGroups(&vertexGroups)
 {
         VertexGroups<>& vg=*pVertexGroups;
+
         maxTime=vg.getMaxTime();
+        verticesScore=std::vector<double>(vg.getMaxVertex()+1);
        // std::cout<<"max time "<<maxTime<<std::endl;
         completeGraph=andres::graph::Digraph<>(vg.getMaxVertex()+1);
        // std::cout<<"cg vertices "<<completeGraph.numberOfVertices()<<std::endl;
@@ -72,6 +75,7 @@ public:
     template<class PAR>
     void addEdgesFromVectors(const py::array_t<size_t>& edges,const py::array_t<double>& costs,PAR& params);
     void addEdgesFromVectorsAll(const py::array_t<size_t>& edges,const py::array_t<double>& costs);
+    void setVerticesCosts(const std::vector<double>& costs);
     std::vector<bool> getGraphEdgeLabels(const std::vector<std::vector<size_t>>& paths) const;
     std::vector<std::array<size_t,2>> getEdgeList() const;
     const VertexGroups<>& getVertexGroups(){
@@ -81,6 +85,7 @@ public:
 
         andres::graph::Digraph<> completeGraph;
         std::vector<double> completeScore;
+        std::vector<double> verticesScore;
 
         size_t maxTime;
 
@@ -91,6 +96,12 @@ private:
 
 };
 
+
+template<class T>
+inline void CompleteStructure<T>::setVerticesCosts(const std::vector<double>& costs){
+    assert(costs.size()==verticesScore.size());
+    verticesScore.assign(costs.begin(),costs.end());
+}
 
 template<class T>
 inline void CompleteStructure<T>::addEdgesFromVectorsAll(const py::array_t<size_t>& edges,const py::array_t<double>& costs){
@@ -235,6 +246,13 @@ inline void CompleteStructure<T>::addEdgesFromFile(const std::string& fileName,P
         params.writeControlOutput();
         //Vertices that are not found have score=0. Appearance and disappearance cost are read here.
         while (std::getline(data, line) && !line.empty()) {
+            strings = split(line, delim);
+
+            unsigned int v = std::stoul(strings[0]);
+
+            double c = std::stod(strings[1]);
+            assert(v<verticesScore.size());
+            verticesScore[v]=c;
 
         }
 
