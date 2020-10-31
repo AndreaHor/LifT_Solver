@@ -294,7 +294,7 @@ template<class T,class PAR>
         for(size_t i=0;i<activeEdges.size();i++){
             size_t label1=vertexLabels[edges.at(i).at(0)];
             size_t label2=vertexLabels[edges.at(i).at(1)];
-            if(label1==label2) activeEdges[i]=1;
+            if(label1==label2&&label1!=0) activeEdges[i]=1;
         }
         return activeEdges;
     }
