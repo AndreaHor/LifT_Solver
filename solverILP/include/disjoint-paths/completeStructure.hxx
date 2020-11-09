@@ -171,11 +171,12 @@ inline void CompleteStructure<T>::addEdgesFromVectors(const py::array_t<size_t>&
         size_t w=edgeVector(i,1);
         double edgeCost=costVector(i);
 
+
+        if(v>vg.getMaxVertex()) break;
+
+        if(w>vg.getMaxVertex()) continue;
         size_t l0=vg.getGroupIndex(v);
         size_t l1=vg.getGroupIndex(w);
-
-        if(v>vg.getMaxVertex()||w>vg.getMaxVertex()) continue;
-
 
         if(l1-l0<=params.getMaxTimeGapComplete()){
             completeGraph.insertEdge(v,w);
